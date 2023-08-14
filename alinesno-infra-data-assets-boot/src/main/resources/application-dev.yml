@@ -1,0 +1,10 @@
+server:
+  port: 30401
+
+# spring 配置
+spring:
+  application:
+    name: alinesno-infra-ops-logback-boot
+  devtools:
+    restart:
+      enabled: true

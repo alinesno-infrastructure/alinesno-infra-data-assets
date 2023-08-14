@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.alinesno.infra.data</groupId>
+		<artifactId>alinesno-infra-data-assets-parent</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>alinesno-infra-data-assets-admin</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<npm.registry.url>http://registry.npm.taobao.org/</npm.registry.url>
+	</properties>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<!-- 使用maven打包，将npm 项目打入工程中 -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.13.4</version>
+				
+				<configuration>
+					<!-- 若不方便访问官网，可使用国内淘宝镜像-->
+					<nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+					<npmDownloadRoot>https://registry.npm.taobao.org/npm/-/</npmDownloadRoot>
+					<yarnDownloadRoot>http://data.linesno.com/web-tools/yarn/</yarnDownloadRoot>
+				</configuration>
+				
+				<executions>
+					<execution>
+						<id>install node and yarn</id>
+						<goals>
+							<goal>install-node-and-yarn</goal>
+						</goals>
+						<configuration>
+							<nodeVersion>v16.13.1</nodeVersion>
+							<yarnVersion>v1.22.10</yarnVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>yarn set registry</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>config set registry ${npm.registry.url}</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>yarn install</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>yarn run build</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>run build:prod</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/docker/dist</outputDirectory>
+							<outputDirectory>${project.build.directory}/classes/static</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/dist</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

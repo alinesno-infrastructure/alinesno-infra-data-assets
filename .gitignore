@@ -1,0 +1,52 @@
+_book
+.settings
+.project
+.classpath
+.springBeans
+target
+bin
+classpath-data.json
+sts-cache
+
+# Compiled class file
+*.class
+*.classpath
+*.factorypath
+*.flattened-pom.xml
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+hs_err_pid*
+
+# IDE Files #
+*.iml
+.idea
+.idea/
+.project
+.settings
+target
+.DS_Store
+/.metadata/
+
+# nodejs
+node
+dist
+node_modules
+
+/.vertx/
+
