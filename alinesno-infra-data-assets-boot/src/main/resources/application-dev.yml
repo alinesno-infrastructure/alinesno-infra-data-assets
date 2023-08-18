@@ -1,10 +1,10 @@
 server:
-  port: 30401
+  port: 30208
 
 # spring 配置
 spring:
   application:
-    name: alinesno-infra-ops-logback-boot
+    name: alinesno-infra-data-assets-boot
   devtools:
     restart:
       enabled: true

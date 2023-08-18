@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <!--定义日志文件的存储地址 勿在 assets 的配置中使用相对路径-->
+    <property name="LOG_HOME" value="/log" />
+    <!-- 控制台输出 -->
+    <!-- 彩色日志 -->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.assets.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.assets.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.assets.ExtendedWhitespaceThrowableProxyConverter" />
+    <!-- 彩色日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <appender name="CONSOLE" class="ch.qos.assets.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+            <!-- 设置字符集 -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <springProperty scope="context" name="watcher.appName" source="spring.application.name"/>
+    <springProperty scope="context" name="watcher.kafkaServers" source="alinesno.data.assets.kafkaServers"/>
+    <springProperty scope="context" name="watcher.env" source="alinesno.data.assets.env"/>
+    <springProperty scope="context" name="watcher.userKey" source="alinesno.data.assets.user-key"/>
+
+    <!-- log configure -->
+    <logger name="com.alinesno.infra" level="DEBUG" />
+
+    <!-- 使用kafka队列配置 -->
+    <appender name="ALINESNO-CLOUD-WATCHER" class="com.alinesno.infra.data.assets.core.assets.KafkaAppender">
+        <appName>${watcher.appName}</appName>
+        <kafkaHosts>${watcher.kafkaServers}</kafkaHosts>
+        <env>${watcher.env}</env>
+        <userKey>${watcher.userKey}</userKey>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ALINESNO-CLOUD-WATCHER"/>
+    </root>
+
+</configuration>
