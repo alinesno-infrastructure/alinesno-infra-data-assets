@@ -52,10 +52,10 @@ jobs:
       - name: local remote scp
         uses: cross-the-world/scp-pipeline@master
         with:
-          host: ${{ secrets.SERVER_BATA_HOST_02 }}
-          port: ${{ secrets.SERVER_BATA_PORT_02 }}
-          user: ${{ secrets.SERVER_BATA_USER_02 }}
-          pass: ${{ secrets.SERVER_BATA_KEY_02 }}
+          host: ${{ secrets.SERVER_BETA_HOST_02 }}
+          port: ${{ secrets.SERVER_BETA_PORT_02 }}
+          user: ${{ secrets.SERVER_BETA_USER_02 }}
+          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
           local: "./deploy/*"
           remote: /home/github-action/${{ env.PROJECT_NAME }}
 
@@ -64,10 +64,10 @@ jobs:
         env:
           WELCOME: "ssh pipeline"
         with:
-          host: ${{ secrets.SERVER_BATA_HOST_02 }}
-          port: ${{ secrets.SERVER_BATA_PORT_02 }}
-          user: ${{ secrets.SERVER_BATA_USER_02 }}
-          pass: ${{ secrets.SERVER_BATA_KEY_02 }}
+          host: ${{ secrets.SERVER_BETA_HOST_02 }}
+          port: ${{ secrets.SERVER_BETA_PORT_02 }}
+          user: ${{ secrets.SERVER_BETA_USER_02 }}
+          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
           connect_timeout: 30s
           script: |
             export PROJECT_NAME=${{ env.PROJECT_NAME }}
