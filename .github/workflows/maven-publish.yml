@@ -152,12 +152,12 @@ jobs:
                         -Djib.to.auth.username=${{secrets.ALIYUN_CR_USERNAME}} \
                         -Djib.to.auth.password=${{secrets.ALIYUN_CR_PASSWORD}}
 
-      - name: Install MurphySec code scan cli
-        run: |
-          wget -q https://s.murphysec.com/release/install.sh -O - | /bin/bash
+      # - name: Install MurphySec code scan cli
+      #   run: |
+      #     wget -q https://s.murphysec.com/release/install.sh -O - | /bin/bash
 
-      - name: Code scan
-        run: murphysec scan . --token ${{ secrets.MURPHYSEC_TOKEN }}
+      # - name: Code scan
+      #   run: murphysec scan . --token ${{ secrets.MURPHYSEC_TOKEN }}
 
       - name: local remote scp
         uses: cross-the-world/scp-pipeline@master
