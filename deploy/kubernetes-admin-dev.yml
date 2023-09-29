@@ -1,0 +1,64 @@
+# 创建service为${PROJECT_NAME}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${PROJECT_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  selector:
+    app: ${PROJECT_NAME}
+    release: canary
+  ports:
+    - name: http
+      targetPort: 80
+      port: 80
+
+---
+# 创建后端服务的pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${PROJECT_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${PROJECT_NAME}
+      release: canary
+  template:
+    metadata:
+      labels:
+        app: ${PROJECT_NAME}
+        release: canary
+    spec:
+      imagePullSecrets:
+        - name: aliyun-docker-registry
+      containers:
+        - name: ${PROJECT_NAME}
+          image: ${ALIYUN_CR_REGISTORY}/${ALIYUN_CR_NAMESPACE}/${PROJECT_NAME}:${VERSION}
+          ports:
+            - name: http
+              containerPort: 80
+
+---
+# 创建域名服务
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-${PROJECT_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: ${PROJECT_NAME}
+                port:
+                  number: 80

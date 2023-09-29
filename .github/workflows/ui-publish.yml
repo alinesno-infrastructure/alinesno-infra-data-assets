@@ -1,0 +1,82 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      # 版本管理
+      PROJECT_NAME: 'alinesno-infra-data-assets-admin'
+      PRO_VERSION: '1.0.0-SNAPSHOT'
+      CURRENT_PROFIRE: 'dev'
+      BUILD_NUMBER: ${{ github.run_number }}
+
+      # 容器镜像
+      ALIYUN_CR_REGISTORY: 'registry.cn-shenzhen.aliyuncs.com'
+      ALIYUN_CR_NAMESPACE: 'alinesno-infra-platform'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.1
+
+      - name: Install dependencies
+        run: |
+          cd ${{ env.PROJECT_NAME }}
+          npm install
+          npm run build:prod
+
+      - name: Login to Aliyun Container Registry (ACR)
+        uses: aliyun/acr-login@v1
+        with:
+          login-server: ${{ env.ALIYUN_CR_REGISTORY }}
+          region-id: cn-shenzhen  # 3
+          username: "${{ secrets.ALIYUN_CR_USERNAME }}"
+          password: "${{ secrets.ALIYUN_CR_PASSWORD }}"
+
+      - name: Build Docker image
+        run: |
+          cd ${{ env.PROJECT_NAME }}
+          cp -r dist ./docker/
+          docker build -t ${{ env.ALIYUN_CR_REGISTORY }}/${{ env.ALIYUN_CR_NAMESPACE }}/${{ env.PROJECT_NAME }}:${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }} ./docker
+          docker push ${{ env.ALIYUN_CR_REGISTORY }}/${{ env.ALIYUN_CR_NAMESPACE }}/${{ env.PROJECT_NAME }}:${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }}
+
+      - name: local remote scp
+        uses: cross-the-world/scp-pipeline@master
+        with:
+          host: ${{ secrets.SERVER_BATA_HOST_02 }}
+          port: ${{ secrets.SERVER_BATA_PORT_02 }}
+          user: ${{ secrets.SERVER_BATA_USER_02 }}
+          pass: ${{ secrets.SERVER_BATA_KEY_02 }}
+          local: "./deploy/*"
+          remote: /home/github-action/${{ env.PROJECT_NAME }}
+
+      - name: SSH Pipelines
+        uses: cross-the-world/ssh-pipeline@master
+        env:
+          WELCOME: "ssh pipeline"
+        with:
+          host: ${{ secrets.SERVER_BATA_HOST_02 }}
+          port: ${{ secrets.SERVER_BATA_PORT_02 }}
+          user: ${{ secrets.SERVER_BATA_USER_02 }}
+          pass: ${{ secrets.SERVER_BATA_KEY_02 }}
+          connect_timeout: 30s
+          script: |
+            export PROJECT_NAME=${{ env.PROJECT_NAME }}
+            export VERSION=${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }}
+
+            export ALIYUN_CR_REGISTORY=${{ env.ALIYUN_CR_REGISTORY }}
+            export ALIYUN_CR_NAMESPACE=${{ env.ALIYUN_CR_NAMESPACE }}
+            export NAMESPACE=${{ secrets.K8S_NAMESPACE }}
+
+            export INFRA_DEV_DOMAIN=${{ secrets.INFRA_BETA_BASE_DOMAIN }}
+
+            envsubst < /home/github-action/${{ env.PROJECT_NAME }}/kubernetes-admin-${{ env.CURRENT_PROFIRE }}.yml | kubectl apply -f -

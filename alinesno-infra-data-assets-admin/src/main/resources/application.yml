@@ -1,0 +1,9 @@
+server:
+  port: 27001
+
+spring:
+  application:
+    name: alinesno-infra-platform-console
+
+alinesno.infra:
+  backend: http://vue.ruoyi.vip/

@@ -17,6 +17,11 @@
 
         <!-- 引用服务 -->
 		<dependency>
+			<groupId>com.alinesno.infra.common</groupId>
+			<artifactId>alinesno-infra-common-web-api-sso</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-domain</artifactId>
 			<version>${revision}</version>

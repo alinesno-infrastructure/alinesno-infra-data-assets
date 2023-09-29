@@ -1,0 +1,148 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main", "master-rule" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  schedule:
+    - cron: '22 10 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu' # See 'Supported distributions' for available options
+        java-version: '17'
+
+    - name: Create Nexus Config File
+      run: |
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > nexus-config.xml
+          echo '<settings>' >> nexus-config.xml
+
+          echo '  <servers>' >> nexus-config.xml
+          echo '    <server>' >> nexus-config.xml
+          echo '      <id>rdc-releases</id>' >> nexus-config.xml
+          echo '      <username>${{ secrets.NEXUS_USERNAME }}</username>' >> nexus-config.xml
+          echo '      <password>${{ secrets.NEXUS_PASSWORD }}</password>' >> nexus-config.xml
+          echo '    </server>' >> nexus-config.xml
+          echo '    <server>' >> nexus-config.xml
+          echo '      <id>rdc-snapshots</id>' >> nexus-config.xml
+          echo '      <username>${{ secrets.NEXUS_USERNAME }}</username>' >> nexus-config.xml
+          echo '      <password>${{ secrets.NEXUS_PASSWORD }}</password>' >> nexus-config.xml
+          echo '    </server>' >> nexus-config.xml
+          echo '  </servers>' >> nexus-config.xml
+
+          echo '  <mirrors>' >> nexus-config.xml
+          echo '    <mirror>' >> nexus-config.xml
+          echo '      <id>mirror</id>' >> nexus-config.xml
+          echo '      <mirrorOf>central,jcenter,!rdc-releases,!rdc-snapshots</mirrorOf>' >> nexus-config.xml
+          echo '      <name>mirror</name>' >> nexus-config.xml
+          echo '      <url>https://repo.maven.apache.org/maven2</url>' >> nexus-config.xml
+          echo '    </mirror>' >> nexus-config.xml
+          echo '    <mirror>' >> nexus-config.xml
+          echo '      <id>rdc-releases</id>' >> nexus-config.xml
+          echo '      <mirrorOf>releases</mirrorOf>' >> nexus-config.xml
+          echo '      <url>${{ secrets.NEXUS_REPOSITORY_RELEASE }}</url>' >> nexus-config.xml
+          echo '    </mirror>' >> nexus-config.xml
+          echo '    <mirror>' >> nexus-config.xml
+          echo '      <id>rdc-snapshots</id>' >> nexus-config.xml
+          echo '      <mirrorOf>snapshots</mirrorOf>' >> nexus-config.xml
+          echo '      <url>${{ secrets.NEXUS_REPOSITORY_SNAPSHOT }}</url>' >> nexus-config.xml
+          echo '    </mirror>' >> nexus-config.xml
+          echo '  </mirrors>' >> nexus-config.xml
+
+          echo '  <profiles>' >> nexus-config.xml
+          echo '    <profile>' >> nexus-config.xml
+          echo '      <id>rdc</id>' >> nexus-config.xml
+          echo '      <properties>' >> nexus-config.xml
+          echo '        <altReleaseDeploymentRepository>' >> nexus-config.xml
+          echo '          rdc-releases::default::${{ secrets.NEXUS_REPOSITORY_RELEASE }}' >> nexus-config.xml
+          echo '        </altReleaseDeploymentRepository>' >> nexus-config.xml
+          echo '        <altSnapshotDeploymentRepository>' >> nexus-config.xml
+          echo '          rdc-snapshots::default::${{ secrets.NEXUS_REPOSITORY_SNAPSHOT }}' >> nexus-config.xml
+          echo '        </altSnapshotDeploymentRepository>' >> nexus-config.xml
+          echo '      </properties>' >> nexus-config.xml
+          echo '      <repositories>' >> nexus-config.xml
+          echo '        <repository>' >> nexus-config.xml
+          echo '          <id>central</id>' >> nexus-config.xml
+          echo '          <url>https://repo.maven.apache.org/maven2</url>' >> nexus-config.xml
+          echo '          <releases>' >> nexus-config.xml
+          echo '            <enabled>true</enabled>' >> nexus-config.xml
+          echo '          </releases>' >> nexus-config.xml
+          echo '          <snapshots>' >> nexus-config.xml
+          echo '            <enabled>false</enabled>' >> nexus-config.xml
+          echo '          </snapshots>' >> nexus-config.xml
+          echo '        </repository>' >> nexus-config.xml
+          echo '        <repository>' >> nexus-config.xml
+          echo '          <id>snapshots</id>' >> nexus-config.xml
+          echo '          <url>https://repo.maven.apache.org/maven2</url>' >> nexus-config.xml
+          echo '          <releases>' >> nexus-config.xml
+          echo '            <enabled>false</enabled>' >> nexus-config.xml
+          echo '          </releases>' >> nexus-config.xml
+          echo '          <snapshots>' >> nexus-config.xml
+          echo '            <enabled>true</enabled>' >> nexus-config.xml
+          echo '          </snapshots>' >> nexus-config.xml
+          echo '        </repository>' >> nexus-config.xml
+          echo '        <repository>' >> nexus-config.xml
+          echo '          <id>rdc-releases</id>' >> nexus-config.xml
+          echo '          <url>${{ secrets.NEXUS_REPOSITORY_RELEASE }}</url>' >> nexus-config.xml
+          echo '          <releases>' >> nexus-config.xml
+          echo '            <enabled>true</enabled>' >> nexus-config.xml
+          echo '          </releases>' >> nexus-config.xml
+          echo '          <snapshots>' >> nexus-config.xml
+          echo '            <enabled>false</enabled>' >> nexus-config.xml
+          echo '          </snapshots>' >> nexus-config.xml
+          echo '        </repository>' >> nexus-config.xml
+          echo '        <repository>' >> nexus-config.xml
+          echo '          <id>rdc-snapshots</id>' >> nexus-config.xml
+          echo '          <url>${{ secrets.NEXUS_REPOSITORY_SNAPSHOT }}</url>' >> nexus-config.xml
+          echo '          <releases>' >> nexus-config.xml
+          echo '            <enabled>false</enabled>' >> nexus-config.xml
+          echo '          </releases>' >> nexus-config.xml
+          echo '          <snapshots>' >> nexus-config.xml
+          echo '            <enabled>true</enabled>' >> nexus-config.xml
+          echo '          </snapshots>' >> nexus-config.xml
+          echo '        </repository>' >> nexus-config.xml
+          echo '      </repositories> ' >> nexus-config.xml
+          echo '    </profile>' >> nexus-config.xml
+          echo '  </profiles>' >> nexus-config.xml
+
+          echo '  <activeProfiles>' >> nexus-config.xml
+          echo '    <activeProfile>rdc</activeProfile>' >> nexus-config.xml
+          echo '  </activeProfiles>' >> nexus-config.xml
+          echo '</settings>' >> nexus-config.xml
+
+          mv nexus-config.xml /usr/share/apache-maven-3.8.8/conf/settings.xml
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
