@@ -77,6 +77,6 @@ jobs:
             export ALIYUN_CR_NAMESPACE=${{ env.ALIYUN_CR_NAMESPACE }}
             export NAMESPACE=${{ secrets.K8S_NAMESPACE }}
 
-            export INFRA_DEV_DOMAIN=${{ secrets.INFRA_BETA_BASE_DOMAIN }}
+            export INFRA_DEV_DOMAIN=${{ secrets.INFRA_DEV_DATA_DOMAIN }}
 
             envsubst < /home/github-action/${{ env.PROJECT_NAME }}/kubernetes-admin-${{ env.CURRENT_PROFIRE }}.yml | kubectl apply -f -
