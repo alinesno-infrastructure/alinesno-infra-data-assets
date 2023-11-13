@@ -19,6 +19,18 @@ spring:
     restart:
       enabled: true
 
+actable:
+  table:
+    auto: update
+  model:
+    pack: com.alinesno.infra.data.assets.entity;
+  database:
+    type: mysql
+  index:
+    prefix: alinesno_data_assets_idx_
+  unique:
+    prefix: alinesno_data_assets_uni_
+
 # sa-token配置
 sa-token:
   token-name: satoken

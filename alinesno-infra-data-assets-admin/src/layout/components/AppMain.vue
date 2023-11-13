@@ -25,7 +25,6 @@ const tagsViewStore = useTagsViewStore()
   height: calc(100vh - 90px);
   width: 100%;
   position: relative;
-  overflow: hidden;
 }
 
 .fixed-header + .app-main {
