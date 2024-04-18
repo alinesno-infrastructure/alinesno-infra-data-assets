@@ -22,6 +22,12 @@
 			<version>${revision}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.alinesno.infra.common</groupId>
+			<artifactId>alinesno-infra-common-web-api-log</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
 		<!-- fastjson -->
 		<dependency>
 				<groupId>com.alibaba</groupId>
