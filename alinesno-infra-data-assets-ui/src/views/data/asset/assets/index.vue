@@ -69,7 +69,7 @@
           </el-table-column>
 
           <!-- 业务字段-->
-          <el-table-column label="指令名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
+          <el-table-column label="名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
             <template #default="scope">
               <div>
                 {{ scope.row.promptName }}
@@ -79,19 +79,19 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="使用次数" align="center" width="100" key="useCount" prop="useCount" v-if="columns[2].visible" :show-overflow-tooltip="true">
+          <el-table-column label="领域" align="center" width="200" key="promptType" prop="promptType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="数据量" align="center" width="100" key="useCount" prop="useCount" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
               <span v-if="scope.row.useCount">{{ scope.row.useCount }}</span>
               <span v-else>0</span>
             </template>
           </el-table-column>
-          <el-table-column label="Prompt配置" align="center" width="130" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
+          <el-table-column label="数据存储" align="center" width="130" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
               <el-button type="primary" text bg icon="Paperclip" @click="configPrompt(scope.row)">配置</el-button>
             </template>
           </el-table-column>
-          <el-table-column label="类型" align="center" width="200" key="promptType" prop="promptType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <!-- <el-table-column label="数据来源" align="center" key="dataSourceApi" prop="dataSourceApi" v-if="columns[4].visible" width="200" /> -->
+          <el-table-column label="数据来源" align="center" key="dataSourceApi" prop="dataSourceApi" v-if="columns[4].visible" width="200" />
           <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[5].visible" >
             <template #default="scope">
               <el-switch
