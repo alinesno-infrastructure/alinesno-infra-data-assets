@@ -30,6 +30,8 @@
         <module>alinesno-infra-data-assets-adapter</module> <!-- 适配层 -->
         <module>alinesno-infra-data-assets-gateway</module>  <!-- 接口服务 -->
         <module>alinesno-infra-data-assets-client</module>  <!-- 对外引用 -->
+
+        <module>alinesno-infra-data-assets-initialize</module> <!-- 初步化数据和示例 -->
         <module>alinesno-infra-data-assets-boot</module>  <!-- 启动服务 -->
 
         <!-- 前端服务
