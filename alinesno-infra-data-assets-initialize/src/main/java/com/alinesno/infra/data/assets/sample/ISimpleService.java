@@ -29,4 +29,6 @@ public interface ISimpleService {
      * 示例数据生命周期
      */
     void dataLifeCycle();
+
+    void label();
 }
