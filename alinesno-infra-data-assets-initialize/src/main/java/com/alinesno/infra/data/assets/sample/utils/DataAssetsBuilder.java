@@ -2,6 +2,8 @@ package com.alinesno.infra.data.assets.sample.utils;
 
 import cn.hutool.core.util.IdUtil;
 import com.alinesno.infra.data.assets.entity.AssetCatalogEntity;
+import com.alinesno.infra.data.assets.entity.LabelEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -665,4 +667,84 @@ public class DataAssetsBuilder {
         child.setRemark(desc);
         return child;
     }
+
+    public static List<LabelEntity> initializeProductionLabels() {
+        List<LabelEntity> labels = new ArrayList<>();
+
+        // 初始化9个生产实例的数据标签
+        LabelEntity label1 = new LabelEntity();
+        label1.setId(IdUtil.getSnowflakeNextId());
+        label1.setLabelName("服务器型号");
+        label1.setLabelKey("server_model");
+        label1.setLabelValue("server_model");
+        label1.setLabelType("硬件");
+        labels.add(label1);
+
+        LabelEntity label2 = new LabelEntity();
+        label2.setId(IdUtil.getSnowflakeNextId());
+        label2.setLabelName("操作系统版本");
+        label2.setLabelKey("os_version");
+        label2.setLabelValue("os_version");
+        label2.setLabelType("软件");
+        labels.add(label2);
+
+        LabelEntity label3 = new LabelEntity();
+        label3.setId(IdUtil.getSnowflakeNextId());
+        label3.setLabelName("部署区域");
+        label3.setLabelKey("deployment_region");
+        label3.setLabelValue("deployment_region");
+        label3.setLabelType("地理位置");
+        labels.add(label3);
+
+        LabelEntity label4 = new LabelEntity();
+        label4.setId(IdUtil.getSnowflakeNextId());
+        label4.setLabelName("服务端口");
+        label4.setLabelKey("service_port");
+        label4.setLabelValue("service_port");
+        label4.setLabelType("网络");
+        labels.add(label4);
+
+        LabelEntity label5 = new LabelEntity();
+        label5.setId(IdUtil.getSnowflakeNextId());
+        label5.setLabelName("数据库类型");
+        label5.setLabelKey("database_type");
+        label5.setLabelValue("database_type");
+        label5.setLabelType("数据库");
+        labels.add(label5);
+
+        LabelEntity label6 = new LabelEntity();
+        label6.setId(IdUtil.getSnowflakeNextId());
+        label6.setLabelName("应用版本");
+        label6.setLabelKey("app_version");
+        label6.setLabelValue("app_version");
+        label6.setLabelType("软件");
+        labels.add(label6);
+
+        LabelEntity label7 = new LabelEntity();
+        label7.setId(IdUtil.getSnowflakeNextId());
+        label7.setLabelName("负载均衡器");
+        label7.setLabelKey("load_balancer");
+        label7.setLabelValue("load_balancer");
+        label7.setLabelType("网络");
+        labels.add(label7);
+
+        LabelEntity label8 = new LabelEntity();
+        label8.setId(IdUtil.getSnowflakeNextId());
+        label8.setLabelName("存储容量");
+        label8.setLabelKey("storage_capacity");
+        label8.setLabelValue("storage_capacity");
+        label8.setLabelType("硬件");
+        labels.add(label8);
+
+        LabelEntity label9 = new LabelEntity();
+        label9.setId(IdUtil.getSnowflakeNextId());
+        label9.setLabelName("安全组");
+        label9.setLabelKey("security_group");
+        label9.setLabelValue("security_group");
+        label9.setLabelType("网络安全");
+        labels.add(label9);
+
+        return labels;
+    }
+
 }
