@@ -21,9 +21,9 @@
               ref="deptTreeRef"
               node-key="id"
               highlight-current
-              default-expand-all
               @node-click="handleNodeClick"
           />
+              <!-- default-expand-all -->
         </div>
       </el-col>
 
