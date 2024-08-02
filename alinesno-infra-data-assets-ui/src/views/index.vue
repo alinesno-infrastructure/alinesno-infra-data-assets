@@ -10,11 +10,6 @@
           <div class="icon">
             <div class="title">
                   {{ currentEnvClusterObj.appName }}
-              <div class="cluster-info">
-                <span><i class="el-icon-monitor"></i>
-                  {{ currentEnvClusterObj.clusterName }}
-                </span>
-              </div>
             </div>
             <div class="title-desc">
                   {{ currentEnvClusterObj.desc }}
@@ -47,7 +42,6 @@ import OperationWorkspaceService from './operation-workspace/service.vue'
 
 const currentEnvClusterObj = ref({
   appName : '数据资产管理服务'  , 
-  clusterName: '可靠性消息中间件集成'  , 
   apiServerUrl: 'http://portal.infra.linesno.com' , 
   desc: '数据资产的管理、存储和访问。该环境包含了公司重要的数据资产，确保数据的安全性、可靠性和高效性。'
 }) 
