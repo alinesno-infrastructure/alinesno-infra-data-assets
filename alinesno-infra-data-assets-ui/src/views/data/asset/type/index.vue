@@ -59,16 +59,16 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column prop="description" label="类型描述" ></el-table-column>
-      <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
-      <el-table-column prop="hasStatus" label="状态" width="100">
+      <el-table-column prop="remark" label="类型描述" ></el-table-column>
+      <el-table-column align="center" prop="orderNum" label="排序" width="200"></el-table-column>
+      <el-table-column align="center" prop="hasStatus" label="状态" width="100">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.hasStatus" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
+          <span>{{ parseTime(scope.row.addTime ) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
@@ -162,7 +162,7 @@ const loading = ref(true);
 const showSearch = ref(true);
 const title = ref("");
 const deptOptions = ref([]);
-const isExpandAll = ref(true);
+const isExpandAll = ref(false);
 const refreshTable = ref(true);
 
 const data = reactive({
