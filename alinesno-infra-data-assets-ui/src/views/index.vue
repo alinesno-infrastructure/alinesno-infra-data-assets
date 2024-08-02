@@ -43,7 +43,7 @@ import OperationWorkspaceService from './operation-workspace/service.vue'
 const currentEnvClusterObj = ref({
   appName : '数据资产管理服务'  , 
   apiServerUrl: 'http://portal.infra.linesno.com' , 
-  desc: '数据资产的管理、存储和访问。该环境包含了公司重要的数据资产，确保数据的安全性、可靠性和高效性。'
+  desc: '数据经采集、集成、加工等流程处理完成后，可以在数据资产模块进行系统化管理'
 }) 
 
 </script>
