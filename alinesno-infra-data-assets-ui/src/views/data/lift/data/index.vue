@@ -37,27 +37,22 @@
                </el-table-column>
 
                <!-- 业务字段-->
-               <el-table-column label="应用名称" align="center" key="dbName" prop="dbName" v-if="columns[0].visible" />
-               <el-table-column label="应用描述" align="center" key="dbDesc" prop="dbDesc" v-if="columns[1].visible" :show-overflow-tooltip="true" />
-               <el-table-column label="表数据量" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
-               <el-table-column label="类型" align="center" key="dbType" prop="dbType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-               <el-table-column label="应用地址" align="center" key="jdbcUrl" prop="jdbcUrl" v-if="columns[4].visible" width="120" />
+               <el-table-column label="资源目录" align="center" key="dbName" prop="dbName" v-if="columns[0].visible" />
+               <el-table-column label="资源路径" align="center" key="dbDesc" prop="dbDesc" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+               <el-table-column label="回收条件" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
+               <el-table-column label="回收策略" align="center" key="dbType" prop="dbType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+               <el-table-column label="到期时间" align="center" key="dbType" prop="dbType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+               <el-table-column label="数据量" align="center" key="jdbcUrl" prop="jdbcUrl" v-if="columns[4].visible" width="120" />
                <el-table-column label="状态" align="center" key="hasStatus" v-if="columns[5].visible" />
-
-               <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
-                  <template #default="scope">
-                     <span>{{ parseTime(scope.row.addTime) }}</span>
-                  </template>
-               </el-table-column>
 
                <!-- 操作字段  -->
                <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
                   <template #default="scope">
-                     <el-tooltip content="修改" placement="top" v-if="scope.row.ApplicationId !== 1">
+                     <el-tooltip content="查看数据" placement="top" v-if="scope.row.ApplicationId !== 1">
                         <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
                            v-hasPermi="['system:Application:edit']"></el-button>
                      </el-tooltip>
-                     <el-tooltip content="删除" placement="top" v-if="scope.row.ApplicationId !== 1">
+                     <el-tooltip content="取消" placement="top" v-if="scope.row.ApplicationId !== 1">
                         <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
                            v-hasPermi="['system:Application:remove']"></el-button>
                      </el-tooltip>
