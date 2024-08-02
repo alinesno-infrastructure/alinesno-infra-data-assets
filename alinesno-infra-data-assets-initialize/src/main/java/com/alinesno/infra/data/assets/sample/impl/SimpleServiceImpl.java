@@ -1,14 +1,17 @@
 package com.alinesno.infra.data.assets.sample.impl;
 
 import com.alinesno.infra.data.assets.entity.AssetCatalogEntity;
+import com.alinesno.infra.data.assets.entity.LabelEntity;
 import com.alinesno.infra.data.assets.sample.ISimpleService;
 import com.alinesno.infra.data.assets.sample.utils.DataAssetsBuilder;
 import com.alinesno.infra.data.assets.service.IAssetCatalogService;
+import com.alinesno.infra.data.assets.service.ILabelService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -17,6 +20,9 @@ public class SimpleServiceImpl implements ISimpleService {
 
     @Autowired
     private IAssetCatalogService catalogService;
+
+    @Autowired
+    private ILabelService labelService;
 
     @Override
     public void catalog() {
@@ -47,5 +53,13 @@ public class SimpleServiceImpl implements ISimpleService {
     @Override
     public void dataLifeCycle() {
 
+    }
+
+    @Override
+    public void label() {
+        if(labelService.count(new LambdaQueryWrapper<>()) == 0){
+            List<LabelEntity> labelList = DataAssetsBuilder.initializeProductionLabels() ;
+            labelService.saveBatch(labelList) ;
+        }
     }
 }
