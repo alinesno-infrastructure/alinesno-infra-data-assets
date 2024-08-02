@@ -140,8 +140,8 @@ public class CommonLoginController {
         Menu assetMenu = new Menu("Asset", "/asset", false, "noRedirect", "Layout", true, new Menu.Meta("资产管理", "druid", false, null), List.of(
                 new Menu("Asset", "data/asset/assets/index", false, false , "data/asset/assets/index", new Menu.Meta("资产管理", "pdf", false, null)),
                 new Menu("Type", "data/asset/type/index", false, false , "data/asset/type/index", new Menu.Meta("分类管理", "redis", false, null)),
-                new Menu("Access", "data/asset/access/index", false, false , "data/asset/access/index", new Menu.Meta("接入管理", "peoples", false, null)),
-                new Menu("Security", "data/asset/security/index", false, false , "data/asset/security/index", new Menu.Meta("安全管理", "monitor", false, null))
+                new Menu("Access", "data/asset/access/index", false, false , "data/asset/access/index", new Menu.Meta("调用管理", "peoples", false, null)),
+                new Menu("Security", "data/asset/security/index", false, false , "data/asset/security/index", new Menu.Meta("安全策略", "monitor", false, null))
         ));
 
         Menu assetBloodMenu = new Menu("Blood", "/blood", false, "noRedirect", "Layout", true, new Menu.Meta("数据血缘", "logininfor", false, null), List.of(
@@ -150,7 +150,7 @@ public class CommonLoginController {
         ));
 
         Menu assetLifeMenu = new Menu("Life", "/lift", false, "noRedirect", "Layout", true, new Menu.Meta("生命周期", "excel", false, null), List.of(
-                new Menu("Data", "data/lift/data/index", false, false , "data/asset/assets/index", new Menu.Meta("数据生命", "excel", false, null)),
+                new Menu("Data", "data/lift/data/index", false, false , "data/lift/data/index", new Menu.Meta("数据生命", "excel", false, null)),
                 new Menu("Config", "data/lift/config/index", false, false , "data/asset/type/index", new Menu.Meta("周期配置", "eye", false, null))
         ));
 
