@@ -9,7 +9,7 @@
           <div class="panel-body" style="height: auto;position: relative;">
             <div class="direct-box">
               <ul>
-                <li class="box-item" v-for="item in directContent" :key="item">
+                <li class="box-item" v-for="item in dataAssetManagementBenefits" :key="item">
                   <div class="dire-panel">
                     <div class="panel-title">
                       <i class="dire-panel-icon" :class="item.icon" :alt="item.name" />
@@ -32,7 +32,7 @@
           <div class="panel-body" style="height: auto;position: relative;">
             <div class="acp-app-list">
               <ul>
-                <li class="app-items" style="width:100%" v-for="item in apps" :key="item">
+                <li class="app-items" style="width:100%" v-for="item in dataAssetScenarios" :key="item">
                   <div class="app-info">
                     <div class="app-item-title">
                       <i :class="item.icon" :alt="item.name" />
@@ -54,18 +54,18 @@
 
 <script setup>
 
-const directContent = ref([
-  { icon: 'fa-brands fa-slack', name: '智能鉴黄', desc: '识别文本中的色情行为描述、色情资源链接、低俗交友、污秽文爱等涉黄内容' },
-  { icon: 'fa-solid fa-list-check', name: '违禁违规', desc: '识别暴力行为、恐怖描述、赌博、毒品、枪支弹药等违禁文字内容' },
-  { icon: 'fa-solid fa-at', name: '恶意推广', desc: '识别带有售卖意向的软文广告、微信/QQ/联系方式等违规广告，支持包含符号、图标等变异广告' },
-  { icon: 'fa-solid fa-list-check', name: '低俗辱骂', desc: '识别文本中的侮辱谩骂、人身攻击、消极宣泄等不良内容' },
-  { icon: 'fa-solid fa-file-word', name: '低质灌水', desc: '识别网络社区常见的乱码、水帖、刷屏等无意义的灌水信息' },
+const dataAssetManagementBenefits = ref([
+  { icon: 'fa-solid fa-chart-line', name: '提升决策效率', desc: '通过高质量的数据支持，帮助组织更快做出明智的业务决策' },
+  { icon: 'fa-solid fa-box-open', name: '增强数据可见性', desc: '提供全面的数据视图，使用户能够轻松找到所需的特定数据' },
+  { icon: 'fa-solid fa-sort-amount-down-alt', name: '优化数据治理', desc: '简化数据管理流程，提高数据质量和一致性' },
+  { icon: 'fa-solid fa-lock', name: '加强安全保障', desc: '实施严格的安全措施，保护敏感信息免受未授权访问' },
+  { icon: 'fa-solid fa-network-wired', name: '促进协作共享', desc: '构建跨部门合作的环境，确保数据在组织内部顺畅流通' }
 ]);
 
-const apps = ref([
-  { icon: 'fa-solid fa-eye-slash', name: '智能内容审核', desc: '识别文章内容中的违规信息、低俗内容、暴力内容等敏感信息' },
-  { icon: 'fa-solid fa-user-shield', name: '注册信息检测', desc: '识别注册信息中的违规内容、虚假信息等不当信息' },
-  { icon: 'fa-solid fa-comment-slash', name: '评论过滤系统', desc: '过滤用户评论中的不良言论、侮辱性内容、广告等信息' },
+const dataAssetScenarios = ref([
+  { icon: 'fa-solid fa-chart-line', name: '业务决策支持', desc: '通过分析历史数据趋势，为管理层提供决策依据，优化业务策略' },
+  { icon: 'fa-solid fa-sort-amount-down-alt', name: '数据质量提升', desc: '监测和改善数据质量，确保数据的准确性和完整性' },
+  { icon: 'fa-solid fa-lock', name: '数据安全防护', desc: '实施数据访问控制和加密措施，保护敏感数据不被未授权访问' },
 ]);
 
 </script>
