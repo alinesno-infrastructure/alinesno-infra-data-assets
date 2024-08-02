@@ -70,6 +70,16 @@ public class AssetCatalogEntity extends InfraBaseEntity {
     @ColumnComment("父类ID")
     private Long parentId;
 
+    @TableField("level")
+    @ColumnType(length=32)
+    @ColumnComment("数据分级")
+    private String level ; // 数据分级
+
+    @TableField("data_source")
+    @ColumnType(length=32)
+    @ColumnComment("数据提供方")
+    private String dataSource;
+
     /** 子类型 */
     @TableField(exist = false)
     private List<AssetCatalogEntity> children = new ArrayList<>();
