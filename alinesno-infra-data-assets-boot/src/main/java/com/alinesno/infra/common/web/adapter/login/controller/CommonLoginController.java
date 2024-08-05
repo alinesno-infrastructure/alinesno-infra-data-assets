@@ -138,7 +138,7 @@ public class CommonLoginController {
         ));
 
         Menu assetMenu = new Menu("Asset", "/asset", false, "noRedirect", "Layout", true, new Menu.Meta("资产管理", "druid", false, null), List.of(
-                new Menu("Asset", "data/asset/manifest/index", false, false , "data/asset/manifest/index", new Menu.Meta("资产清单", "druid", false, null)),
+                new Menu("Manifest", "data/asset/manifest/index", false, false , "data/asset/manifest/index", new Menu.Meta("资产清单", "druid", false, null)),
                 new Menu("Asset", "data/asset/assets/index", false, false , "data/asset/assets/index", new Menu.Meta("资产管理", "pdf", false, null)),
                 new Menu("Type", "data/asset/type/index", false, false , "data/asset/type/index", new Menu.Meta("分类管理", "redis", false, null)),
                 new Menu("Label", "data/asset/label/index", false, false , "data/asset/label/index", new Menu.Meta("标签", "link", false, null)),
