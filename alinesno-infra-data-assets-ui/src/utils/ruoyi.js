@@ -5,6 +5,51 @@
  * Copyright (c) 2019 ruoyi
  */
 
+// 格式化字节大小
+export function formatBytes(bytes) {
+    if (bytes === 0) return '0B';
+
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+    // 将字节数转换为相应的单位
+    const size = bytes / Math.pow(1024, i);
+
+    // 格式化输出
+    let formattedSize = size.toFixed(2).replace(/\.00$/, '');
+    if (formattedSize.indexOf('.') !== -1) {
+        formattedSize = formattedSize.replace(/0+$/, '');
+    }
+
+    // 构建最终字符串
+    let output = '';
+    if (i >= 3) output += `${formattedSize}G`;
+    if (i >= 2) output += `${size % 1024 > 0 ? (size % 1024).toFixed(2).replace(/\.00$/, '') : ''}Mb`;
+    if (i >= 1) output += `${size % 1024 > 0 ? (size % 1024).toFixed(2) % 1024 > 0 ? (size % 1024).toFixed(2) % 1024 : '' : ''}Kb`;
+    if (i === 0) output += `${size}B`;
+
+    // 清除多余的字符
+    output = output.replace(/0+$/g, '');
+    output = output.replace(/G0*Mb0*Kb/g, 'G');
+    output = output.replace(/G0*Mb/g, 'G');
+    output = output.replace(/G0*Kb/g, 'G');
+    output = output.replace(/0*Mb0*Kb/g, '');
+    output = output.replace(/0*Mb/g, '');
+    output = output.replace(/0*Kb/g, '');
+    output = output.replace(/G0*Kb/g, 'G');
+    output = output.replace(/G/g, '');
+    output = output.replace(/Mb0*Kb/g, 'Mb');
+    output = output.replace(/Mb/g, '');
+    output = output.replace(/Kb/g, '');
+
+    // 如果结果为空字符串，则返回基本单位
+    if (output === '') {
+        output = `${size}${sizes[i]}`;
+    }
+
+    return output;
+ }
+
 // 日期格式化
 export function parseTime(time, pattern) {
   if (arguments.length === 0 || !time) {
