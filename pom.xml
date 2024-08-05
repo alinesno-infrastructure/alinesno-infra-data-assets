@@ -38,6 +38,8 @@
         <module>alinesno-infra-data-fastapi-gateway</module>  <!-- 接口网关 -->
 
         <module>alinesno-infra-data-assets-initialize</module> <!-- 初步化数据和示例 -->
+
+        <module>alinesno-infra-data-assets-ui</module>  <!-- 前端UI服务 -->
         <module>alinesno-infra-data-assets-boot</module>  <!-- 启动服务 -->
 
         <!-- 前端服务
