@@ -60,10 +60,14 @@
         <el-table v-loading="loading" :data="PromptList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :align="'center'" />
 
-          <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
+          <el-table-column label="图标" :align="'center'" width="50" key="status" v-if="columns[5].visible">
             <template #default="scope">
               <div class="role-icon">
-                <img :src="'http://data.linesno.com/icons/sepcialist/dataset_' + ((scope.$index + 1)%10 + 5) + '.png'" />
+                <i v-if="scope.row.dataType == 'database'" class="fa-brands fa-wordpress" />
+                <i v-if="scope.row.dataType == 'image'" class="fa-brands fa-envira" />
+                <i v-if="scope.row.dataType == 'document'" class="fa-solid fa-truck-fast" />
+                <i v-if="scope.row.dataType == 'video'" class="fa-solid fa-server" />
+                <i v-if="scope.row.dataType == 'text'" class="fa-solid fa-rocket" />
               </div>
             </template>
           </el-table-column>
@@ -72,26 +76,27 @@
           <el-table-column label="名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
             <template #default="scope">
               <div>
-                {{ scope.row.promptName }}
+                {{ scope.row.dataName }}
               </div>
               <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
-                会话次数: 12734  调用码: {{ scope.row.promptId }} <el-icon><CopyDocument /></el-icon>
+                负责人: {{ scope.row.dataOwner }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="领域" align="center" width="200" key="promptType" prop="promptType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="数据量" align="center" width="100" key="useCount" prop="useCount" v-if="columns[2].visible" :show-overflow-tooltip="true">
+          <el-table-column label="领域" align="left" width="200" key="dataDescription" prop="dataDescription" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="存储量" align="center" width="150" key="dataSize" prop="dataSize" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
-              <span v-if="scope.row.useCount">{{ scope.row.useCount }}</span>
-              <span v-else>0</span>
+              <span>{{ formatBytes(scope.row.dataSize) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="数据存储" align="center" width="130" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
-              <el-button type="primary" text bg icon="Paperclip" @click="configPrompt(scope.row)">配置</el-button>
+              <el-button v-if="scope.row.dataLocation == 'distributed_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
+              <el-button v-if="scope.row.dataLocation == 'local_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
+              <el-button v-if="scope.row.dataLocation == 'cloud_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
             </template>
           </el-table-column>
-          <el-table-column label="数据来源" align="center" key="dataSourceApi" prop="dataSourceApi" v-if="columns[4].visible" width="200" />
+          <el-table-column label="数据来源" align="center" key="dataSource" prop="dataSource" v-if="columns[4].visible" width="200" />
           <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[5].visible" >
             <template #default="scope">
               <el-switch
@@ -102,7 +107,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
+          <el-table-column label="最后更新" align="center" prop="addTime" v-if="columns[6].visible" width="160">
             <template #default="scope">
               <span>{{ parseTime(scope.row.addTime) }}</span>
             </template>
