@@ -15,19 +15,6 @@
 
 	<dependencies>
 
-		<!-- 集成UI -->
-		<dependency>
-			<groupId>com.alinesno.infra.ui</groupId>
-			<artifactId>alinesno-infra-data-assets-ui</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-cloud-starter-gateway</artifactId>
-					<groupId>org.springframework.cloud</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
         <!-- 引用服务 -->
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
@@ -52,6 +39,23 @@
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-initialize</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- 引用fastapi工具包 -->
+		<dependency>
+			<groupId>com.alinesno.infra.data</groupId>
+			<artifactId>alinesno-infra-data-fastapi-gateway</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alinesno.infra.data</groupId>
+			<artifactId>alinesno-infra-data-fastapi-domain</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alinesno.infra.data</groupId>
+			<artifactId>alinesno-infra-data-fastapi-plugins</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
