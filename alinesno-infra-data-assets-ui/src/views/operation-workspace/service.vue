@@ -11,12 +11,11 @@
               <ul>
                 <li class="app-items" v-for="item in apps" :key="item" style="width:calc(25% - 10px)">
                   <div class="app-icon">
-<!--                    <img :src="item.icon" :alt="item.name" />-->
                     <i :class="item.icon" style="font-size: 20px" />
                   </div>
                   <div class="app-info">
                     <div class="app-item-title">{{ item.name }}</div>
-                    <div class="app-item desc">{{ item.desc }}</div>
+                    <div class="app-item remark">{{ item.remark }}</div>
                   </div>
                 </li>
               </ul>
@@ -53,6 +52,13 @@
 
 <script setup>
 
+import {
+  topCatalog
+} from "@/api/data/asset/dashboard";
+
+import { ref } from 'vue'
+import { ElLoading } from 'element-plus'
+
 const operationAssets = ref([
   { id: '1', title: '资产总量', count: 3762428145 },
   { id: '2', title: '资产类型', count: 164 },
@@ -61,17 +67,25 @@ const operationAssets = ref([
   { id: '5', title: '使用统计', count: 78366485 },
 ])
 
-const apps = ref([
-  { icon: 'fa-brands fa-slack', name: '学生信息数据', desc: '学生的个人资料、学籍信息、成绩记录等' },
-  { icon: 'fa-solid fa-list-check', name: '教职工信息', desc: '教师和其他工作人员的个人资料、职称等' },
-  { icon: 'fa-solid fa-at', name: '课程资料数据', desc: '课程大纲、教学材料、课程评估数据等' },
-  { icon: 'fa-solid fa-list-check', name: '学校财务数据', desc: '学校的财务报表、预算、经费使用情况等' },
-  { icon: 'fa-solid fa-file-word', name: '校园设施管理数据', desc: '设施维护记录、安全检查记录、设备清单等' },
-  { icon: 'fa-solid fa-eye-slash', name: '学生表现数据', desc: '学生的考试成绩、出勤情况、行为表现等' },
-  { icon: 'fa-solid fa-file-word', name: '学校教学数据', desc: '教学效果评估、学生评价、教学资源使用情况等' },
-  { icon: 'fa-solid fa-user-shield', name: '招生数据数据', desc: '招生计划、招生宣传材料、招生渠道数据等' },
-  { icon: 'fa-solid fa-comment-slash', name: '校友关系数据', desc: '校友基本信息、校友捐赠记录等' },
-]);
+const apps = ref([]);
+
+// 获取数据
+function handCatalog(){
+
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
+
+    topCatalog().then(res => {
+        apps.value = res.data;
+        loading.close();
+    })
+}
+
+// 获取数据
+handCatalog();
 
 </script>
 
@@ -94,7 +108,7 @@ const apps = ref([
     color: #545b64 ;
   }
 
-  li.app-items .app-item.desc {
+  li.app-items .app-item.remark {
     font-size: 12px;
     color: #545b64;
     margin-top: 5px;
