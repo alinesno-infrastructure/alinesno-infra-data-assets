@@ -1,0 +1,24 @@
+import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
+
+/**
+ * 数据库接口操作
+ *
+ * @author luoxiaodong
+ * @since 1.0.0
+ */
+
+// 接口配置项
+var prefix = '/api/infra/data/assets/dashboard/' ;
+var managerUrl = {
+    topCatalog : prefix +"topCatalog" ,
+}
+
+// 查询部门下拉树结构
+export function topCatalog() {
+    return request({
+        url: managerUrl.topCatalog,
+        method: 'get'
+    })
+}
+
