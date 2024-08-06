@@ -6,6 +6,7 @@ import com.alinesno.infra.data.assets.api.TreeSelectDto;
 import com.alinesno.infra.data.assets.entity.AssetCatalogEntity;
 import com.alinesno.infra.data.assets.mapper.AssetCatalogMapper;
 import com.alinesno.infra.data.assets.service.IAssetCatalogService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,16 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
 
         List<AssetCatalogEntity> deptTrees = buildDeptTree(list());
         return deptTrees.stream().map(TreeSelectDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AssetCatalogEntity> topCatalog(int count) {
+
+        LambdaQueryWrapper<AssetCatalogEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(AssetCatalogEntity::getOrderNum);
+        queryWrapper.last("limit " + count);
+
+        return list(queryWrapper) ;
     }
 
     /**
