@@ -63,7 +63,11 @@
           <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
             <template #default="scope">
               <div class="role-icon">
-                <img :src="'http://data.linesno.com/icons/sepcialist/dataset_' + ((scope.$index + 1)%10 + 5) + '.png'" />
+                <i v-if="scope.row.dataType == 'database'" class="fa-brands fa-wordpress" />
+                <i v-if="scope.row.dataType == 'image'" class="fa-brands fa-envira" />
+                <i v-if="scope.row.dataType == 'document'" class="fa-solid fa-truck-fast" />
+                <i v-if="scope.row.dataType == 'video'" class="fa-solid fa-server" />
+                <i v-if="scope.row.dataType == 'text'" class="fa-solid fa-rocket" />
               </div>
             </template>
           </el-table-column>
