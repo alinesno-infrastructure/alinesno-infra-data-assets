@@ -85,3 +85,16 @@ export function delApiGroup(databaseId) {
     method: 'delete'
   })
 }
+
+// 状态【请填写功能名称】修改
+export function changeGroupStatus(id , status) {
+    const data = {
+        id ,
+        status
+    }
+    return request({
+        url: managerUrl.statusUrl,
+        method: 'put',
+        data: data
+    })
+}
