@@ -147,7 +147,7 @@ public class CommonLoginController {
 
         Menu assetBloodMenu = new Menu("Service", "/service", false, "noRedirect", "Layout", true, new Menu.Meta("数据服务", "logininfor", false, null), List.of(
                 new Menu("ApiCatalog", "data/fastapi/group/index", false, false , "data/fastapi/group/index", new Menu.Meta("服务目录", "logininfor", false, null)),
-                new Menu("Client", "data/service/client/index", false, false , "data/service/client/index", new Menu.Meta("客户端", "peoples", false, null)),
+                new Menu("Client", "data/fastapi/apiclient/index", false, false , "data/fastapi/apiclient/index", new Menu.Meta("客户端", "peoples", false, null)),
                 new Menu("Api", "data/fastapi/api/index", false, false , "data/fastapi/api/index", new Menu.Meta("API开发", "link", false, null))
         ));
 
