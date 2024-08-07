@@ -57,13 +57,7 @@ public class ApiConfigEntity extends InfraBaseEntity {
     @ColumnComment("JSON参数")
     private String jsonParam;
 
-    /**
-     * 状态
-     */
-    @TableField("status")
-    @ColumnType(value = MySqlTypeConstant.INT, length = 11)
-    @ColumnComment("状态 0-offline;1-online")
-    private Integer status;
+
 
     /**
      * 访问权限
@@ -78,7 +72,7 @@ public class ApiConfigEntity extends InfraBaseEntity {
      */
     @TableField("group_id")
     @ColumnType(value = MySqlTypeConstant.VARCHAR, length = 20)
-    @ColumnComment("分组ID")
+    @ColumnComment("服务目录")
     private String groupId;
 
     /**
