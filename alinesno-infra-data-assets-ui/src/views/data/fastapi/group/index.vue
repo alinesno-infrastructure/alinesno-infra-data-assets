@@ -12,10 +12,10 @@
          <el-form-item label="状态" prop="hasStatus">
             <el-select v-model="queryParams.hasStatus" placeholder="分组状态" clearable>
                <el-option
-                  v-for="dict in sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
+                  v-for="item in hasStatusOptions"
+                  :key="item.key"
+                  :label="item.label"
+                  :value="item.key"
                />
             </el-select>
          </el-form-item>
@@ -62,9 +62,17 @@
          <el-table-column prop="description" label="分组描述" ></el-table-column>
          <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
          <el-table-column prop="hasStatus" label="状态" width="100">
-            <template #default="scope">
+           <template  #default="scope">
+             <el-switch
+                 v-model="scope.row.hasStatus"
+                 :active-value="0"
+                 :inactive-value="1"
+                 @change="handleStatusChange(scope.row)"
+             ></el-switch>
+           </template>
+<!--            <template #default="scope">
                <dict-tag :options="sys_normal_disable" :value="scope.row.hasStatus" />
-            </template>
+            </template>-->
          </el-table-column>
          <el-table-column label="创建时间" align="center" prop="createTime" width="200">
             <template #default="scope">
@@ -100,7 +108,7 @@
       <el-dialog :title="title" v-model="open" width="600px" append-to-body>
          <el-form ref="deptRef" :model="form" :rules="rules" label-width="80px">
             <el-row>
-               <el-col :span="24" v-if="form.parentId !== 0">
+               <el-col :span="24" v-if="form.parentId !== 0" >
                   <el-form-item label="上级分组" prop="parentId">
                      <el-tree-select
                         v-model="form.parentId"
@@ -109,6 +117,7 @@
                         value-key="id"
                         placeholder="选择上级分组"
                         check-strictly
+                        style="width:480px"
                      />
                   </el-form-item>
                </el-col>
@@ -124,18 +133,7 @@
                </el-col>
                <el-col :span="24">
                   <el-form-item label="显示排序" prop="orderNum">
-                     <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
-                  </el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="分组状态">
-                     <el-radio-group v-model="form.hasStatus">
-                        <el-radio
-                           v-for="dict in sys_normal_disable"
-                           :key="dict.value"
-                           :label="dict.value"
-                        >{{ dict.label }}</el-radio>
-                     </el-radio-group>
+                     <el-input-number v-model="form.orderNum" controls-position="right" :min="0"  style="width:480px"/>
                   </el-form-item>
                </el-col>
             </el-row>
@@ -151,7 +149,15 @@
 </template>
 
 <script setup name="ApiGroup">
-import { listApiGroup, getApiGroup, delApiGroup, addApiGroup, updateApiGroup, listApiGroupExcludeChild } from "@/api/data/fastapi/apiGroup";
+import {
+  listApiGroup,
+  getApiGroup,
+  delApiGroup,
+  addApiGroup,
+  updateApiGroup,
+  listApiGroupExcludeChild,
+  changeGroupStatus
+} from "@/api/data/fastapi/apiGroup";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -176,9 +182,13 @@ const data = reactive({
     name: [{ required: true, message: "分组名称不能为空", trigger: "blur" }],
     orderNum: [{ required: true, message: "显示排序不能为空", trigger: "blur" }]
   },
+  hasStatusOptions: [
+    {key: 0, label: "启用",cantSelect: true},
+    {key: 1, label: "禁用",cantSelect: true}
+  ]
 });
 
-const { queryParams, form, rules } = toRefs(data);
+const { queryParams, form, rules, hasStatusOptions } = toRefs(data);
 
 /** 查询分组列表 */
 function getList() {
@@ -274,6 +284,15 @@ function handleDelete(row) {
     getList();
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => {});
+}
+
+/** 状态修改 **/
+function   handleStatusChange(row) {
+  return changeGroupStatus(row.id, row.hasStatus).then(response=>{
+    if(response.code == 200){
+      proxy.$modal.msgSuccess("操作成功");
+    }
+  });
 }
 
 getList();
