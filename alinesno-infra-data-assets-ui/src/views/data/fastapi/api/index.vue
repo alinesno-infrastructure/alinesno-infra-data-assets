@@ -3,26 +3,27 @@
       <el-row :gutter="20">
          <!--类型数据-->
          <el-col :span="4" :xs="24">
-            <div class="head-container">
-               <el-input v-model="deptName" placeholder="请输入类型名称" clearable prefix-icon="Search"
+<!--            <div class="head-container">
+               <el-input v-model="deptName" placeholder="请输入服务目录" clearable prefix-icon="Search"
                   style="margin-bottom: 20px" />
-            </div>
+            </div>-->
             <div class="head-container">
+              服务目录
                <el-tree :data="deptOptions" :props="{ label: 'label', children: 'children' }"
                   :expand-on-click-node="false" :filter-node-method="filterNode" ref="deptTreeRef" node-key="id"
                   highlight-current default-expand-all @node-click="handleNodeClick" />
             </div>
          </el-col>
 
-         <!--指令数据-->
+         <!--API数据-->
          <el-col :span="20" :xs="24">
             <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="100px">
-               <el-form-item label="指令名称" prop="name">
-                  <el-input v-model="queryParams.name" placeholder="请输入指令名称" clearable style="width: 240px"
+               <el-form-item label="名称" prop="name">
+                  <el-input v-model="queryParams.name" placeholder="请输入API名称" clearable style="width: 240px"
                      @keyup.enter="handleQuery" />
                </el-form-item>
-               <el-form-item label="指令名称" prop="name">
-                  <el-input v-model="queryParams['condition[name|like]']" placeholder="请输入指令名称" clearable
+               <el-form-item label="路径" prop="path">
+                  <el-input v-model="queryParams.path" placeholder="请输入API路径" clearable
                      style="width: 240px" @keyup.enter="handleQuery" />
                </el-form-item>
                <el-form-item>
@@ -49,17 +50,16 @@
             <el-table v-loading="loading" :data="ApiConfigList" @selection-change="handleSelectionChange">
                <el-table-column type="selection" width="50" :align="'center'" />
 
-               <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
+               <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[0].visible">
                   <template #default="scope">
                      <div class="role-icon">
-                        <img
-                           :src="'http://data.linesno.com/icons/sepcialist/dataset_' + ((scope.$index + 1) % 10 + 5) + '.png'" />
+                        <img :src="'http://data.linesno.com/icons/sepcialist/dataset_' + ((scope.$index + 1) % 10 + 5) + '.png'" style="width: 25px;height: 25px"/>
                      </div>
                   </template>
                </el-table-column>
 
                <!-- 业务字段-->
-               <el-table-column label="名称" align="left" key="name" prop="name" v-if="columns[0].visible">
+               <el-table-column label="名称" align="left" key="name" prop="name" v-if="columns[1].visible">
                   <template #default="scope">
                      <div>
                         {{ scope.row.name }}
@@ -76,29 +76,34 @@
                      <span v-else>0</span>
                   </template>
                </el-table-column>
-               <el-table-column label="描述" align="left" key="note" prop="note" v-if="columns[2].visible"
+               <el-table-column label="描述" align="left" key="note" prop="note" v-if="columns[3].visible"
                   :show-overflow-tooltip="true" />
-               <el-table-column label="配置" align="center" width="150" key="note" prop="note" v-if="columns[2].visible"
+               <el-table-column label="配置" align="center" width="150" key="note" prop="note" v-if="columns[4].visible"
                   :show-overflow-tooltip="true">
                   <template #default="scope">
                      <el-button type="primary" text bg icon="Paperclip"
                         @click="configExecuteSqlConfig(scope.row)">配置SQL</el-button>
                   </template>
                </el-table-column>
-               <el-table-column label="类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[3].visible">
+               <el-table-column label="内容类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[5].visible">
                   <template #default="scope">
                      <span v-if="scope.row.contentType == 2">application/json</span>
                      <span v-if="scope.row.contentType == 1">application/x-www-form-urlencoed</span>
                   </template>
                </el-table-column>
-               <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[5].visible">
+
+              <el-form-item label="私有" prop="access">
+                <el-switch v-model="form.access" :active-value="0" :inactive-value="1" v-if="columns[6].visible"/>
+              </el-form-item>
+
+               <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
                   <template #default="scope">
-                     <el-switch v-model="scope.row.hasStatus" :active-value="1" :inactive-value="0"
+                     <el-switch v-model="scope.row.hasStatus" :active-value="0" :inactive-value="1"
                         @change="handleChangStatusField('hasStatus', scope.row.hasStatus, scope.row.id)" />
                   </template>
                </el-table-column>
 
-               <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
+               <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[8].visible" width="160">
                   <template #default="scope">
                      <span>{{ parseTime(scope.row.addTime) }}</span>
                   </template>
@@ -145,24 +150,24 @@
             <el-row>
                <el-col :span="24">
                   <el-form-item label="名称" prop="name">
-                     <el-input v-model="form.name" placeholder="请输入指令名称" maxlength="50" />
+                     <el-input v-model="form.name" placeholder="请输入指令名称" maxlength="50" style="width: 720px;" />
                   </el-form-item>
                </el-col>
             </el-row>
             <el-row>
                <el-col :span="24">
                   <el-form-item label="路径" prop="path">
-                     <el-input v-model="form.path" placeholder="请输入路径" maxlength="128" />
+                     <el-input v-model="form.path" placeholder="请输入路径" maxlength="128" style="width: 720px;"/>
                   </el-form-item>
                </el-col>
             </el-row>
 
             <el-row>
                <el-col :span="24">
-                  <el-form-item style="width: 100%;" label="接口分组" prop="groupId">
+                  <el-form-item  label="服务目录" prop="groupId">
                      <el-tree-select v-model="form.groupId" :data="deptOptions"
                         :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id"
-                        placeholder="请选择归属类型" check-strictly />
+                        placeholder="请选择归属服务目录" check-strictly  style="width: 720px;"/>
                   </el-form-item>
                </el-col>
             </el-row>
@@ -170,19 +175,19 @@
             <el-row>
                <el-col :span="24">
                   <el-form-item label="描述" prop="note">
-                     <el-input v-model="form.note" placeholder="请输入指令备注"></el-input>
+                     <el-input type="textarea" v-model="form.note" placeholder="请输入指令备注"  style="width: 720px;"></el-input>
                   </el-form-item>
                </el-col>
             </el-row>
 
-            <el-form-item style="width: 100%;" label="ContentType" prop="contentType">
+            <el-form-item style="width: 100%;" label="内容类型" prop="contentType">
                <el-tree-select v-model="form.contentType" :data="contentTypeOptions"
-                  :props="{ value: 'id', label: 'label'}" value-key="id" placeholder="请选择归属类型"
-                  check-strictly />
+                  :props="{ value: 'id', label: 'label'}" value-key="id" placeholder="请选择内容类型"
+                  check-strictly style="width: 720px;" />
             </el-form-item>
 
             <el-form-item label="私有" prop="access">
-               <el-switch v-model="form.access" :active-value="1" :inactive-value="0" />
+               <el-switch v-model="form.access" :active-value="0" :inactive-value="1" />
             </el-form-item>
 
          </el-form>
@@ -227,6 +232,7 @@ const promptOpen = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const names = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -241,13 +247,15 @@ const roleOptions = ref([]);
 
 // 列显隐信息
 const columns = ref([
-   { key: 0, label: `指令名称`, visible: true },
-   { key: 1, label: `指令描述`, visible: true },
-   { key: 2, label: `表数据量`, visible: true },
-   { key: 3, label: `类型`, visible: true },
-   { key: 4, label: `指令地址`, visible: true },
-   { key: 5, label: `状态`, visible: true },
-   { key: 6, label: `更新时间`, visible: true }
+   { key: 0, label: `图标`, visible: true },
+   { key: 1, label: `名称`, visible: true },
+   { key: 2, label: `路径`, visible: true },
+   { key: 3, label: `描述`, visible: true },
+   { key: 4, label: `配置`, visible: true },
+   { key: 5, label: `内容类型`, visible: true },
+   { key: 6, label: `私有`, visible: true },
+   { key: 7, label: `状态`, visible: true },
+   { key: 8, label: `添加时间`, visible: true }
 ]);
 
 const data = reactive({
@@ -256,16 +264,19 @@ const data = reactive({
       pageNum: 1,
       pageSize: 10,
       name: undefined,
-      promptDesc: undefined,
-      catalogId: undefined
+      path: undefined
    },
    rules: {
       name: [{ required: true, message: "名称不能为空", trigger: "blur" }],
-      dataSourceApi: [{ required: true, message: "连接不能为空", trigger: "blur" }],
-      contentType: [{ required: true, message: "类型不能为空", trigger: "blur" }],
-      promptDesc: [{ required: true, message: "备注不能为空", trigger: "blur" }]
+      path: [{ required: true, message: "路径不能为空", trigger: "blur" }],
+      groupId: [{ required: true, message: "服务目录不能为空", trigger: "blur" }],
+      contentType: [{ required: true, message: "内容类型不能为空", trigger: "blur" }],
+      access: [{ required: false, message: "私有不能为空", trigger: "blur" }],
+      note: [{ required: false, message: "备注不能为空", trigger: "blur" }]
    }
 });
+
+
 
 const { queryParams, form, rules } = toRefs(data);
 
@@ -281,7 +292,7 @@ function getList() {
 
 // 节点单击事件
 function handleNodeClick(data) {
-   queryParams.value.catalogId = data.id;
+   queryParams.value.groupId = data.id;
    getList();
 }
 
@@ -296,7 +307,7 @@ function resetQuery() {
    dateRange.value = [];
    proxy.resetForm("queryRef");
 
-   queryParams.value.catalogId = undefined;
+   queryParams.value.groupId = undefined;
 
    proxy.$refs.deptTreeRef.setCurrentKey(null);
    handleQuery();
@@ -304,7 +315,8 @@ function resetQuery() {
 /** 删除按钮操作 */
 function handleDelete(row) {
    const ApiConfigIds = row.id || ids.value;
-   proxy.$modal.confirm('是否确认删除指令编号为"' + ApiConfigIds + '"的数据项？').then(function () {
+   const ApiNames = row.name || names.value;
+   proxy.$modal.confirm('是否确认删除api名称为"' + ApiNames + '"的数据项？').then(function () {
       return delApiConfig(ApiConfigIds);
    }).then(() => {
       getList();
@@ -315,6 +327,7 @@ function handleDelete(row) {
 /** 选择条数  */
 function handleSelectionChange(selection) {
    ids.value = selection.map(item => item.id);
+   names.value = selection.map(item => item.name);
    single.value = selection.length != 1;
    multiple.value = !selection.length;
 };
@@ -339,13 +352,12 @@ function configExecuteSqlConfig(row) {
 function reset() {
    form.value = {
       id: undefined,
-      deptId: undefined,
-      ApiConfigName: undefined,
-      nickName: undefined,
-      password: undefined,
-      phonenumber: undefined,
-      status: "0",
-      remark: undefined,
+      name: undefined,
+      path: undefined,
+      groupId: undefined,
+      contentType: undefined,
+      runSql: undefined,
+      note: undefined
    };
    proxy.resetForm("databaseRef");
 };
