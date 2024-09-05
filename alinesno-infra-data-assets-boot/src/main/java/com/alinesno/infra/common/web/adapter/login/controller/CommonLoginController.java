@@ -145,6 +145,12 @@ public class CommonLoginController {
                 new Menu("Security", "data/asset/security/index", false, false , "data/asset/security/index", new Menu.Meta("安全策略", "monitor", false, null))
         ));
 
+        Menu metricsMenu = new Menu("Metrics", "/metrics", false, "noRedirect", "Layout", true, new Menu.Meta("指标管理", "druid", false, null), List.of(
+                new Menu("Metrics", "data/asset/metric/index", false, false , "data/asset/metric/index", new Menu.Meta("指标管理", "druid", false, null)),
+                new Menu("MetricsType", "data/asset/metricType/index", false, false , "data/asset/metricType/index", new Menu.Meta("指标类型", "redis", false, null)),
+                new Menu("MetricsConfig", "data/asset/metricConfig/index", false, false , "data/asset/metricConfig/index", new Menu.Meta("指标配置", "pdf", false, null))
+        ));
+
         Menu assetBloodMenu = new Menu("Service", "/service", false, "noRedirect", "Layout", true, new Menu.Meta("数据服务", "logininfor", false, null), List.of(
                 new Menu("ApiCatalog", "data/fastapi/group/index", false, false , "data/fastapi/group/index", new Menu.Meta("服务目录", "logininfor", false, null)),
                 new Menu("Client", "data/fastapi/apiclient/index", false, false , "data/fastapi/apiclient/index", new Menu.Meta("客户端", "peoples", false, null)),
@@ -168,7 +174,7 @@ public class CommonLoginController {
                 new Menu("Monitor", "data/function/monitor/index", false, false , "data/asset/monitor/index", new Menu.Meta("使用分析", "tree-table", false, null))
                 ));
 
-        List<Menu> menus = List.of(dashboardMenu , assetMenu ,assetBloodMenu , assetOpsMenu , assetLifeMenu , systemMenu) ;
+        List<Menu> menus = List.of(dashboardMenu , assetMenu , metricsMenu ,assetBloodMenu , assetOpsMenu , assetLifeMenu , systemMenu) ;
         String jsonString = JSON.toJSONString(menus, SerializerFeature.WriteMapNullValue);
 
         return AjaxResult.success(JSONArray.parseArray(jsonString)) ;
