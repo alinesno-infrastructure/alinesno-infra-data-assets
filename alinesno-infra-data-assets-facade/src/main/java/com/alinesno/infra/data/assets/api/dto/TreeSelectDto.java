@@ -32,4 +32,5 @@ public class TreeSelectDto implements Serializable {
         this.label = promptCatalog.getName();
         this.children = promptCatalog.getChildren().stream().map(TreeSelectDto::new).collect(Collectors.toList());
     }
+
 }
