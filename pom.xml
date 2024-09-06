@@ -31,6 +31,9 @@
         <module>alinesno-infra-data-assets-gateway</module>  <!-- 接口服务 -->
         <module>alinesno-infra-data-assets-client</module>  <!-- 对外引用 -->
 
+        <!-- 业务指标管理 -->
+        <module>alinesno-infra-data-assets-metrics</module> <!-- 数据指标管理-->
+
         <!-- 数据服务 -->
         <module>alinesno-infra-data-fastapi-facade</module>  <!-- 接口与引用 -->
         <module>alinesno-infra-data-fastapi-plugins</module>  <!-- 接口插件 -->
