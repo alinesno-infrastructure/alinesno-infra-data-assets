@@ -1,7 +1,14 @@
 # alinesno-infra-data-assets
 提供数据资产管理的功能，用于管理和维护组织的数据资产，包括数据目录、数据词典、数据血缘等。
 
-# 功能列表
+## 包结构说明
+
+- `alinesno-infra-data-assets-collector`:  数据资产三方数据接收模块，用于接收来自第三方数据源，例如文件、API、保存到数据资产平台中进行管理。
+- `alinesno-infra-data-assets-metrics`:  指标管理模块，用于做数据资产接口能力的分析和提供对应的数据指标。
+- `alinesno-infra-data-assets-api`: 提供数据资产管理的API接口。
+- `alinesno-infra-data-assets-domain`: 提供数据资产管理的领域模型。
+
+## 功能列表
 
 1. **仪表板 (Dashboard):**
     - 提供一个总览界面，用于展示关键指标和重要信息概览。
