@@ -12,7 +12,7 @@
     </div>
     <div class="acp-header-item ">
       <router-link class="header-label-text" to="/dashboard/smartService">
-        <i class="fa-solid fa-swatchbook"></i> 专家 
+        <i class="fa-solid fa-swatchbook"></i> 专家
       </router-link>
     </div>
     <div class="acp-header-item ">
@@ -25,14 +25,14 @@
       <div class="acp-header-item " style="display: flex">
         <a class="header-label-text">
           <i class="fa-solid fa-shield-halved"></i>
-          {{ nickname }}
+          {{ userStore.nickName }}
           {{ account }}
           <el-icon>
             <ArrowDownBold />
           </el-icon>
         </a>
         <a class="header-label-text" target="_blank">
-          <img :src="avator" class="su70ez-0 CB-gLgKdv" alt="" />
+          <img src="http://data.linesno.com/switch_header.png" class="su70ez-0 CB-gLgKdv" alt="" />
         </a>
       </div>
 
@@ -41,12 +41,13 @@
 
           <el-container style="margin-bottom: 15px">
             <el-header class="bg-color-base info-h" style="">
-              <p class="color-text-secondary f-e-s">名称: {{ nickname }}</p>
-              <p class="color-text-primary f-e-s">账号ID: 417-14778-7888  
+              <p class="color-text-secondary f-e-s">登陆名: {{ userStore.name }}
                 <span class="copy-user-id">
-                  <i class="fa-solid fa-clone"></i> 
+                  <i class="fa-solid fa-clone"></i>
                 </span>
               </p>
+              <p class="color-text-primary f-e-s" v-if="userStore.org">组织: {{ userStore.org.orgName }} </p>
+              <p class="color-text-secondary f-e-s" v-if="userStore.org">角色: {{ userStore.org.roleName }}</p>
             </el-header>
           </el-container>
 
@@ -58,7 +59,7 @@
 
           <router-link :to="{ path: '/dashboard/dashboardTheme' }" replace>
           <el-dropdown-item>
-            <i class="fa-solid fa-desktop"></i> 组织配置
+            <i class="fa-solid fa-desktop"></i> 机构配置
           </el-dropdown-item>
           </router-link>
 
@@ -68,6 +69,7 @@
             </el-dropdown-item>
           </router-link>
 
+          <!--
           <el-dropdown-item @click="setting = true">
             <i class="fa-solid fa-pen-ruler"></i> 布局设置
           </el-dropdown-item>
@@ -75,6 +77,7 @@
           <el-dropdown-item>
             <i class="fa-solid fa-rocket"></i> 账单面板
           </el-dropdown-item>
+          -->
 
           <el-container>
             <el-main>
@@ -88,114 +91,50 @@
 
   </nav>
 </template>
-<script>
-export default {
-  name: "TopHeader",
-  components: {},
-  data() {
-    return {
-      drawer: false,
-      direction: 'rtl',
-    };
-  },
-  computed: {
-    role: {
-      get() {
-        return this.$store.state.user.roles;
-      },
-    },
-    account: {
-      get() {
-        // const { account } =  null ; // this.$store.state.user;
-        // return account ? account : "";
-        return "";
-      },
-    },
-    nickname: {
-      get() {
-        const nickname = '超级管理员' //  this.$store.state.user.nickname;
-        return nickname;
-      },
-    },
-    name: {
-      get() {
-        const name = '超级管理员'; //  this.$store.state.user.name;
-        return name;
-      },
-    },
-    avator: {
-      get() {
-        const avatar = "http://data.linesno.com/switch_header.png"; //  this.$store.state.user.avatar;
-        return avatar;
-      },
-    },
-    setting: {
-      get() {
-        return this.$store.state.settings.showSettings;
-      },
-      set(val) {
-        this.$store.dispatch("settings/changeSetting", {
-          key: "showSettings",
-          value: val,
-        });
-      },
-    },
-    topNav: {
-      get() {
-        return this.$store.state.settings.topNav;
-      },
-    },
-  },
-  methods: {
-    lockScreen() {
-      this.$message({
-        message: '功能在内测试中',
-        type: 'success'
-      });
-    },
-    handleCommand(command) {
-      this.$router.push({ name: command });
-    },
-    toggleSideBar() {
-      this.$store.dispatch("app/toggleSideBar");
-    },
-    submitForm() { },
-    cancel() { },
-    dashboardHome() {
-      window.location.href = this.saasUrl;
-    },
-    // 表单重置
-    reset() {
-      this.form = {
-        noticeId: undefined,
-        noticeTitle: undefined,
-        noticeType: undefined,
-        noticeContent: undefined,
-        status: "0",
-      };
-      this.resetForm("form");
-    },
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加工单";
-    },
-    async logout() {
-      this.$confirm("确定注销并退出系统吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        // this.$store.dispatch('LogOut').then(res()=>{
-        //     window.location.href="/"
-        // })
-        this.$store.dispatch("LogOut").then(() => {
-          window.location.href = "/";
-        });
-      });
-    },
-  },
-};
+
+<script setup>
+
+import { ElMessageBox } from 'element-plus'
+import useUserStore from '@/store/modules/user'
+
+const userStore = useUserStore()
+const router = useRouter();
+
+// const avatar = ref('http://data.linesno.com/switch_header.png') ;
+// const nickname = ref('超级管理员') ;
+// const name = ref('超级管理员') ;
+
+function logout() {
+  ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+
+    userStore.ssoLogOut().then(() => {
+      location.href = '/index';
+    })
+
+  }).catch(() => { });
+}
+
+/** 判断用户是否已经存在组织 */
+function handleInOrg(){
+  let org = userStore.org ;
+  if(!org){ // 如果不存在则跳转到组织配置界面
+    router.push('/createOrg')
+  }
+}
+
+onMounted(() => {
+  handleInOrg()
+})
+
+console.log('avatar = ' + userStore.avatar)
+console.log('name = ' + userStore.name)
+console.log('dept = ' + JSON.stringify(userStore.dept))
+console.log('role = ' + JSON.stringify(userStore.roles))
+
 </script>
 
 <style lang="scss" scoped>
