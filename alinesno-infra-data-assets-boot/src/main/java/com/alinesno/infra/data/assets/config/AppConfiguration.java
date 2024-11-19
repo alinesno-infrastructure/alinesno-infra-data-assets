@@ -4,6 +4,8 @@ import com.alinesno.infra.common.facade.enable.EnableActable;
 import com.alinesno.infra.common.web.adapter.sso.enable.EnableInfraSsoApi;
 import com.alinesno.infra.common.web.log.aspect.LogAspect;
 import com.alinesno.infra.data.assets.sample.ISimpleService;
+import com.dtflys.forest.springboot.annotation.ForestScan;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,10 +16,20 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 服务配置
  */
+@Slf4j
 @EnableActable
-@MapperScan(basePackages = {"com.alinesno.infra.data.assets.mapper" , "com.alinesno.infra.data.fastapi.mapper"})
 @EnableInfraSsoApi
-@ComponentScan(basePackages = {"com.alinesno.infra.data.assets" , "com.alinesno.infra.data.fastapi"})
+@ForestScan({
+        "com.alinesno.infra.common.web.adapter.base.consumer" ,
+        "com.alinesno.infra.smart.assistant.adapter"
+})
+@MapperScan(basePackages = {
+        "com.alinesno.infra.data.**.mapper" ,
+})
+@ComponentScan(basePackages = {
+        "com.alinesno.infra.data.assets" ,
+        "com.alinesno.infra.data.fastapi"
+})
 @Configuration
 public class AppConfiguration implements CommandLineRunner {
 
@@ -32,14 +44,17 @@ public class AppConfiguration implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // 初始化资产目录
-        simpleService.catalog();
+        log.debug("服务应用启动.");
 
-        // 初始化标签分类
-        simpleService.label();
-
-        // 示例资产数据
-        simpleService.data();
+//        // 初始化资产目录
+//        simpleService.catalog();
+//
+//        // 初始化标签分类
+//        simpleService.label();
+//
+//        // 示例资产数据
+//        simpleService.data();
 
     }
+
 }
