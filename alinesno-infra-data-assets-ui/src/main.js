@@ -43,19 +43,12 @@ import TreeSelect from '@/components/TreeSelect'
 // 字典标签组件
 import DictTag from '@/components/DictTag'
 
-// 引用全局变量文件
-import GLOBAL_VAR from '@/api/global_variable.js'
-import GLOBAL_FUN from '@/api/global_function.js'
-
 //引入echarts
 import * as echarts from 'echarts';
 
 const app = createApp(App)
 
 app.config.globalProperties.$echarts = echarts
-
-app.config.globalProperties.GLOBAL_VAR = GLOBAL_VAR
-app.config.globalProperties.GLOBAL_FUN = GLOBAL_FUN
 
 // 全局方法挂载
 app.config.globalProperties.useDict = useDict
