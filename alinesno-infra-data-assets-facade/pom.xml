@@ -34,6 +34,13 @@
 				<artifactId>fastjson</artifactId>
 		</dependency>
 
+		<!-- 多数据源支持 -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+
 	</dependencies>
 
 </project>
