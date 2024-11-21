@@ -142,58 +142,58 @@ jobs:
           echo '</settings>' >> nexus-config.xml
 
       - name: Build and Deploy to Nexus
-        run: mvn clean deploy --settings nexus-config.xml
+        run: mvn clean package --settings nexus-config.xml
 
-      - name: Deploy to AliyunCR
-        run: |
-          mvn -B -U -s nexus-config.xml -f ${{ env.PROJECT_NAME }}/pom.xml clean compile jib:build \
-                        -Ddocker.registry.name=${{ env.ALIYUN_CR_NAMESPACE }} \
-                        -Djib.to.tags=${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }} \
-                        -Djib.to.auth.username=${{secrets.ALIYUN_CR_USERNAME}} \
-                        -Djib.to.auth.password=${{secrets.ALIYUN_CR_PASSWORD}}
-
-      # - name: Install MurphySec code scan cli
-      #   run: |
-      #     wget -q https://s.murphysec.com/release/install.sh -O - | /bin/bash
-
-      # - name: Code scan
-      #   run: murphysec scan . --token ${{ secrets.MURPHYSEC_TOKEN }}
-
-      - name: local remote scp
-        uses: cross-the-world/scp-pipeline@master
-        with:
-          host: ${{ secrets.SERVER_BETA_HOST_02 }}
-          port: ${{ secrets.SERVER_BETA_PORT_02 }}
-          user: ${{ secrets.SERVER_BETA_USER_02 }}
-          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
-          local: "./deploy/*"
-          remote: /home/github-action/${{ env.PROJECT_NAME }}/
-
-      - name: SSH Pipelines
-        uses: cross-the-world/ssh-pipeline@master
-        env:
-          WELCOME: "ssh pipeline"
-        with:
-          host: ${{ secrets.SERVER_BETA_HOST_02 }}
-          port: ${{ secrets.SERVER_BETA_PORT_02 }}
-          user: ${{ secrets.SERVER_BETA_USER_02 }}
-          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
-          connect_timeout: 30s
-          script: |
-            export PROJECT_NAME=${{ env.PROJECT_NAME }}
-            export VERSION=${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }}
-
-            export ALIYUN_CR_REGISTORY=${{ env.ALIYUN_CR_REGISTORY }}
-            export ALIYUN_CR_NAMESPACE=${{ env.ALIYUN_CR_NAMESPACE }}
-            export NAMESPACE=${{ secrets.K8S_NAMESPACE }}
-
-            export REDIS_HOST=${{ secrets.DEV_REDIS_HOST_02 }}
-            export REDIS_KEY=${{ secrets.DEV_REDIS_KEY_02 }}
-
-            export INFRA_DEV_DOMAIN=${{ secrets.INFRA_BETA_DATA_DOMAIN }}
-
-            export DB_MYSQL_URL=${{ secrets.DEV_DB_MYSQL_URL }}
-            export DB_MYSQL_USRENAME=${{ secrets.DEV_DB_MYSQL_USRENAME }}
-            export DB_MYSQL_PASSWORD=${{ secrets.DEV_DB_MYSQL_PASSWORD }}
-
-            envsubst < /home/github-action/${{ env.PROJECT_NAME }}/kubernetes-${{ env.CURRENT_PROFIRE }}.yml | kubectl apply -f -
+#      - name: Deploy to AliyunCR
+#        run: |
+#          mvn -B -U -s nexus-config.xml -f ${{ env.PROJECT_NAME }}/pom.xml clean compile jib:build \
+#                        -Ddocker.registry.name=${{ env.ALIYUN_CR_NAMESPACE }} \
+#                        -Djib.to.tags=${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }} \
+#                        -Djib.to.auth.username=${{secrets.ALIYUN_CR_USERNAME}} \
+#                        -Djib.to.auth.password=${{secrets.ALIYUN_CR_PASSWORD}}
+#
+#      # - name: Install MurphySec code scan cli
+#      #   run: |
+#      #     wget -q https://s.murphysec.com/release/install.sh -O - | /bin/bash
+#
+#      # - name: Code scan
+#      #   run: murphysec scan . --token ${{ secrets.MURPHYSEC_TOKEN }}
+#
+#      - name: local remote scp
+#        uses: cross-the-world/scp-pipeline@master
+#        with:
+#          host: ${{ secrets.SERVER_BETA_HOST_02 }}
+#          port: ${{ secrets.SERVER_BETA_PORT_02 }}
+#          user: ${{ secrets.SERVER_BETA_USER_02 }}
+#          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
+#          local: "./deploy/*"
+#          remote: /home/github-action/${{ env.PROJECT_NAME }}/
+#
+#      - name: SSH Pipelines
+#        uses: cross-the-world/ssh-pipeline@master
+#        env:
+#          WELCOME: "ssh pipeline"
+#        with:
+#          host: ${{ secrets.SERVER_BETA_HOST_02 }}
+#          port: ${{ secrets.SERVER_BETA_PORT_02 }}
+#          user: ${{ secrets.SERVER_BETA_USER_02 }}
+#          pass: ${{ secrets.SERVER_BETA_KEY_02 }}
+#          connect_timeout: 30s
+#          script: |
+#            export PROJECT_NAME=${{ env.PROJECT_NAME }}
+#            export VERSION=${{ env.PRO_VERSION }}.${{ env.BUILD_NUMBER }}
+#
+#            export ALIYUN_CR_REGISTORY=${{ env.ALIYUN_CR_REGISTORY }}
+#            export ALIYUN_CR_NAMESPACE=${{ env.ALIYUN_CR_NAMESPACE }}
+#            export NAMESPACE=${{ secrets.K8S_NAMESPACE }}
+#
+#            export REDIS_HOST=${{ secrets.DEV_REDIS_HOST_02 }}
+#            export REDIS_KEY=${{ secrets.DEV_REDIS_KEY_02 }}
+#
+#            export INFRA_DEV_DOMAIN=${{ secrets.INFRA_BETA_DATA_DOMAIN }}
+#
+#            export DB_MYSQL_URL=${{ secrets.DEV_DB_MYSQL_URL }}
+#            export DB_MYSQL_USRENAME=${{ secrets.DEV_DB_MYSQL_USRENAME }}
+#            export DB_MYSQL_PASSWORD=${{ secrets.DEV_DB_MYSQL_PASSWORD }}
+#
+#            envsubst < /home/github-action/${{ env.PROJECT_NAME }}/kubernetes-${{ env.CURRENT_PROFIRE }}.yml | kubectl apply -f -
