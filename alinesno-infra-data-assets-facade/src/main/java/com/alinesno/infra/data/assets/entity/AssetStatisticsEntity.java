@@ -8,6 +8,7 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
@@ -22,8 +23,8 @@ import java.math.BigDecimal;
 @Data
 @TableName("asset_statistics")
 public class AssetStatisticsEntity extends InfraBaseEntity {
-    private static final long serialVersionUID = 1L;
     // fields
+    //getter and setter
     /**
     * 来源系统
     */
@@ -104,75 +105,5 @@ public class AssetStatisticsEntity extends InfraBaseEntity {
     @ColumnType(length = 11)
     @TableField("asset_special_topics")
     private Long assetSpecialTopics;
-    //getter and setter
-    public String getSourceSystem(){
-        return this.sourceSystem;
-    }
-    public AssetStatisticsEntity setSourceSystem(String arg){
-        this.sourceSystem = arg;
-        return this;
-    }
-    public String getDataAsset(){
-        return this.dataAsset;
-    }
-    public AssetStatisticsEntity setDataAsset(String arg){
-        this.dataAsset = arg;
-        return this;
-    }
-    public Long getRunningDays(){
-        return this.runningDays;
-    }
-    public AssetStatisticsEntity setRunningDays(Long arg){
-        this.runningDays = arg;
-        return this;
-    }
-    public BigDecimal getDataStorage(){
-        return this.dataStorage;
-    }
-    public AssetStatisticsEntity setDataStorage(BigDecimal arg){
-        this.dataStorage = arg;
-        return this;
-    }
-    public Long getDataRequests(){
-        return this.dataRequests;
-    }
-    public AssetStatisticsEntity setDataRequests(Long arg){
-        this.dataRequests = arg;
-        return this;
-    }
-    public Long getDataSubjects(){
-        return this.dataSubjects;
-    }
-    public AssetStatisticsEntity setDataSubjects(Long arg){
-        this.dataSubjects = arg;
-        return this;
-    }
-    public Long getAssetIndustryCategories(){
-        return this.assetIndustryCategories;
-    }
-    public AssetStatisticsEntity setAssetIndustryCategories(Long arg){
-        this.assetIndustryCategories = arg;
-        return this;
-    }
-    public Long getAssetSubjects(){
-        return this.assetSubjects;
-    }
-    public AssetStatisticsEntity setAssetSubjects(Long arg){
-        this.assetSubjects = arg;
-        return this;
-    }
-    public Long getAssetBusinessCategories(){
-        return this.assetBusinessCategories;
-    }
-    public AssetStatisticsEntity setAssetBusinessCategories(Long arg){
-        this.assetBusinessCategories = arg;
-        return this;
-    }
-    public Long getAssetSpecialTopics(){
-        return this.assetSpecialTopics;
-    }
-    public AssetStatisticsEntity setAssetSpecialTopics(Long arg){
-        this.assetSpecialTopics = arg;
-        return this;
-    }
+
 }
