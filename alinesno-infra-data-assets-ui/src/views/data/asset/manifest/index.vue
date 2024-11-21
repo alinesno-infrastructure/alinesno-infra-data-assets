@@ -27,14 +27,14 @@
         </div>
       </el-col>
 
-      <!--指令数据-->
+      <!--清单数据-->
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="100px">
-          <el-form-item label="指令名称" prop="promptName">
-            <el-input v-model="queryParams.promptName" placeholder="请输入指令名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
+          <el-form-item label="清单名称" prop="tableName">
+            <el-input v-model="queryParams.tableName" placeholder="请输入清单名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="指令名称" prop="promptName">
-            <el-input v-model="queryParams['condition[promptName|like]']" placeholder="请输入指令名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
+          <el-form-item label="清单名称" prop="tableName">
+            <el-input v-model="queryParams['condition[tableName|like]']" placeholder="请输入清单名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -57,7 +57,7 @@
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="PromptList" @selection-change="handleSelectionChange">
+        <el-table v-loading="loading" :data="ManifestList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :align="'center'" />
 
           <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
@@ -73,39 +73,26 @@
           </el-table-column>
 
           <!-- 业务字段-->
-          <el-table-column label="指令名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
+          <el-table-column label="清单名称" align="left" key="tableName" prop="tableName" v-if="columns[0].visible">
             <template #default="scope">
               <div>
-                {{ scope.row.promptName }}
+                {{ scope.row.tableName }}
               </div>
               <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
-                会话次数: 12734  调用码: {{ scope.row.promptId }} <el-icon><CopyDocument /></el-icon>
+                描述: {{ scope.row.description }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="使用次数" align="center" width="100" key="useCount" prop="useCount" v-if="columns[2].visible" :show-overflow-tooltip="true">
-            <template #default="scope">
-              <span v-if="scope.row.useCount">{{ scope.row.useCount }}</span>
-              <span v-else>0</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="Prompt配置" align="center" width="130" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
-            <template #default="scope">
-              <el-button type="primary" text bg icon="Paperclip" @click="configPrompt(scope.row)">配置</el-button>
-            </template>
-          </el-table-column>
-          <el-table-column label="类型" align="center" width="200" key="promptType" prop="promptType" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <!-- <el-table-column label="数据来源" align="center" key="dataSourceApi" prop="dataSourceApi" v-if="columns[4].visible" width="200" /> -->
-          <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[5].visible" >
-            <template #default="scope">
-              <el-switch
-                  v-model="scope.row.hasStatus"
-                  active-value="0"
-                  inactive-value="1"
-              />
-            </template>
-          </el-table-column>
+          <el-table-column label="主题域" align="center" key="dataDomain" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true" />
 
+          <el-table-column label="字段" align="center" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <el-button type="primary" text bg icon="Paperclip" @click="configManifestField(scope.row)">配置</el-button>
+            </template>
+          </el-table-column>
           <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
             <template #default="scope">
               <span>{{ parseTime(scope.row.addTime) }}</span>
@@ -115,13 +102,13 @@
           <!-- 操作字段  -->
           <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
             <template #default="scope">
-              <el-tooltip content="修改" placement="top" v-if="scope.row.PromptId !== 1">
+              <el-tooltip content="修改" placement="top" v-if="scope.row.ManifestId !== 1">
                 <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-                           v-hasPermi="['system:Prompt:edit']"></el-button>
+                           v-hasPermi="['system:Manifest:edit']"></el-button>
               </el-tooltip>
-              <el-tooltip content="删除" placement="top" v-if="scope.row.PromptId !== 1">
+              <el-tooltip content="删除" placement="top" v-if="scope.row.ManifestId !== 1">
                 <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-                           v-hasPermi="['system:Prompt:remove']"></el-button>
+                           v-hasPermi="['system:Manifest:remove']"></el-button>
               </el-tooltip>
             </template>
 
@@ -131,21 +118,21 @@
       </el-col>
     </el-row>
 
-    <!-- 添加或修改指令配置对话框 -->
+    <!-- 添加或修改清单配置对话框 -->
     <el-dialog :title="promptTitle" v-model="promptOpen" width="1024" destroy-on-close append-to-body>
 
-      <PromptEditor :currentPostId="currentPostId" :currentPromptContent="currentPromptContent" />
+      <ManifestEditor :currentPostId="currentPostId" :currentManifestContent="currentManifestContent" />
 
     </el-dialog>
 
-    <!-- 添加或修改指令配置对话框 -->
+    <!-- 添加或修改清单配置对话框 -->
     <el-dialog :title="title" v-model="open" width="900px" append-to-body>
       <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px">
         <el-row>
           <el-col :span="24">
-            <el-form-item style="width: 100%;" label="类型" prop="promptType">
+            <el-form-item style="width: 100%;" label="类型" prop="dataDomain">
               <el-tree-select
-                  v-model="form.promptType"
+                  v-model="form.dataDomain"
                   :data="deptOptions"
                   :props="{ value: 'id', label: 'label', children: 'children' }"
                   value-key="id"
@@ -157,23 +144,23 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="名称" prop="promptName">
-              <el-input v-model="form.promptName" placeholder="请输入指令名称" maxlength="50" />
+            <el-form-item label="名称" prop="tableName">
+              <el-input v-model="form.tableName" placeholder="请输入清单名称" maxlength="50" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="数据来源" prop="dataSourceApi">
-              <el-input v-model="form.dataSourceApi" placeholder="请输入dataSourceApi数据来源" maxlength="128" />
+            <el-form-item label="描述" prop="description">
+              <el-input v-model="form.description" placeholder="请输入description数据来源" maxlength="128" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="24">
-            <el-form-item label="备注" prop="promptDesc">
-              <el-input v-model="form.promptDesc" placeholder="请输入指令备注"></el-input>
+            <el-form-item label="涉密等级" prop="confidentialityLevel">
+              <el-input v-model="form.confidentialityLevel" placeholder="请输入涉密等级"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -189,29 +176,32 @@
   </div>
 </template>
 
-<script setup name="Prompt">
+<script setup name="Manifest">
 
 import {
-  listPrompt,
-  delPrompt,
-  getPrompt,
-  updatePrompt,
   catalogTreeSelect,
-  addPrompt
 } from "@/api/data/asset/dataAsset";
 
-import PromptEditor from "./editor.vue"
+import {
+  listManifest,
+  delManifest,
+  getManifest,
+  updateManifest,
+  addManifest
+} from "@/api/data/asset/manifest";
+
+import ManifestEditor from "./editor.vue"
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 
 // 定义变量
-const PromptList = ref([]);
+const ManifestList = ref([]);
 const open = ref(false);
 
 const promptTitle = ref("");
 const currentPostId = ref("");
-const currentPromptContent = ref([]);
+const currentManifestContent = ref([]);
 const promptOpen = ref(false);
 
 const loading = ref(true);
@@ -228,11 +218,11 @@ const roleOptions = ref([]);
 
 // 列显隐信息
 const columns = ref([
-  { key: 0, label: `指令名称`, visible: true },
-  { key: 1, label: `指令描述`, visible: true },
+  { key: 0, label: `清单名称`, visible: true },
+  { key: 1, label: `清单描述`, visible: true },
   { key: 2, label: `表数据量`, visible: true },
   { key: 3, label: `类型`, visible: true },
-  { key: 4, label: `指令地址`, visible: true },
+  { key: 4, label: `清单地址`, visible: true },
   { key: 5, label: `状态`, visible: true },
   { key: 6, label: `更新时间`, visible: true }
 ]);
@@ -242,26 +232,26 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    promptName: undefined,
-    promptDesc: undefined,
+    tableName: undefined,
+    confidentialityLevel: undefined,
     catalogId: undefined
   },
   rules: {
-    promptName: [{ required: true, message: "名称不能为空", trigger: "blur" }] ,
-    dataSourceApi: [{ required: true, message: "连接不能为空", trigger: "blur" }],
-    promptType: [{ required: true, message: "类型不能为空", trigger: "blur" }] ,
-    promptDesc: [{ required: true, message: "备注不能为空", trigger: "blur" }]
+    tableName: [{ required: true, message: "名称不能为空", trigger: "blur" }] ,
+    description: [{ required: true, message: "连接不能为空", trigger: "blur" }],
+    dataDomain: [{ required: true, message: "类型不能为空", trigger: "blur" }] ,
+    confidentialityLevel: [{ required: true, message: "备注不能为空", trigger: "blur" }]
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询指令列表 */
+/** 查询清单列表 */
 function getList() {
   loading.value = true;
-  listPrompt(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
+  listManifest(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
     loading.value = false;
-    PromptList.value = res.rows;
+    ManifestList.value = res.rows;
     total.value = res.total;
   });
 };
@@ -291,9 +281,9 @@ function resetQuery() {
 };
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const PromptIds = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除指令编号为"' + PromptIds + '"的数据项？').then(function () {
-    return delPrompt(PromptIds);
+  const ManifestIds = row.id || ids.value;
+  proxy.$modal.confirm('是否确认删除清单编号为"' + ManifestIds + '"的数据项？').then(function () {
+    return delManifest(ManifestIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -314,15 +304,12 @@ function getDeptTree() {
   });
 };
 
-/** 配置Prompt */
-function configPrompt(row){
-  promptTitle.value = "配置角色Prompt";
-  promptOpen.value = true ;
-  currentPostId.value = row.id;
-
-  if(row.promptContent){
-    currentPromptContent.value = JSON.parse(row.promptContent);
-  }
+/** 配置Manifest */
+function configManifestField(row){
+  router.push({
+    path:'/asset/data/asset/manifest/editorField' ,
+    query: { 'manifestId': row.id }
+  })
 }
 
 /** 重置操作表单 */
@@ -330,7 +317,7 @@ function reset() {
   form.value = {
     id: undefined,
     deptId: undefined,
-    PromptName: undefined,
+    ManifestName: undefined,
     nickName: undefined,
     password: undefined,
     phonenumber: undefined,
@@ -350,17 +337,17 @@ function cancel() {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加指令";
+  title.value = "添加清单";
 };
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const PromptId = row.id || ids.value;
-  getPrompt(PromptId).then(response => {
+  const ManifestId = row.id || ids.value;
+  getManifest(ManifestId).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改指令";
+    title.value = "修改清单";
   });
 };
 
@@ -369,13 +356,13 @@ function submitForm() {
   proxy.$refs["databaseRef"].validate(valid => {
     if (valid) {
       if (form.value.id != undefined) {
-        updatePrompt(form.value).then(response => {
+        updateManifest(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addPrompt(form.value).then(response => {
+        addManifest(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
