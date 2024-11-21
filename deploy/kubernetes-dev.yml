@@ -42,9 +42,11 @@ spec:
               value: |
                 -Dspring.data.redis.host=${REDIS_HOST}
                 -Dspring.data.redis.password=${REDIS_KEY}
+                
                 -Dspring.datasource.url=jdbc:mysql://${DB_MYSQL_URL}/dev_alinesno_infra_data_assets_v100?serverTimezone=GMT%2B8&zeroDateTimeBehavior=CONVERT_TO_NULL
                 -Dspring.datasource.username=${DB_MYSQL_USRENAME}
                 -Dspring.datasource.password=${DB_MYSQL_PASSWORD}
+                
                 -Dserver.port=8080
           ports:
             - name: http
