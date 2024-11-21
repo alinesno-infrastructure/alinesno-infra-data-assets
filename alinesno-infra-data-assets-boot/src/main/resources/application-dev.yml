@@ -5,12 +5,20 @@ server:
 spring:
   application:
     name: alinesno-infra-data-assets-boot
-    id: 1848341995578118144
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dev_alinesno_infra_data_assets_v100?serverTimezone=GMT%2B8&zeroDateTimeBehavior=CONVERT_TO_NULL
-    username: root
-    password: adminer
+    id: 1859413612966105088
+  datasource.dynamic:
+    primary: mysql
+    datasource:
+      mysql:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/dev_alinesno_infra_base_search_v100?characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+        username: root
+        password: adminer
+      postgresql:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:5432/your_database
+        username: your_username
+        password: your_password
   data:
     redis:
       host: 127.0.0.1
@@ -52,6 +60,7 @@ alinesno:
     excludes:
       - /sso/**
       - /logout
+      - /api/assets/collector/**
   infra:
     gateway:
       host: http://alinesno-infra-base-gateway-proxy-application.beta.base.infra.linesno.com
