@@ -43,18 +43,7 @@ public class AppConfiguration implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
         log.debug("服务应用启动.");
-
-//        // 初始化资产目录
-//        simpleService.catalog();
-//
-//        // 初始化标签分类
-//        simpleService.label();
-//
-//        // 示例资产数据
-//        simpleService.data();
-
     }
 
 }
