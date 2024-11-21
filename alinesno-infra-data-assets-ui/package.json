@@ -14,6 +14,7 @@
     "@element-plus/icons-vue": "2.0.10",
     "@vueup/vue-quill": "1.1.0",
     "@vueuse/core": "9.5.0",
+    "alinesno-infra-data-assets-ui": "file:",
     "axios": "1.6.0",
     "echarts": "5.4.0",
     "element-plus": "2.2.27",
