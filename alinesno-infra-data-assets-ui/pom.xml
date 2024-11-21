@@ -2,15 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.alinesno.infra.common</groupId>
-        <artifactId>alinesno-infra-platform-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.4</version>
+        <relativePath></relativePath>
     </parent>
 
-    <groupId>com.alinesno.infra.ui</groupId>
-    <artifactId>alinesno-infra-data-assets-ui</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <artifactId>alinesno-ui</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -22,9 +20,17 @@
         <spring-cloud.version>2022.0.3</spring-cloud.version>
     </properties>
 
-    <dependencies>
-
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -36,8 +42,9 @@
                 <version>1.13.4</version>
 
                 <configuration>
-                    <!-- 若不方便访问官网，可使用国内淘宝镜像-->
+                    <!-- 若不方便访问官网，可使用国内淘宝镜像
                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+                    -->
                     <npmDownloadRoot>https://registry.npm.taobao.org/npm/-/</npmDownloadRoot>
                     <yarnDownloadRoot>http://data.linesno.com/web-tools/yarn/</yarnDownloadRoot>
                 </configuration>
@@ -50,7 +57,7 @@
                         </goals>
                         <configuration>
                             <nodeVersion>v16.13.1</nodeVersion>
-                            <yarnVersion>v1.22.10</yarnVersion>
+                            <yarnVersion>v1.22.22</yarnVersion>
                         </configuration>
                     </execution>
                     <execution>
@@ -125,6 +132,7 @@
                     </execution>
                 </executions>
             </plugin>
+
 
         </plugins>
     </build>
