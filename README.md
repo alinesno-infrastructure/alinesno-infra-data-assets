@@ -37,6 +37,17 @@
     - 备份与恢复：确保数据的可靠性和可恢复性。
     - 使用分析：监控系统使用情况，帮助优化性能和用户体验。
 
+## 库设计
+
+- 元数据库: mysql
+- 数据资产库: postgresql
+
+- (不在当前应用管理中)数据仓库: clickhouse + minio(分布式存储)
+
+## 
+
+
+
 ## 鸣谢
 
 - 开发参考阿里云的数据资产运营平台：https://www.aliyun.com/product/data-asset-platform
