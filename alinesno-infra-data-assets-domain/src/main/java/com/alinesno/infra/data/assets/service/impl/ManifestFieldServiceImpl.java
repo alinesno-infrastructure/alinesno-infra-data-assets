@@ -5,15 +5,18 @@ import com.alinesno.infra.data.assets.api.TableFieldRequestDto;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
 import com.alinesno.infra.data.assets.mapper.ManifestFieldMapper;
 import com.alinesno.infra.data.assets.service.IManifestFieldService;
-import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.lang.exception.RpcServiceRuntimeException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 资产收藏Service业务层处理
@@ -34,12 +37,12 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
      * @param fieldRequests
      * @param mId
      */
+    @DS("postgresql")
     @SneakyThrows
     @Override
     public void saveTableStructure(List<TableFieldRequestDto> fieldRequests, long mId) {
         log.debug("fieldRequests={} , mId={}", fieldRequests, mId);
 
-        DynamicDataSourceContextHolder.push("postgresql");
         log.debug("当前使用数据源:{}", pgJdbcTemplate.getDataSource().getConnection().getClientInfo());
 
         String tableName = "table_" + mId;
@@ -53,32 +56,33 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
             // 表存在，更新表结构
             updateTableStructure(tableName, fieldRequests);
         }
-//        DynamicDataSourceContextHolder.poll();
-//
-//        // --->>>>>>>>>>>>>>>>>>> 切换数据库保存元数据
-//        DynamicDataSourceContextHolder.push("mysql");
-//        log.debug("当前使用数据源:{}", pgJdbcTemplate.getDataSource().getConnection().getClientInfo());
-//
-//        // 删除掉之前所有当前的表结构
-//        LambdaUpdateWrapper<ManifestFieldEntity> wrapper = new LambdaUpdateWrapper<>();
-//        wrapper.eq(ManifestFieldEntity::getManifestId, mId);
-//        remove(wrapper);
-//
-//        // 将 fieldRequests 转换为 List<ManifestFieldEntity>，调用mybatis-plus方法保存到数据库中
-//        List<ManifestFieldEntity> manifestFieldEntities = fieldRequests.stream()
-//                .map(field -> ManifestFieldEntity.builder()
-//                        .manifestId(mId)
-//                        .name(field.getName())
-//                        .type(field.getType())
-//                        .length(field.getLength())
-//                        .isNullable(field.getIsNullable())
-//                        .isPrimaryKey(field.getIsPrimaryKey())
-//                        .comment(field.getComment())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        saveBatch(manifestFieldEntities);
-//        DynamicDataSourceContextHolder.poll();
+
+    }
+
+    @Override
+    public void saveManifest(List<TableFieldRequestDto> fieldRequests, long mId) {
+
+        // 删除掉之前所有当前的表结构
+        LambdaUpdateWrapper<ManifestFieldEntity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(ManifestFieldEntity::getManifestId, mId);
+        remove(wrapper);
+
+        // 将 fieldRequests 转换为 List<ManifestFieldEntity>，调用mybatis-plus方法保存到数据库中
+        List<ManifestFieldEntity> manifestFieldEntities = fieldRequests.stream()
+                .map(field -> {
+                    ManifestFieldEntity entity = new ManifestFieldEntity();
+                    entity.setManifestId(mId);
+                    entity.setFieldName(field.getName());
+                    entity.setFieldType(field.getType());
+                    entity.setFiledLength(field.getLength());
+                    entity.setIsNullable(field.getIsNullable());
+                    entity.setIsPrimaryKey(field.getIsPrimaryKey());
+                    entity.setFieldComment(field.getComment());
+                    return entity;
+                })
+                .collect(Collectors.toList());
+
+        saveBatch(manifestFieldEntities);
     }
 
 
@@ -112,6 +116,54 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
         log.debug("createTableSql = {}", createTableSql.toString());
 
         log.info("Table {} created successfully", tableName);
+
+        // 插入示例数据
+        insertExampleData(tableName, fieldRequests);
+
+    }
+
+    private void insertExampleData(String tableName, List<TableFieldRequestDto> fieldRequests) {
+        StringBuilder insertSql = new StringBuilder("INSERT INTO ").append(tableName).append(" (");
+
+        // 构建列名部分
+        for (int i = 0; i < fieldRequests.size(); i++) {
+            TableFieldRequestDto field = fieldRequests.get(i);
+            insertSql.append(field.getName());
+            if (i < fieldRequests.size() - 1) {
+                insertSql.append(", ");
+            }
+        }
+
+        insertSql.append(") VALUES (");
+
+        // 构建值部分
+        for (int i = 0; i < fieldRequests.size(); i++) {
+            TableFieldRequestDto field = fieldRequests.get(i);
+            String value = getExampleValue(field.getType());
+            insertSql.append(value);
+            if (i < fieldRequests.size() - 1) {
+                insertSql.append(", ");
+            }
+        }
+
+        insertSql.append(");");
+
+        pgJdbcTemplate.execute(insertSql.toString());
+
+        log.debug("insertSql = {}", insertSql.toString());
+
+        log.info("Example data inserted into table {}", tableName);
+    }
+
+    private String getExampleValue(String type) {
+        return switch (type.toLowerCase()) {
+            case "varchar", "string" -> "'1'";
+            case "integer" -> "123";
+            case "float" -> "123.45";
+            case "boolean" -> "true";
+            case "date" -> "'2024-01-01'";
+            default -> throw new IllegalArgumentException("Unsupported data type: " + type);
+        };
     }
 
     private void updateTableStructure(String tableName, List<TableFieldRequestDto> fieldRequests) {
@@ -139,27 +191,47 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
 
         // 删除字段
         for (String column : columnsToDelete) {
-            String dropColumnSql = "ALTER TABLE " + tableName + " DROP COLUMN " + column;
-            log.debug("dropColumnSql = {}", dropColumnSql);
-            pgJdbcTemplate.execute(dropColumnSql);
-            log.info("Column {} dropped from table {}", column, tableName);
+            if (columnExists(tableName, column)) {
+                String dropColumnSql = "ALTER TABLE " + tableName + " DROP COLUMN " + column;
+                log.debug("Executing SQL: {}", dropColumnSql);
+                try {
+                    pgJdbcTemplate.execute(dropColumnSql);
+                    log.info("Column {} dropped from table {}", column, tableName);
+                } catch (Exception e) {
+                    log.error("Failed to drop column {}: {}", column, e.getMessage());
+                    throw new RpcServiceRuntimeException("Failed to drop column " + column, e.getMessage());
+                }
+            } else {
+                log.warn("Column {} does not exist in table {}", column, tableName);
+            }
         }
 
         // 添加字段
         for (TableFieldRequestDto field : columnsToAdd) {
             String addColumnSql = "ALTER TABLE " + tableName + " ADD COLUMN " + field.getName() + " " +
                     mapTypeToSql(field.getType(), field.getLength());
-            if (!field.getIsNullable()) {
-                addColumnSql += " NOT NULL";
-            }
-            if (field.getIsPrimaryKey()) {
-                addColumnSql += " PRIMARY KEY";
-            }
 
-            log.debug("addColumnSql = {}", addColumnSql);
+            log.debug("Executing SQL: {}", addColumnSql);
+            try {
+                pgJdbcTemplate.execute(addColumnSql);
+                log.info("Column {} added to table {}", field.getName(), tableName);
 
-            pgJdbcTemplate.execute(addColumnSql);
-            log.info("Column {} added to table {}", field.getName(), tableName);
+                if (!field.getIsNullable()) {
+                    // 更新所有行以填充默认值
+                    String updateSql = "UPDATE " + tableName + " SET " + field.getName() + " = " + getDefaultValue(field.getType());
+                    log.debug("Executing SQL: {}", updateSql);
+                    pgJdbcTemplate.execute(updateSql);
+
+                    // 设置 NOT NULL 约束
+                    String setNotNullSql = "ALTER TABLE " + tableName + " ALTER COLUMN " + field.getName() + " SET NOT NULL";
+                    log.debug("Executing SQL: {}", setNotNullSql);
+                    pgJdbcTemplate.execute(setNotNullSql);
+                    log.info("Column {} set to NOT NULL in table {}", field.getName(), tableName);
+                }
+            } catch (Exception e) {
+                log.error("Failed to add column {}: {}", field.getName(), e.getMessage());
+                throw new RpcServiceRuntimeException("Failed to add column " + field.getName(), e.getMessage());
+            }
         }
 
         // 更新字段
@@ -174,15 +246,42 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
             if (field.getIsPrimaryKey()) {
                 // 如果是主键，则需要先删除旧的主键约束再添加新的
                 String dropPkConstraintSql = "ALTER TABLE " + tableName + " DROP CONSTRAINT IF EXISTS " + tableName + "_pkey";
-                pgJdbcTemplate.execute(dropPkConstraintSql);
+                log.debug("Executing SQL: {}", dropPkConstraintSql);
+                try {
+                    pgJdbcTemplate.execute(dropPkConstraintSql);
+                } catch (Exception e) {
+                    log.error("Failed to drop primary key constraint: {}", e.getMessage());
+                }
                 alterColumnSql += ", ADD PRIMARY KEY (" + field.getName() + ")";
             }
 
-            log.debug("alterColumnSql = {}", alterColumnSql);
-
-            pgJdbcTemplate.execute(alterColumnSql);
-            log.info("Column {} updated in table {}", field.getName(), tableName);
+            log.debug("Executing SQL: {}", alterColumnSql);
+            try {
+                pgJdbcTemplate.execute(alterColumnSql);
+                log.info("Column {} updated in table {}", field.getName(), tableName);
+            } catch (Exception e) {
+                log.error("Failed to update column {}: {}", field.getName(), e.getMessage());
+                throw new RpcServiceRuntimeException("Failed to update column " + field.getName(), e.getMessage());
+            }
         }
+    }
+
+    private String getDefaultValue(String type) {
+        return switch (type.toLowerCase()) {
+            case "varchar", "string" -> "'v'";
+            case "integer" -> "0";
+            case "float" -> "0.0";
+            case "boolean" -> "false";
+            case "date" -> "CURRENT_DATE";
+            default -> throw new IllegalArgumentException("Unsupported data type: " + type);
+        };
+    }
+
+
+    private boolean columnExists(String tableName, String columnName) {
+        String sql = "SELECT column_name FROM information_schema.columns WHERE table_name = ? AND column_name = ?";
+        List<String> columns = pgJdbcTemplate.queryForList(sql, new Object[]{tableName, columnName}, String.class);
+        return !columns.isEmpty();
     }
 
     private boolean requiresUpdate(String tableName, TableFieldRequestDto field) {
@@ -218,8 +317,11 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
     private Boolean isColumnPrimaryKey(String tableName, String columnName) {
         // 查询当前列是否为主键
         // 注意：这里假设每个表只有一个主键，如果有复合主键则需要更复杂的逻辑
-        String sql = "SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attnum = ANY(i.indkey) AND a.attrelid = i.indrelid WHERE i.indisprimary AND a.attname = ? AND i.indrelid::regclass::text = ?";
-        return pgJdbcTemplate.queryForObject(sql, new Object[]{columnName, tableName}, Boolean.class);
+        return false;
+
+        // TODO 后期判断主键
+//        String sql = "SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attnum = ANY(i.indkey) AND a.attrelid = i.indrelid WHERE i.indisprimary AND a.attname = ? AND i.indrelid::regclass::text = ?";
+//        return pgJdbcTemplate.queryForObject(sql, new Object[]{columnName, tableName}, Boolean.class);
     }
 
     private List<String> getExistingColumns(String tableName) {
@@ -230,7 +332,7 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
 
     private String mapTypeToSql(String type, Integer length) {
         return switch (type.toLowerCase()) {
-            case "varchar" -> "VARCHAR(" + (length == null ? 255 : length) + ")";
+            case "varchar", "string" -> "VARCHAR(" + (length == null ? 255 : length) + ")";
             case "integer" -> "INTEGER";
             case "float" -> "FLOAT";
             case "boolean" -> "BOOLEAN";
