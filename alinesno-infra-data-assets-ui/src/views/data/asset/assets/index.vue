@@ -57,7 +57,28 @@
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="PromptList" @selection-change="handleSelectionChange">
+         <el-table v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
+    <el-table-column type="selection" width="50" :align="'center'" />
+    
+    <!-- 动态生成表头 -->
+    <el-table-column v-for="field in fields" :key="field.fieldName" :label="field.fieldComment" :prop="field.fieldName" :align="field.fieldType === 'string' ? 'left' : 'center'" />
+    
+    <!-- 操作字段  -->
+    <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
+      <template #default="scope">
+        <el-tooltip content="修改" placement="top">
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
+        </el-tooltip>
+        <el-tooltip content="删除" placement="top">
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"></el-button>
+        </el-tooltip>
+      </template>
+    </el-table-column>
+  </el-table>
+  <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
+
+        <!--
+        <el-table v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :align="'center'" />
 
           <el-table-column label="图标" :align="'center'" width="50" key="status" v-if="columns[5].visible">
@@ -72,7 +93,6 @@
             </template>
           </el-table-column>
 
-          <!-- 业务字段-->
           <el-table-column label="名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
             <template #default="scope">
               <div>
@@ -113,31 +133,27 @@
             </template>
           </el-table-column>
 
-          <!-- 操作字段  -->
           <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
             <template #default="scope">
-              <el-tooltip content="修改" placement="top" v-if="scope.row.PromptId !== 1">
+              <el-tooltip content="修改" placement="top" v-if="scope.row.AssetDataId !== 1">
                 <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-                           v-hasPermi="['system:Prompt:edit']"></el-button>
+                           v-hasPermi="['system:AssetData:edit']"></el-button>
               </el-tooltip>
-              <el-tooltip content="删除" placement="top" v-if="scope.row.PromptId !== 1">
+              <el-tooltip content="删除" placement="top" v-if="scope.row.AssetDataId !== 1">
                 <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-                           v-hasPermi="['system:Prompt:remove']"></el-button>
+                           v-hasPermi="['system:AssetData:remove']"></el-button>
               </el-tooltip>
             </template>
 
           </el-table-column>
         </el-table>
+
         <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
+        -->
+
+
       </el-col>
     </el-row>
-
-    <!-- 添加或修改指令配置对话框 -->
-    <el-dialog :title="promptTitle" v-model="promptOpen" width="1024" destroy-on-close append-to-body>
-
-      <PromptEditor :currentPostId="currentPostId" :currentPromptContent="currentPromptContent" />
-
-    </el-dialog>
 
     <!-- 添加或修改指令配置对话框 -->
     <el-dialog :title="title" v-model="open" width="900px" append-to-body>
@@ -190,29 +206,30 @@
   </div>
 </template>
 
-<script setup name="Prompt">
+<script setup name="AssetData">
 
 import {
-  listPrompt,
-  delPrompt,
-  getPrompt,
-  updatePrompt,
+  listAssetData,
+  delAssetData,
+  getAssetData,
+  updateAssetData,
   catalogTreeSelect,
-  addPrompt
+  catalogManifestTreeSelect,
+  addAssetData
 } from "@/api/data/asset/dataAsset";
 
-import PromptEditor from "./editor.vue"
+// import AssetDataEditor from "./editor.vue"
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 
 // 定义变量
-const PromptList = ref([]);
+const AssetDataList = ref([]);
 const open = ref(false);
 
 const promptTitle = ref("");
 const currentPostId = ref("");
-const currentPromptContent = ref([]);
+const currentAssetDataContent = ref([]);
 const promptOpen = ref(false);
 
 const loading = ref(true);
@@ -226,6 +243,7 @@ const dateRange = ref([]);
 const deptOptions = ref(undefined);
 const postOptions = ref([]);
 const roleOptions = ref([]);
+const fields = ref([]);
 
 // 列显隐信息
 const columns = ref([
@@ -245,7 +263,7 @@ const data = reactive({
     pageSize: 10,
     promptName: undefined,
     promptDesc: undefined,
-    catalogId: undefined
+    manifestId: undefined
   },
   rules: {
     promptName: [{ required: true, message: "名称不能为空", trigger: "blur" }] ,
@@ -260,16 +278,19 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询指令列表 */
 function getList() {
   loading.value = true;
-  listPrompt(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
+  listAssetData(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
     loading.value = false;
-    PromptList.value = res.rows;
+    AssetDataList.value = res.rows;
     total.value = res.total;
+    fields.value = res.fields; // 动态设置表头
+  }).finally(() => {
+    loading.value = false;
   });
 };
 
 // 节点单击事件
 function handleNodeClick(data) {
-  queryParams.value.catalogId = data.id;
+  queryParams.value.manifestId = data.id;
   console.log('data.id = ' + data.id)
   getList();
 }
@@ -285,16 +306,16 @@ function resetQuery() {
   dateRange.value = [];
   proxy.resetForm("queryRef");
 
-  queryParams.value.catalogId = undefined;
+  queryParams.value.manifestId = undefined;
 
   proxy.$refs.deptTreeRef.setCurrentKey(null);
   handleQuery();
 };
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const PromptIds = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除指令编号为"' + PromptIds + '"的数据项？').then(function () {
-    return delPrompt(PromptIds);
+  const AssetDataIds = row.id || ids.value;
+  proxy.$modal.confirm('是否确认删除指令编号为"' + AssetDataIds + '"的数据项？').then(function () {
+    return delAssetData(AssetDataIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -310,19 +331,19 @@ function handleSelectionChange(selection) {
 
 /** 查询类型下拉树结构 */
 function getDeptTree() {
-  catalogTreeSelect().then(response => {
+  catalogManifestTreeSelect().then(response => {
     deptOptions.value = response.data;
   });
 };
 
-/** 配置Prompt */
-function configPrompt(row){
-  promptTitle.value = "配置角色Prompt";
+/** 配置AssetData */
+function configAssetData(row){
+  promptTitle.value = "配置角色AssetData";
   promptOpen.value = true ;
   currentPostId.value = row.id;
 
   if(row.promptContent){
-    currentPromptContent.value = JSON.parse(row.promptContent);
+    currentAssetDataContent.value = JSON.parse(row.promptContent);
   }
 }
 
@@ -331,7 +352,7 @@ function reset() {
   form.value = {
     id: undefined,
     deptId: undefined,
-    PromptName: undefined,
+    AssetDataName: undefined,
     nickName: undefined,
     password: undefined,
     phonenumber: undefined,
@@ -357,8 +378,8 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const PromptId = row.id || ids.value;
-  getPrompt(PromptId).then(response => {
+  const AssetDataId = row.id || ids.value;
+  getAssetData(AssetDataId).then(response => {
     form.value = response.data;
     open.value = true;
     title.value = "修改指令";
@@ -370,13 +391,13 @@ function submitForm() {
   proxy.$refs["databaseRef"].validate(valid => {
     if (valid) {
       if (form.value.id != undefined) {
-        updatePrompt(form.value).then(response => {
+        updateAssetData(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addPrompt(form.value).then(response => {
+        addAssetData(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
