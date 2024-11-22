@@ -22,9 +22,18 @@ var managerUrl = {
     exportUrl: prefix + "exportExcel",
     changeField: prefix + "changeField",
     downloadfile: prefix + "downloadfile",
-    updatePromptContent: prefix + "updatePromptContent",
+    updateAssetDataContent: prefix + "updateAssetDataContent",
     catalogTreeSelect: prefix + "catalogTreeSelect",
-    getPromptContent: prefix + "getPromptContent",
+    catalogManifestTreeSelect: prefix + "catalogManifestTreeSelect",
+    getAssetDataContent: prefix + "getAssetDataContent",
+}
+
+// 查询清单下拉树结构
+export function catalogManifestTreeSelect() {
+    return request({
+        url: managerUrl.catalogManifestTreeSelect ,
+        method: 'get'
+    })
 }
 
 // 查询部门下拉树结构
@@ -35,17 +44,17 @@ export function catalogTreeSelect() {
     })
 }
 
-// 列新PromptContent
-export function updatePromptContent(data , postId) {
+// 列新AssetDataContent
+export function updateAssetDataContent(data , postId) {
     return request({
-        url: managerUrl.updatePromptContent + '?postId=' + postId,
+        url: managerUrl.updateAssetDataContent + '?postId=' + postId,
         method: 'post',
         data: data
     })
 }
 
 // 查询数据库列表
-export function listPrompt(query) {
+export function listAssetData(query) {
     return request({
         url: managerUrl.datatables ,
         method: 'post',
@@ -53,16 +62,16 @@ export function listPrompt(query) {
     })
 }
 
-// 获取PromptContent内容
-export function getPromptContent(postId) {
+// 获取AssetDataContent内容
+export function getAssetDataContent(postId) {
     return request({
-        url: managerUrl.getPromptContent+ '?postId=' + parseStrEmpty(postId),
+        url: managerUrl.getAssetDataContent+ '?postId=' + parseStrEmpty(postId),
         method: 'get'
     })
 }
 
 // 查询数据库详细
-export function getPrompt(databaseId) {
+export function getAssetData(databaseId) {
     return request({
         url: managerUrl.detailUrl + '/' + parseStrEmpty(databaseId),
         method: 'get'
@@ -70,7 +79,7 @@ export function getPrompt(databaseId) {
 }
 
 // 新增数据库
-export function addPrompt(data) {
+export function addAssetData(data) {
     return request({
         url: managerUrl.saveUrl ,
         method: 'post',
@@ -79,7 +88,7 @@ export function addPrompt(data) {
 }
 
 // 修改数据库
-export function updatePrompt(data) {
+export function updateAssetData(data) {
     return request({
         url: managerUrl.updateUrl ,
         method: 'put',
@@ -88,7 +97,7 @@ export function updatePrompt(data) {
 }
 
 // 删除数据库
-export function delPrompt(databaseId) {
+export function delAssetData(databaseId) {
     return request({
         url: managerUrl.removeUrl + '/' + parseStrEmpty(databaseId),
         method: 'delete'
