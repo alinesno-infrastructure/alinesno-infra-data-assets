@@ -1,12 +1,13 @@
 package com.alinesno.infra.data.assets.collector.service;
 
-import org.springframework.stereotype.Service;
+import com.alinesno.infra.data.assets.api.TableMetrics;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Map;
 
 public interface DataAssetService {
-    void handleCsvFile(MultipartFile file, String model);
-    void handleJsonFile(MultipartFile file, String model);
-    void handleListData(List<Map<String, String>> dataList, String model);
+    TableMetrics handleCsvFile(MultipartFile file, String model);
+    TableMetrics handleJsonFile(MultipartFile file, String model);
+    TableMetrics handleListData(List<Map<String, String>> dataList, String model);
 }
