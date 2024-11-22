@@ -63,32 +63,28 @@
           <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
             <template #default="scope">
               <div class="role-icon">
-                <i v-if="scope.row.dataType == 'database'" class="fa-brands fa-wordpress" />
-                <i v-if="scope.row.dataType == 'image'" class="fa-brands fa-envira" />
-                <i v-if="scope.row.dataType == 'document'" class="fa-solid fa-truck-fast" />
-                <i v-if="scope.row.dataType == 'video'" class="fa-solid fa-server" />
-                <i v-if="scope.row.dataType == 'text'" class="fa-solid fa-rocket" />
+                <img src="http://data.linesno.com/icons/entity-icon/table.png" />
               </div>
             </template>
           </el-table-column>
 
           <!-- 业务字段-->
-          <el-table-column label="清单名称" align="left" key="tableName" prop="tableName" v-if="columns[0].visible">
+          <el-table-column label="清单名称" align="left" key="tableName" prop="tableName" v-if="columns[0].visible" :show-overflow-tooltip="true" >
             <template #default="scope">
               <div>
                 {{ scope.row.tableName }}
               </div>
               <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
-                描述: {{ scope.row.description }}
+                {{ scope.row.description }}
               </div>
             </template>
           </el-table-column>
           <el-table-column label="主题域" align="center" key="dataDomain" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true" />
           <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="80" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" />
           <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true" />
 
-          <el-table-column label="字段" align="center" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
+          <el-table-column label="字段" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
               <el-button type="primary" text bg icon="Paperclip" @click="configManifestField(scope.row)">配置</el-button>
             </template>
@@ -119,11 +115,9 @@
     </el-row>
 
     <!-- 添加或修改清单配置对话框 -->
-    <el-dialog :title="promptTitle" v-model="promptOpen" width="1024" destroy-on-close append-to-body>
-
+    <!-- <el-dialog :title="promptTitle" v-model="promptOpen" width="1024" destroy-on-close append-to-body>
       <ManifestEditor :currentPostId="currentPostId" :currentManifestContent="currentManifestContent" />
-
-    </el-dialog>
+    </el-dialog> -->
 
     <!-- 添加或修改清单配置对话框 -->
     <el-dialog :title="title" v-model="open" width="900px" append-to-body>
@@ -190,7 +184,7 @@ import {
   addManifest
 } from "@/api/data/asset/manifest";
 
-import ManifestEditor from "./editor.vue"
+// import ManifestEditor from "./editor.vue"
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
