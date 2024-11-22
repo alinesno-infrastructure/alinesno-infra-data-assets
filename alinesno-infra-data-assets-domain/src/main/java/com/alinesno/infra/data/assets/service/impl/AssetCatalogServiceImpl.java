@@ -4,10 +4,13 @@ import com.alinesno.infra.common.core.service.impl.IBaseServiceImpl;
 import com.alinesno.infra.common.core.utils.StringUtils;
 import com.alinesno.infra.data.assets.api.TreeSelectDto;
 import com.alinesno.infra.data.assets.entity.AssetCatalogEntity;
+import com.alinesno.infra.data.assets.entity.ManifestEntity;
 import com.alinesno.infra.data.assets.mapper.AssetCatalogMapper;
 import com.alinesno.infra.data.assets.service.IAssetCatalogService;
+import com.alinesno.infra.data.assets.service.IManifestService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity, AssetCatalogMapper> implements IAssetCatalogService {
+
+    @Autowired
+    private IManifestService manifestService ;
 
     @Override
     public List<AssetCatalogEntity> selectCatalogList(AssetCatalogEntity promptCatalog) {
@@ -71,6 +77,37 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
         queryWrapper.last("limit " + count);
 
         return list(queryWrapper) ;
+    }
+
+    @Override
+    public List<TreeSelectDto> catalogManifestTreeSelect() {
+
+        List<TreeSelectDto> dtoList = selectCatalogTreeList();
+
+        // 查询叶子节点下面的清单
+        for (TreeSelectDto dto : dtoList) {
+            if (dto.getChildren().isEmpty()) {
+                // 查询叶子节点下面的清单
+                LambdaQueryWrapper<ManifestEntity> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(ManifestEntity::getDataDomain, dto.getId());
+                List<ManifestEntity> manifests = manifestService.list(queryWrapper);
+                if(manifests != null){
+                    // 将ManifestEntity转换成TreeSelectDto类
+                    List<TreeSelectDto> manifestDtos = manifests.stream()
+                            .map(manifest -> {
+                                TreeSelectDto tree = new TreeSelectDto();
+                                tree.setId(manifest.getId());
+                                tree.setLabel(manifest.getTableName());
+                                return tree ;
+                            })
+                            .toList();
+                    dto.setChildren(manifestDtos);
+                }
+            }
+        }
+
+
+        return dtoList ;
     }
 
     /**
