@@ -8,11 +8,12 @@ import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
+import com.alinesno.infra.data.assets.api.AssetsTableDataInfo;
 import com.alinesno.infra.data.assets.entity.AssetCollectionEntity;
 import com.alinesno.infra.data.assets.entity.AssetDataEntity;
-import com.alinesno.infra.data.assets.service.IAssetCatalogService;
-import com.alinesno.infra.data.assets.service.IAssetCollectionService;
-import com.alinesno.infra.data.assets.service.IAssetDataService;
+import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
+import com.alinesno.infra.data.assets.service.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,10 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
     @Autowired
     private IAssetCatalogService catalogService ;
 
+
+    @Autowired
+    private IManifestFieldService manifestFieldService ;
+
     /**
      * 获取BusinessLogEntity的DataTables数据。
      *
@@ -52,23 +57,20 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
      */
     @ResponseBody
     @PostMapping("/datatables")
-    public TableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
+    public AssetsTableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
         log.debug("page = {}", ToStringBuilder.reflectionToString(page));
+        String manifestId =  request.getParameter("manifestId") ;
 
-        List<ConditionDto> condition =  page.getConditionList() ;
-
-        String catalogId =  request.getParameter("catalogId") ;
-
-        if(StringUtils.isNotBlank(catalogId)){
-            ConditionDto dto = new ConditionDto() ;
-            dto.setColumn("prompt_type");
-            dto.setValue(catalogId);
-
-            condition.add(dto) ;
-            page.setConditionList(condition);
+        if(StringUtils.isEmpty(manifestId)){
+            return new AssetsTableDataInfo();
         }
 
-        return this.toPage(model, this.getFeign(), page);
+        // 从ManifestField中查询出表的字段信息
+        LambdaQueryWrapper<ManifestFieldEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ManifestFieldEntity::getManifestId, manifestId);
+        List<ManifestFieldEntity> fieldList = manifestFieldService.list(queryWrapper);
+
+        return service.findManifestData(page,manifestId , fieldList);
     }
 
     @Override
@@ -92,6 +94,10 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
         return AjaxResult.success("success" , catalogService.selectCatalogTreeList()) ;
     }
 
+    @GetMapping("/catalogManifestTreeSelect")
+    public AjaxResult catalogManifestTreeSelect(){
+        return AjaxResult.success("success" , catalogService.catalogManifestTreeSelect()) ;
+    }
     @Override
     public IAssetDataService getFeign() {
         return this.service;
