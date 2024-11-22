@@ -27,7 +27,12 @@
 			<artifactId>alinesno-infra-common-core</artifactId>
 			<version>${revision}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.4</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>
