@@ -40,4 +40,10 @@ public interface IAssetCatalogService extends IBaseService<AssetCatalogEntity> {
      * @return
      */
     List<AssetCatalogEntity> topCatalog(int count);
+
+    /**
+     * 查询清单列表信息
+     * @return
+     */
+    List<TreeSelectDto> catalogManifestTreeSelect();
 }
