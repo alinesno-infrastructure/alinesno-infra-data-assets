@@ -50,6 +50,10 @@ metadata:
   namespace: ${NAMESPACE}
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100M"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
   rules:
     - host: "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
