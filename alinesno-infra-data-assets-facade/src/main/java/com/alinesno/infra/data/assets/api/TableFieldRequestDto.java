@@ -3,12 +3,15 @@ package com.alinesno.infra.data.assets.api;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.NotNull;
 
 /**
  * 表字段请求DTO类
  * 用于处理与表字段相关的请求，确保字段信息的准确性
  */
+@NoArgsConstructor
 @Data
 public class TableFieldRequestDto {
 
@@ -34,4 +37,13 @@ public class TableFieldRequestDto {
 
     // 字段注释，可选
     private String comment;
+
+    public TableFieldRequestDto(String filedName, String fieldType, Integer filedLength, Boolean isNullable, Boolean isPrimaryKey, String filedComment) {
+        this.name = filedName;
+        this.type = fieldType;
+        this.length = filedLength;
+        this.isNullable = isNullable;
+        this.isPrimaryKey = isPrimaryKey;
+        this.comment = filedComment;
+    }
 }
