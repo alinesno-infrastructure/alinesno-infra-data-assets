@@ -23,4 +23,10 @@ public interface IManifestFieldService extends IBaseService<ManifestFieldEntity>
      */
     void saveTableStructure(List<TableFieldRequestDto> fieldRequests, long mId);
 
+    /**
+     * 保存字段信息
+     * @param fieldRequests
+     * @param mId
+     */
+    void saveManifest(List<TableFieldRequestDto> fieldRequests, long mId);
 }
