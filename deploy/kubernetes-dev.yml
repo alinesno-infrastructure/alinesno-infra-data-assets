@@ -43,9 +43,14 @@ spec:
                 -Dspring.data.redis.host=${REDIS_HOST}
                 -Dspring.data.redis.password=${REDIS_KEY}
                 
-                -Dspring.datasource.url=jdbc:mysql://${DB_MYSQL_URL}/dev_alinesno_infra_data_assets_v100?serverTimezone=GMT%2B8&zeroDateTimeBehavior=CONVERT_TO_NULL
-                -Dspring.datasource.username=${DB_MYSQL_USRENAME}
-                -Dspring.datasource.password=${DB_MYSQL_PASSWORD}
+                -Dspring.datasource.dynamic.datasource.mysql.url=jdbc:mysql://${DB_MYSQL_URL}/dev_alinesno_infra_data_assets_v100?serverTimezone=GMT%2B8&zeroDateTimeBehavior=CONVERT_TO_NULL
+                -Dspring.datasource.dynamic.datasource.mysql.username=${DB_MYSQL_USRENAME}
+                -Dspring.datasource.dynamic.datasource.mysql.password=${DB_MYSQL_PASSWORD}
+
+                -Dspring.datasource.dynamic.datasource.postgresql.driver-class-name=org.postgresql.Driver
+                -Dspring.datasource.dynamic.datasource.postgresql.url=jdbc:postgresql://${DB_PG_URL}/dev_alinesno_infra_data_assets_datahouse
+                -Dspring.datasource.dynamic.datasource.postgresql.username=${DB_PG_USERNAME}
+                -Dspring.datasource.dynamic.datasource.postgresql.password=${DB_PG_PASSWORD}
                 
                 -Dserver.port=8080
           ports:
