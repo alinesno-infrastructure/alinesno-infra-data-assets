@@ -74,9 +74,10 @@ import {
     getManifestFieldByMId,
     updateManifestFieldByMId
 } from "@/api/data/asset/manifestField";
+import { ElLoading } from 'element-plus'
 
 const router = useRouter();
-const route = useRoute();
+const { proxy } = getCurrentInstance();
 
 const manifestId = ref("")
 
@@ -97,27 +98,6 @@ const handleDelete = (index) => {
     fields.value.splice(index, 1);
     errors.value.splice(index, 1);
 };
-
-// const validateFields = () => {
-//     let isValid = true;
-//     errors.value = fields.value.map(field => {
-//         const fieldErrors = {};
-//         if (!field.name) {
-//             fieldErrors.name = '列名为空';
-//             isValid = false;
-//         }
-//         if (!field.type) {
-//             fieldErrors.type = '数据类型为空';
-//             isValid = false;
-//         }
-//         if (field.type === 'string' && (field.length === null || field.length <= 0)) {
-//             fieldErrors.length = '类型长度小于0';
-//             isValid = false;
-//         }
-//         return fieldErrors;
-//     });
-//     return isValid;
-// };
 
 const validateFields = () => {
     let isValid = true;
@@ -210,12 +190,23 @@ const handleUpdateManifestField = () => {
         return;
     }
 
+    const loading = ElLoading.service({
+        lock: true,
+        text: '模型更新中，勿刷新页面，请稍等...',
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
+
     try {
+
         updateManifestFieldByMId(manifestId.value, fields.value).then(res => {
             console.log('保存成功', fields.value);
+            proxy.$modal.msgSuccess("更新成功");
+            loading.close()
         })
     } catch (error) {
         console.error('保存失败', error);
+        proxy.$modal.msgError("更新失败");
+        loading.close()
     }
 };
 
