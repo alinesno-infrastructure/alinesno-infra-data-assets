@@ -8,6 +8,7 @@ import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.api.TableFieldRequestDto;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
 import com.alinesno.infra.data.assets.service.IManifestFieldService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -52,14 +53,29 @@ public class ManifestFieldController extends BaseController<ManifestFieldEntity,
 
     @PostMapping("/updateManifestFieldByMId")
     public AjaxResult updateManifestFieldByMId(@Valid @RequestBody List<TableFieldRequestDto> fieldRequests , @RequestParam long mId) {
+
         service.saveTableStructure(fieldRequests , mId);
+        service.saveManifest(fieldRequests , mId) ;
+
         return AjaxResult.success("表结构保存成功");
     }
 
     @GetMapping("/getManifestFieldByMId")
     public AjaxResult getManifestFieldByMId(@RequestParam long mId) {
         log.debug("getManifestFieldByMId = {}", mId);
-        return AjaxResult.success();
+        LambdaQueryWrapper<ManifestFieldEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ManifestFieldEntity::getManifestId, mId);
+        List<ManifestFieldEntity> list = service.list(queryWrapper) ;
+
+        List<TableFieldRequestDto> dtos = list.stream().map(e -> new TableFieldRequestDto(
+                e.getFieldName(),
+                e.getFieldType(),
+                e.getFiledLength(),
+                e.getIsNullable(),
+                e.getIsPrimaryKey(),
+                e.getFieldComment())).toList();
+
+        return AjaxResult.success(dtos);
     }
 
     @Override
