@@ -1,11 +1,12 @@
 package com.alinesno.infra.data.assets.api.controller;
 
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
-import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionQuery;
 import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionSave;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionScope;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
+import com.alinesno.infra.common.web.adapter.login.account.CurrentAccountJwt;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.entity.ManifestEntity;
 import com.alinesno.infra.data.assets.service.IManifestService;
@@ -40,7 +41,7 @@ public class ManifestController extends BaseController<ManifestEntity, IManifest
      * @param page DatatablesPageBean对象。
      * @return 包含DataTables数据的TableDataInfo对象。
      */
-    @DataPermissionQuery
+    @DataPermissionScope
     @ResponseBody
     @PostMapping("/datatables")
     public TableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
@@ -52,6 +53,9 @@ public class ManifestController extends BaseController<ManifestEntity, IManifest
     @DataPermissionSave
     @Override
     public AjaxResult save(Model model, @RequestBody ManifestEntity entity) throws Exception {
+
+        log.debug("CurrentAccountJwt.get() = {}" , CurrentAccountJwt.get().getOrgId());
+
         return super.save(model, entity);
     }
 
