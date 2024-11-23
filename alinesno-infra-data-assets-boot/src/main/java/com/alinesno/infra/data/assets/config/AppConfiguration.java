@@ -1,5 +1,6 @@
 package com.alinesno.infra.data.assets.config;
 
+import com.alinesno.infra.common.extend.datasource.enable.EnableInfraDataScope;
 import com.alinesno.infra.common.facade.enable.EnableActable;
 import com.alinesno.infra.common.web.adapter.sso.enable.EnableInfraSsoApi;
 import com.alinesno.infra.common.web.log.aspect.LogAspect;
@@ -21,6 +22,7 @@ import org.springframework.util.unit.DataSize;
  */
 @Slf4j
 @EnableActable
+@EnableInfraDataScope
 @EnableInfraSsoApi
 @ForestScan({
         "com.alinesno.infra.common.web.adapter.base.consumer" ,
