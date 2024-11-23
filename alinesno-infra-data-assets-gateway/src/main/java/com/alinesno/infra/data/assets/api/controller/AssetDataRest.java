@@ -1,21 +1,20 @@
 package com.alinesno.infra.data.assets.api.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
 import com.alinesno.infra.common.core.utils.StringUtils;
-import com.alinesno.infra.common.facade.pageable.ConditionDto;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionQuery;
+import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
-import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.api.AssetsTableDataInfo;
-import com.alinesno.infra.data.assets.entity.AssetCollectionEntity;
 import com.alinesno.infra.data.assets.entity.AssetDataEntity;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
-import com.alinesno.infra.data.assets.service.*;
+import com.alinesno.infra.data.assets.service.IAssetCatalogService;
+import com.alinesno.infra.data.assets.service.IAssetDataService;
+import com.alinesno.infra.data.assets.service.IManifestFieldService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,14 +88,15 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
         return ok() ;
     }
 
+    @DataPermissionQuery
     @GetMapping("/catalogTreeSelect")
-    public AjaxResult catalogTreeSelect(){
-        return AjaxResult.success("success" , catalogService.selectCatalogTreeList()) ;
+    public AjaxResult catalogTreeSelect(PermissionQuery query){
+        return AjaxResult.success("success" , catalogService.selectCatalogTreeList(query)) ;
     }
 
     @GetMapping("/catalogManifestTreeSelect")
-    public AjaxResult catalogManifestTreeSelect(){
-        return AjaxResult.success("success" , catalogService.catalogManifestTreeSelect()) ;
+    public AjaxResult catalogManifestTreeSelect(PermissionQuery query){
+        return AjaxResult.success("success" , catalogService.catalogManifestTreeSelect(query)) ;
     }
     @Override
     public IAssetDataService getFeign() {
