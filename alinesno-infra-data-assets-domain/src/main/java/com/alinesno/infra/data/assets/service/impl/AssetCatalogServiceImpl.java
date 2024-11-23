@@ -2,6 +2,7 @@ package com.alinesno.infra.data.assets.service.impl;
 
 import com.alinesno.infra.common.core.service.impl.IBaseServiceImpl;
 import com.alinesno.infra.common.core.utils.StringUtils;
+import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.data.assets.api.TreeSelectDto;
 import com.alinesno.infra.data.assets.entity.AssetCatalogEntity;
 import com.alinesno.infra.data.assets.entity.ManifestEntity;
@@ -28,26 +29,30 @@ import java.util.stream.Collectors;
 public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity, AssetCatalogMapper> implements IAssetCatalogService {
 
     @Autowired
-    private IManifestService manifestService ;
+    private IManifestService manifestService;
 
     @Override
-    public List<AssetCatalogEntity> selectCatalogList(AssetCatalogEntity promptCatalog) {
+    public List<AssetCatalogEntity> selectCatalogList(AssetCatalogEntity promptCatalog, PermissionQuery query) {
 
-        List<AssetCatalogEntity> list = list() ;
+        LambdaQueryWrapper<AssetCatalogEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.setEntityClass(AssetCatalogEntity.class) ;
+        query.toWrapper(queryWrapper);
 
-        if(list == null || list.isEmpty()){
+        List<AssetCatalogEntity> list = list(queryWrapper);
 
-            list = new ArrayList<>() ;
+        if (list == null || list.isEmpty()) {
+
+            list = new ArrayList<>();
 
             // 默认有一个选项是父类
-            AssetCatalogEntity parent = new AssetCatalogEntity() ;
+            AssetCatalogEntity parent = new AssetCatalogEntity();
             parent.setName("父类对象");
             parent.setId(0L);
 
-            list.add(parent) ;
+            list.add(parent);
         }
 
-        return list ;
+        return list;
 
     }
 
@@ -55,17 +60,21 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
     public void insertCatalog(AssetCatalogEntity entity) {
 
         AssetCatalogEntity info = this.getById(entity.getParentId());
-        if(info != null){
+        if (info != null) {
             entity.setAncestors(info.getAncestors() + "," + entity.getParentId());
         }
 
-        this.save(entity) ;
+        this.save(entity);
     }
 
     @Override
-    public List<TreeSelectDto> selectCatalogTreeList() {
+    public List<TreeSelectDto> selectCatalogTreeList(PermissionQuery query) {
 
-        List<AssetCatalogEntity> deptTrees = buildDeptTree(list());
+        LambdaQueryWrapper<AssetCatalogEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.setEntityClass(AssetCatalogEntity.class) ;
+        query.toWrapper(queryWrapper);
+
+        List<AssetCatalogEntity> deptTrees = buildDeptTree(list(queryWrapper));
         return deptTrees.stream().map(TreeSelectDto::new).collect(Collectors.toList());
     }
 
@@ -76,38 +85,48 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
         queryWrapper.orderByDesc(AssetCatalogEntity::getOrderNum);
         queryWrapper.last("limit " + count);
 
-        return list(queryWrapper) ;
+        return list(queryWrapper);
     }
 
     @Override
-    public List<TreeSelectDto> catalogManifestTreeSelect() {
+    public List<TreeSelectDto> catalogManifestTreeSelect(PermissionQuery query) {
+        List<TreeSelectDto> dtoList = selectCatalogTreeList(query);
 
-        List<TreeSelectDto> dtoList = selectCatalogTreeList();
+        // 递归处理每个节点及其子节点
+        addManifestToTree(dtoList);
 
-        // 查询叶子节点下面的清单
-        for (TreeSelectDto dto : dtoList) {
-            if (dto.getChildren().isEmpty()) {
-                // 查询叶子节点下面的清单
+        return dtoList;
+    }
+
+    /**
+     * 递归方法，为树中的每个叶子节点添加其下的清单
+     *
+     * @param nodes 当前层级的节点列表
+     */
+    private void addManifestToTree(List<TreeSelectDto> nodes) {
+        for (TreeSelectDto node : nodes) {
+            if (node.getChildren().isEmpty()) {
+                // 叶子节点，查询其下的清单
                 LambdaQueryWrapper<ManifestEntity> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(ManifestEntity::getDataDomain, dto.getId());
+                queryWrapper.eq(ManifestEntity::getDataDomain, node.getId());
                 List<ManifestEntity> manifests = manifestService.list(queryWrapper);
-                if(manifests != null){
+                if (manifests != null && !manifests.isEmpty()) {
                     // 将ManifestEntity转换成TreeSelectDto类
                     List<TreeSelectDto> manifestDtos = manifests.stream()
                             .map(manifest -> {
                                 TreeSelectDto tree = new TreeSelectDto();
                                 tree.setId(manifest.getId());
                                 tree.setLabel(manifest.getTableName());
-                                return tree ;
+                                return tree;
                             })
                             .toList();
-                    dto.setChildren(manifestDtos);
+                    node.setChildren(manifestDtos);
                 }
+            } else {
+                // 非叶子节点，递归处理子节点
+                addManifestToTree(node.getChildren());
             }
         }
-
-
-        return dtoList ;
     }
 
     /**
@@ -143,8 +162,7 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
         List<AssetCatalogEntity> childList = getChildList(list, t);
         t.setChildren(childList);
         for (AssetCatalogEntity tChild : childList) {
-            if (hasChild(list, tChild))
-            {
+            if (hasChild(list, tChild)) {
                 recursionFn(list, tChild);
             }
         }
