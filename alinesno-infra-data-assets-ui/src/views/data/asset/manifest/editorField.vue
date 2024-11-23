@@ -155,10 +155,11 @@ const validateFields = () => {
                 fieldErrors.length = '长度必须大于0';
                 isValid = false;
             }
-        } else if (field.length !== null) {
-            fieldErrors.length = '不应设置长度';
-            isValid = false;
-        }
+        } 
+        // else if (field.length !== null) {
+        //     fieldErrors.length = '不应设置长度';
+        //     isValid = false;
+        // }
 
         // 验证主键
         if (field.isPrimaryKey) {
@@ -204,9 +205,9 @@ const handleUpdateManifestField = () => {
             loading.close()
         })
     } catch (error) {
+        loading.close()
         console.error('保存失败', error);
         proxy.$modal.msgError("更新失败");
-        loading.close()
     }
 };
 
