@@ -1,7 +1,9 @@
 package com.alinesno.infra.data.assets.collector.service.impl;
 
+import com.alinesno.infra.data.assets.api.TableFieldRequestDto;
 import com.alinesno.infra.data.assets.api.TableMetrics;
 import com.alinesno.infra.data.assets.collector.service.DataAssetService;
+import com.alinesno.infra.data.assets.constants.AssetDataConstants;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
 import com.alinesno.infra.data.assets.service.IManifestFieldService;
 import com.alinesno.infra.data.assets.service.IManifestService;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +70,28 @@ public class DataAssetServiceImpl implements DataAssetService {
     public TableMetrics handleListData(List<Map<String, String>> dataList, String model) {
         // 实现List数据处理逻辑
         log.debug("Handling list data for model: " + model);
+
+        // 获取默认字段
+        List<TableFieldRequestDto> defaultFields = AssetDataConstants.DEFAULT_FIELDS;
+
+        // 检查并添加默认字段
+        for (Map<String, String> data : dataList) {
+            for (TableFieldRequestDto defaultField : defaultFields) {
+                if (!data.containsKey(defaultField.getName())) {
+                    switch (defaultField.getType()) {
+                        case "string":
+                            data.put(defaultField.getName(), "");
+                            break;
+                        case "date":
+                            data.put(defaultField.getName(), new Date().toString());
+                            break;
+                        default:
+                            data.put(defaultField.getName(), "");
+                            break;
+                    }
+                }
+            }
+        }
 
         // 插入到列数据中
         List<ManifestFieldEntity> fieldList = getManifestFieldEntities(model);
