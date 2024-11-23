@@ -5,6 +5,7 @@ import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
+import com.alinesno.infra.data.assets.constants.AssetDataConstants;
 import com.alinesno.infra.data.assets.api.TableFieldRequestDto;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
 import com.alinesno.infra.data.assets.service.IManifestFieldService;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,15 +56,27 @@ public class ManifestFieldController extends BaseController<ManifestFieldEntity,
     @PostMapping("/updateManifestFieldByMId")
     public AjaxResult updateManifestFieldByMId(@Valid @RequestBody List<TableFieldRequestDto> fieldRequests , @RequestParam long mId) {
 
-        service.saveTableStructure(fieldRequests , mId);
-        service.saveManifest(fieldRequests , mId) ;
+        // 检查并添加默认字段
+        List<TableFieldRequestDto> updatedFieldRequests = new ArrayList<>(fieldRequests);
+        for (TableFieldRequestDto defaultField : AssetDataConstants.DEFAULT_FIELDS) {
+            boolean exists = fieldRequests.stream()
+                .anyMatch(field -> field.getName().equals(defaultField.getName()));
+            if (!exists) {
+                updatedFieldRequests.add(defaultField);
+            }
+        }
+
+        service.saveTableStructure(updatedFieldRequests , mId);
+        service.saveManifest(updatedFieldRequests , mId) ;
 
         return AjaxResult.success("表结构保存成功");
     }
 
     @GetMapping("/getManifestFieldByMId")
     public AjaxResult getManifestFieldByMId(@RequestParam long mId) {
+
         log.debug("getManifestFieldByMId = {}", mId);
+
         LambdaQueryWrapper<ManifestFieldEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ManifestFieldEntity::getManifestId, mId);
         List<ManifestFieldEntity> list = service.list(queryWrapper) ;
