@@ -72,43 +72,31 @@
          <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px">
             <el-row>
                <el-col :span="24">
-                  <el-form-item label="名称" prop="dbName">
-                     <el-input v-model="form.dbName" placeholder="请输入应用名称" maxlength="50" />
+                  <el-form-item label="名称" prop="labelName">
+                     <el-input v-model="form.labelName" placeholder="请输入应用名称" maxlength="50" />
                   </el-form-item>
                </el-col>
             </el-row>
             <el-row>
                <el-col :span="24">
-                  <el-form-item label="连接" prop="jdbcUrl">
-                     <el-input v-model="form.jdbcUrl" placeholder="请输入jdbcUrl连接地址" maxlength="128" />
+                  <el-form-item label="标识" prop="labelKey">
+                     <el-input v-model="form.labelKey" placeholder="请输入标识" maxlength="128" />
                   </el-form-item>
                </el-col>
                <el-col :span="24">
-                  <el-form-item label="类型" prop="dbType">
-                     <el-input v-model="form.dbType" placeholder="请输入类型" maxlength="50" />
+                  <el-form-item label="类型" prop="labelType">
+                     <el-input v-model="form.labelType" placeholder="请输入类型" maxlength="50" />
                   </el-form-item>
                </el-col>
             </el-row>
             <el-row>
                <el-col :span="24">
-                  <el-form-item label="用户名" prop="dbUsername">
-                     <el-input v-model="form.dbUsername" placeholder="请输入连接用户名" maxlength="30" />
-                  </el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="密码" prop="dbPasswd">
-                     <el-input v-model="form.dbPasswd" placeholder="请输入应用密码" type="password" maxlength="30" show-password />
+                  <el-form-item label="标签值" prop="labelValue">
+                     <el-input v-model="form.labelValue" placeholder="请输入标识值" maxlength="30" />
                   </el-form-item>
                </el-col>
             </el-row>
 
-            <el-row>
-               <el-col :span="24">
-                  <el-form-item label="备注" prop="dbDesc">
-                     <el-input v-model="form.dbDesc" placeholder="请输入应用备注"></el-input>
-                  </el-form-item>
-               </el-col>
-            </el-row>
          </el-form>
          <template #footer>
             <div class="dialog-footer">
@@ -168,12 +156,10 @@ const data = reactive({
       dbDesc: undefined
    },
    rules: {
-      dbName: [{ required: true, message: "名称不能为空", trigger: "blur" }] , 
-      jdbcUrl: [{ required: true, message: "连接不能为空", trigger: "blur" }],
-      dbType: [{ required: true, message: "类型不能为空", trigger: "blur" }] , 
-      dbUsername: [{ required: true , message: "用户名不能为空", trigger: "blur"}],
-      dbPasswd: [{ required: true, message: "密码不能为空", trigger: "blur" }] , 
-      dbDesc: [{ required: true, message: "备注不能为空", trigger: "blur" }] 
+      labelName: [{ required: true, message: "名称不能为空", trigger: "blur" }] , 
+      labelKey: [{ required: true, message: "连接不能为空", trigger: "blur" }],
+      labelType: [{ required: true, message: "类型不能为空", trigger: "blur" }] , 
+      labelValue: [{ required: true , message: "用户名不能为空", trigger: "blur"}]
    }
 });
 
