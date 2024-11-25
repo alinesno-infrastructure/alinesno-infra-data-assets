@@ -268,7 +268,7 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
 
     private String getDefaultValue(String type) {
         return switch (type.toLowerCase()) {
-            case "varchar", "string" -> "'v'";
+            case "varchar", "string" -> "'0'";
             case "integer" -> "0";
             case "float" -> "0.0";
             case "boolean" -> "false";
@@ -337,6 +337,7 @@ public class ManifestFieldServiceImpl extends IBaseServiceImpl<ManifestFieldEnti
             case "float" -> "FLOAT";
             case "boolean" -> "BOOLEAN";
             case "date" -> "DATE";
+            case "timestamp" -> "TIMESTAMP";
             default -> throw new IllegalArgumentException("Unsupported data type: " + type);
         };
     }
