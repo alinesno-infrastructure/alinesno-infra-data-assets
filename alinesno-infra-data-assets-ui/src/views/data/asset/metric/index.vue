@@ -156,7 +156,7 @@
 </template>
 
 <script setup name="Metric">
-import { listMetric, getMetric, delMetric, addMetric, updateMetric, listMetricExcludeChild } from "@/api/data/asset/metric";
+import { datatableMetric , getMetric, delMetric, addMetric, updateMetric, listMetricExcludeChild } from "@/api/data/asset/metric";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -190,8 +190,8 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询分类列表 */
 function getList() {
   loading.value = true;
-  listMetric(queryParams.value).then(response => {
-    deptList.value = proxy.handleTree(response.data, "id");
+  datatableMetric(queryParams.value).then(response => {
+    // deptList.value = proxy.handleTree(response.data, "id");
     loading.value = false;
   });
 }
