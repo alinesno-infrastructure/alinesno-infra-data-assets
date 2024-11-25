@@ -2,10 +2,12 @@ package com.alinesno.infra.data.fastapi.service.impl;
 
 import com.alinesno.infra.common.core.service.impl.IBaseServiceImpl;
 import com.alinesno.infra.common.core.utils.StringUtils;
+import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.data.fastapi.api.TreeSelectDto;
 import com.alinesno.infra.data.fastapi.entity.ApiGroupEntity;
 import com.alinesno.infra.data.fastapi.mapper.ApiGroupMapper;
 import com.alinesno.infra.data.fastapi.service.IApiGroupService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,13 @@ import java.util.stream.Collectors;
 public class ApiGroupServiceImpl extends IBaseServiceImpl<ApiGroupEntity, ApiGroupMapper> implements IApiGroupService {
 
     @Override
-    public List<ApiGroupEntity> selectCatalogList(ApiGroupEntity promptCatalog) {
+    public List<ApiGroupEntity> selectCatalogList(ApiGroupEntity promptCatalog, PermissionQuery query) {
 
-        List<ApiGroupEntity> list = list() ;
+        LambdaQueryWrapper<ApiGroupEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.setEntityClass(ApiGroupEntity.class);
+        query.toWrapper(queryWrapper);
+
+        List<ApiGroupEntity> list = list(queryWrapper) ;
 
         if(list == null || list.isEmpty()){
 
@@ -50,9 +56,13 @@ public class ApiGroupServiceImpl extends IBaseServiceImpl<ApiGroupEntity, ApiGro
     }
 
     @Override
-    public List<TreeSelectDto> selectCatalogTreeList() {
+    public List<TreeSelectDto> selectCatalogTreeList(PermissionQuery query) {
 
-        List<ApiGroupEntity> deptTrees = buildDeptTree(list());
+        LambdaQueryWrapper<ApiGroupEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.setEntityClass(ApiGroupEntity.class);
+        query.toWrapper(queryWrapper);
+
+        List<ApiGroupEntity> deptTrees = buildDeptTree(list(queryWrapper));
         return deptTrees.stream().map(TreeSelectDto::new).collect(Collectors.toList());
     }
 
