@@ -47,6 +47,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
+			<artifactId>alinesno-infra-data-assets-metrics</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-collector</artifactId>
 			<version>${revision}</version>
 		</dependency>
