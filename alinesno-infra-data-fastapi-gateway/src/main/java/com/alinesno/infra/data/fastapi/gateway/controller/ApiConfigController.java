@@ -1,6 +1,10 @@
 package com.alinesno.infra.data.fastapi.gateway.controller;
 
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionQuery;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionSave;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionScope;
+import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
@@ -44,6 +48,7 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
      * @param page DatatablesPageBean对象。
      * @return 包含DataTables数据的TableDataInfo对象。
      */
+    @DataPermissionScope
     @ResponseBody
     @PostMapping("/datatables")
     public TableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
@@ -51,9 +56,10 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
         return this.toPage(model, this.getFeign(), page);
     }
 
+    @DataPermissionQuery
     @GetMapping("/catalogTreeSelect")
-    public AjaxResult catalogTreeSelect(){
-        return AjaxResult.success("success" , groupService.selectCatalogTreeList()) ;
+    public AjaxResult catalogTreeSelect(PermissionQuery query){
+        return AjaxResult.success("success" , groupService.selectCatalogTreeList(query)) ;
     }
 
     /**
@@ -76,6 +82,12 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
         service.update(null, updateWrapper);
 
         return AjaxResult.success() ;
+    }
+
+    @DataPermissionSave
+    @Override
+    public AjaxResult save(Model model, @RequestBody ApiConfigEntity entity) throws Exception {
+        return super.save(model, entity);
     }
 
     @Override
