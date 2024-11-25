@@ -81,7 +81,13 @@
           </el-table-column>
           <el-table-column label="主题域" align="center" key="dataDomain" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true" />
           <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="80" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="120" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" >
+            <template #default="scope">
+              <div>
+                {{ getConfidentialityLevelValue(scope.row.confidentialityLevel) }}
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true" />
 
           <el-table-column label="字段" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
@@ -143,18 +149,23 @@
             </el-form-item>
           </el-col>
         </el-row>
+
         <el-row>
           <el-col :span="24">
-            <el-form-item label="描述" prop="description">
-              <el-input v-model="form.description" placeholder="请输入description数据来源" maxlength="128" />
+             <el-form-item label="安全级别" prop="confidentialityLevel">
+              <el-radio-group v-model="form.confidentialityLevel">
+                <el-radio v-for="level in dataSecurityLevels" :key="level.key" :label="level.key">
+                  {{ level.value }} - {{ level.desc }}
+                </el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="24">
-            <el-form-item label="涉密等级" prop="confidentialityLevel">
-              <el-input v-model="form.confidentialityLevel" placeholder="请输入涉密等级"></el-input>
+            <el-form-item label="描述" prop="description">
+              <el-input v-model="form.description" placeholder="请输入description数据来源" maxlength="128" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -221,6 +232,15 @@ const columns = ref([
   { key: 6, label: `更新时间`, visible: true }
 ]);
 
+// 定义数据安全级别常量
+const dataSecurityLevels = ref([
+  { key: 1, value: 'Public', desc: '公开数据，无敏感信息，对数据丢失或泄露的影响较小' },
+  { key: 2, value: 'Internal', desc: '仅限公司内部使用，对数据丢失或泄露有一定影响' },
+  { key: 3, value: 'Confidential', desc: '重要数据，对数据丢失或泄露有较大影响，需严格保护' },
+  { key: 4, value: 'Highly Confidential', desc: '非常重要的数据，对数据丢失或泄露有严重影响，需最高级别保护' },
+  { key: 5, value: 'Top Secret', desc: '极其重要的数据，对数据丢失或泄露有灾难性影响，需最严格的保护措施' }
+]);
+
 const data = reactive({
   form: {},
   queryParams: {
@@ -252,7 +272,7 @@ function getList() {
 
 // 节点单击事件
 function handleNodeClick(data) {
-  queryParams.value.catalogId = data.id;
+  queryParams.value.dataDomain = data.id;
   console.log('data.id = ' + data.id)
   getList();
 }
@@ -325,6 +345,12 @@ function cancel() {
   open.value = false;
   promptOpen.value = false ;
   reset();
+};
+
+// 获取涉密等级的值
+const getConfidentialityLevelValue = (key) => {
+  const level = dataSecurityLevels.value.find(item => item.key == key);
+  return level ? level.value : '未知';
 };
 
 /** 新增按钮操作 */
