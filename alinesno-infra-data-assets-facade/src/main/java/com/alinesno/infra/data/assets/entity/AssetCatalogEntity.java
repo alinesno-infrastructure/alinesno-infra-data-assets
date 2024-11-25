@@ -48,7 +48,7 @@ public class AssetCatalogEntity extends InfraBaseEntity {
 
     @Excel(name="资源描述")
     @TableField("remark")
-    @ColumnType(length=50)
+    @ColumnType(length=128)
     @ColumnComment("资源描述")
     private String remark;
 
