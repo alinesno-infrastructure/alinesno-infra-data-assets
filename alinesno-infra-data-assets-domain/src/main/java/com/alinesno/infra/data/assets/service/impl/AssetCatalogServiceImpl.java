@@ -41,16 +41,15 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
         List<AssetCatalogEntity> list = list(queryWrapper);
 
         if (list == null || list.isEmpty()) {
-
             list = new ArrayList<>();
-
-            // 默认有一个选项是父类
-            AssetCatalogEntity parent = new AssetCatalogEntity();
-            parent.setName("父类对象");
-            parent.setId(0L);
-
-            list.add(parent);
         }
+
+        // 默认有一个选项是父类
+        AssetCatalogEntity parent = new AssetCatalogEntity();
+        parent.setName("父类对象");
+        parent.setId(0L);
+
+        list.add(parent);
 
         return list;
 
@@ -79,9 +78,11 @@ public class AssetCatalogServiceImpl extends IBaseServiceImpl<AssetCatalogEntity
     }
 
     @Override
-    public List<AssetCatalogEntity> topCatalog(int count) {
+    public List<AssetCatalogEntity> topCatalog(int count, PermissionQuery query) {
 
         LambdaQueryWrapper<AssetCatalogEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.setEntityClass(AssetCatalogEntity.class) ;
+        query.toWrapper(queryWrapper);
         queryWrapper.orderByDesc(AssetCatalogEntity::getOrderNum);
         queryWrapper.last("limit " + count);
 
