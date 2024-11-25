@@ -25,7 +25,7 @@ public interface IManifestService extends IBaseService<ManifestEntity> {
      * @param fieldList
      * @param tableName
      */
-    TableMetrics saveToDatahouse(List<Map<String, String>> dataList, List<ManifestFieldEntity> fieldList, String tableName);
+    TableMetrics saveToDatahouse(List<Map<String, Object>> dataList, List<ManifestFieldEntity> fieldList, String tableName);
 
     /**
      * 保存csv文件到Postgresql数据资产库
