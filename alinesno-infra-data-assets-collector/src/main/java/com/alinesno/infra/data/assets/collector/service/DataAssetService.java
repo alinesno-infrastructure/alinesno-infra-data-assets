@@ -1,5 +1,6 @@
 package com.alinesno.infra.data.assets.collector.service;
 
+import com.alinesno.infra.data.assets.api.PushDataUserInfoDto;
 import com.alinesno.infra.data.assets.api.TableMetrics;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,27 +15,30 @@ public interface DataAssetService {
     /**
      * 处理CSV文件数据
      *
-     * @param file CSV文件，包含数据资产信息
-     * @param model 模型名称，用于指定数据处理的方式或规则
+     * @param file        CSV文件，包含数据资产信息
+     * @param model       模型名称，用于指定数据处理的方式或规则
+     * @param userInfoDto
      * @return TableMetrics 表格指标对象，包含处理后的数据信息
      */
-    TableMetrics handleCsvFile(MultipartFile file, String model);
+    TableMetrics handleCsvFile(MultipartFile file, String model, PushDataUserInfoDto userInfoDto);
 
     /**
      * 处理JSON文件数据
      *
-     * @param file JSON文件，包含数据资产信息
-     * @param model 模型名称，用于指定数据处理的方式或规则
+     * @param file        JSON文件，包含数据资产信息
+     * @param model       模型名称，用于指定数据处理的方式或规则
+     * @param userInfoDto
      * @return TableMetrics 表格指标对象，包含处理后的数据信息
      */
-    TableMetrics handleJsonFile(MultipartFile file, String model);
+    TableMetrics handleJsonFile(MultipartFile file, String model, PushDataUserInfoDto userInfoDto);
 
     /**
      * 处理列表数据
      *
-     * @param dataList 数据列表，每个元素为一个Map，代表一行数据
-     * @param model 模型名称，用于指定数据处理的方式或规则
+     * @param dataList    数据列表，每个元素为一个Map，代表一行数据
+     * @param model       模型名称，用于指定数据处理的方式或规则
+     * @param userInfoDto
      * @return TableMetrics 表格指标对象，包含处理后的数据信息
      */
-    TableMetrics handleListData(List<Map<String, String>> dataList, String model);
+    TableMetrics handleListData(List<Map<String, Object>> dataList, String model, PushDataUserInfoDto userInfoDto);
 }
