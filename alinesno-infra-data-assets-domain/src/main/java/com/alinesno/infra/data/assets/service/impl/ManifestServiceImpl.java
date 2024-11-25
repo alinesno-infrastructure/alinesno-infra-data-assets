@@ -26,7 +26,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +56,7 @@ public class ManifestServiceImpl extends IBaseServiceImpl<ManifestEntity, Manife
     @DS("postgresql")
     @Transactional
     @Override
-    public TableMetrics saveToDatahouse(List<Map<String, String>> dataList, List<ManifestFieldEntity> fieldList, String tableName) {
+    public TableMetrics saveToDatahouse(List<Map<String, Object>> dataList, List<ManifestFieldEntity> fieldList, String tableName) {
         if (dataList == null || dataList.isEmpty() || fieldList == null || fieldList.isEmpty() || tableName == null || tableName.isEmpty()) {
             log.warn("输入参数无效。无法继续保存数据。");
             return null;
@@ -85,10 +87,18 @@ public class ManifestServiceImpl extends IBaseServiceImpl<ManifestEntity, Manife
             @SneakyThrows
             @Override
             public void setValues(PreparedStatement ps, int i) {
-                Map<String, String> dataMap = dataList.get(i);
+                Map<String, Object> dataMap = dataList.get(i);
                 for (int j = 0; j < fieldList.size(); j++) {
                     ManifestFieldEntity field = fieldList.get(j);
-                    ps.setString(j + 1, dataMap.get(field.getFieldName()));
+
+                    if(dataMap.get(field.getFieldName()) instanceof java.sql.Timestamp) {
+                        ps.setTimestamp(j + 1, (java.sql.Timestamp) dataMap.get(field.getFieldName()));
+                    }else if(dataMap.get(field.getFieldName()) instanceof java.sql.Date) {
+                        ps.setDate(j + 1, (java.sql.Date) dataMap.get(field.getFieldName()));
+                    }else {
+                        ps.setObject(j + 1, dataMap.get(field.getFieldName()));
+                    }
+
                 }
             }
 
