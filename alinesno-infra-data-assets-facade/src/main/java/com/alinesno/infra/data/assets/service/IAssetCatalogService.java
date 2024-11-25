@@ -39,10 +39,12 @@ public interface IAssetCatalogService extends IBaseService<AssetCatalogEntity> {
 
     /**
      * 查询顶级类型列表
+     *
      * @param count
+     * @param query
      * @return
      */
-    List<AssetCatalogEntity> topCatalog(int count);
+    List<AssetCatalogEntity> topCatalog(int count, PermissionQuery query);
 
     /**
      * 查询清单列表信息
