@@ -66,6 +66,12 @@ export const constantRoutes = [
         meta: { title: '模型编辑', icon: 'dashboard', affix: true }
       },
       {
+        path: '/service/data/fastapi/api/script',
+        component: () => import('@/views/data/fastapi/api/sqlEditor'),
+        name: '/service/data/fastapi/api/script',
+        meta: { title: '工具脚本', icon: 'dashboard', affix: true }
+      },
+      {
         path: '/dashboard/suportTechnique',
         component: () => import('@/views/suportTechnique'),
         name: '/dashboard/suportTechnique',
