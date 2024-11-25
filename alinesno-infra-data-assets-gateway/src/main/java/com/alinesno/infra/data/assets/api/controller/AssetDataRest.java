@@ -3,6 +3,7 @@ package com.alinesno.infra.data.assets.api.controller;
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
 import com.alinesno.infra.common.core.utils.StringUtils;
 import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionQuery;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionScope;
 import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.response.AjaxResult;
@@ -54,6 +55,7 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
      * @param page DatatablesPageBean对象。
      * @return 包含DataTables数据的TableDataInfo对象。
      */
+    @DataPermissionScope
     @ResponseBody
     @PostMapping("/datatables")
     public AssetsTableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
@@ -68,6 +70,9 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
         LambdaQueryWrapper<ManifestFieldEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ManifestFieldEntity::getManifestId, manifestId);
         List<ManifestFieldEntity> fieldList = manifestFieldService.list(queryWrapper);
+
+        // fieldList里面 去掉特定的字段（org_id、operator_id、department_id)这几个
+        fieldList.removeIf(field -> "org_id".equals(field.getFieldName()) || "operator_id".equals(field.getFieldName()) || "department_id".equals(field.getFieldName()));
 
         return service.findManifestData(page,manifestId , fieldList);
     }
@@ -94,6 +99,7 @@ public class AssetDataRest extends BaseController<AssetDataEntity, IAssetDataSer
         return AjaxResult.success("success" , catalogService.selectCatalogTreeList(query)) ;
     }
 
+    @DataPermissionQuery
     @GetMapping("/catalogManifestTreeSelect")
     public AjaxResult catalogManifestTreeSelect(PermissionQuery query){
         return AjaxResult.success("success" , catalogService.catalogManifestTreeSelect(query)) ;
