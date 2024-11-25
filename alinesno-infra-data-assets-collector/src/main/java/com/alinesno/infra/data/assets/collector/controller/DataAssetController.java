@@ -2,8 +2,12 @@ package com.alinesno.infra.data.assets.collector.controller;
 
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
 import com.alinesno.infra.common.facade.response.AjaxResult;
+import com.alinesno.infra.data.assets.api.PushDataUserInfoDto;
 import com.alinesno.infra.data.assets.api.TableMetrics;
+import com.alinesno.infra.data.assets.collector.aspect.PushAccess;
 import com.alinesno.infra.data.assets.collector.service.DataAssetService;
+import com.alinesno.infra.data.assets.key.KeyGenerator;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,6 +27,9 @@ import java.util.Map;
 public class DataAssetController {
 
     @Autowired
+    private HttpServletRequest request ;
+
+    @Autowired
     private DataAssetService dataAssetService;
 
     /**
@@ -32,10 +39,17 @@ public class DataAssetController {
      * @param model 数据模型标识
      * @return 操作结果的Ajax响应
      */
+    @PushAccess
     @PostMapping("/csv")
     public AjaxResult handleCsvFile(@RequestParam("file") MultipartFile file,
                                     @RequestParam("model") String model) {
-        TableMetrics tableMetrics = dataAssetService.handleCsvFile(file, model);
+
+        PushDataUserInfoDto userInfoDto = genUserInfoDto() ;
+        TableMetrics tableMetrics = dataAssetService.handleCsvFile(
+                file,
+                model ,
+                userInfoDto);
+
         return AjaxResult.success("操作成功." ,tableMetrics);
     }
 
@@ -46,10 +60,17 @@ public class DataAssetController {
      * @param model 数据模型标识
      * @return 操作结果的Ajax响应
      */
+    @PushAccess
     @PostMapping("/json")
     public AjaxResult handleJsonFile(@RequestParam("file") MultipartFile file,
                                      @RequestParam("model") String model) {
-        TableMetrics tableMetrics =  dataAssetService.handleJsonFile(file, model);
+
+        PushDataUserInfoDto userInfoDto = genUserInfoDto() ;
+        TableMetrics tableMetrics = dataAssetService.handleJsonFile(
+                file,
+                model,
+                userInfoDto);
+
         return AjaxResult.success("操作成功." , tableMetrics);
     }
 
@@ -60,10 +81,27 @@ public class DataAssetController {
      * @param model 数据模型标识
      * @return 操作结果的Ajax响应
      */
+    @PushAccess
     @PostMapping("/list")
-    public AjaxResult handleListData(@RequestBody List<Map<String, String>> dataList,
+    public AjaxResult handleListData(@RequestBody List<Map<String, Object>> dataList,
                                      @RequestParam("model") String model) {
-        TableMetrics tableMetrics = dataAssetService.handleListData(dataList, model);
+
+        PushDataUserInfoDto userInfoDto = genUserInfoDto() ;
+        TableMetrics tableMetrics = dataAssetService.handleListData(
+                dataList,
+                model,
+                userInfoDto);
+
         return AjaxResult.success("数据插入成功." , tableMetrics);
+    }
+
+    private PushDataUserInfoDto genUserInfoDto() {
+        String apiKey = request.getHeader(KeyGenerator.API_KEY) ;
+
+        String[] ids = KeyGenerator.parseIdsFromKey(apiKey);
+        String userId = ids[0] ;
+        String orgId = ids[1] ;
+
+        return new PushDataUserInfoDto(userId , orgId) ;
     }
 }
