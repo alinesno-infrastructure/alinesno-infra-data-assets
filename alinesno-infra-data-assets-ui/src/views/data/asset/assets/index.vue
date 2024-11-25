@@ -58,99 +58,30 @@
         </el-row>
 
          <el-table v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
-    <el-table-column type="selection" width="50" :align="'center'" />
-    
-    <!-- 动态生成表头 -->
-    <el-table-column v-for="field in fields" :key="field.fieldName" :label="field.fieldComment" :prop="field.fieldName" :align="field.fieldType === 'string' ? 'left' : 'center'" />
-    
-    <!-- 操作字段  -->
-    <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
-      <template #default="scope">
-        <el-tooltip content="修改" placement="top">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
-        </el-tooltip>
-        <el-tooltip content="删除" placement="top">
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"></el-button>
-        </el-tooltip>
-      </template>
-    </el-table-column>
-  </el-table>
-  <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
 
-        <!--
-        <el-table v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :align="'center'" />
-
-          <el-table-column label="图标" :align="'center'" width="50" key="status" v-if="columns[5].visible">
-            <template #default="scope">
-              <div class="role-icon">
-                <i v-if="scope.row.dataType == 'database'" class="fa-brands fa-wordpress" />
-                <i v-if="scope.row.dataType == 'image'" class="fa-brands fa-envira" />
-                <i v-if="scope.row.dataType == 'document'" class="fa-solid fa-truck-fast" />
-                <i v-if="scope.row.dataType == 'video'" class="fa-solid fa-server" />
-                <i v-if="scope.row.dataType == 'text'" class="fa-solid fa-rocket" />
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="名称" align="left" key="promptName" prop="promptName" v-if="columns[0].visible">
-            <template #default="scope">
-              <div>
-                {{ scope.row.dataName }}
-              </div>
-              <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
-                负责人: {{ scope.row.dataOwner }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="领域" align="left" width="200" key="dataDescription" prop="dataDescription" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="存储量" align="center" width="150" key="dataSize" prop="dataSize" v-if="columns[2].visible" :show-overflow-tooltip="true">
-            <template #default="scope">
-              <span>{{ formatBytes(scope.row.dataSize) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据存储" align="center" width="130" key="promptContent" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
-            <template #default="scope">
-              <el-button v-if="scope.row.dataLocation == 'distributed_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
-              <el-button v-if="scope.row.dataLocation == 'local_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
-              <el-button v-if="scope.row.dataLocation == 'cloud_storage'" type="primary" text bg icon="Paperclip">云存储</el-button>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据来源" align="center" key="dataSource" prop="dataSource" v-if="columns[4].visible" width="200" />
-          <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[5].visible" >
-            <template #default="scope">
-              <el-switch
-                  v-model="scope.row.hasStatus"
-                  active-value="0"
-                  inactive-value="1"
-              />
-            </template>
-          </el-table-column>
-
-          <el-table-column label="最后更新" align="center" prop="addTime" v-if="columns[6].visible" width="160">
-            <template #default="scope">
-              <span>{{ parseTime(scope.row.addTime) }}</span>
-            </template>
-          </el-table-column>
-
+          
+          <!-- 动态生成表头 -->
+          <el-table-column v-for="field in fields" 
+            :key="field.fieldName" 
+            :label="field.fieldComment" 
+            :prop="field.fieldName"
+            :formatter="formatDate " 
+            :align="field.fieldType === 'string' ? 'left' : 'center'" />
+          
+          <!-- 操作字段  -->
           <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
             <template #default="scope">
-              <el-tooltip content="修改" placement="top" v-if="scope.row.AssetDataId !== 1">
-                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-                           v-hasPermi="['system:AssetData:edit']"></el-button>
+              <el-tooltip content="修改" placement="top">
+                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
               </el-tooltip>
-              <el-tooltip content="删除" placement="top" v-if="scope.row.AssetDataId !== 1">
-                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-                           v-hasPermi="['system:AssetData:remove']"></el-button>
+              <el-tooltip content="删除" placement="top">
+                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"></el-button>
               </el-tooltip>
             </template>
-
           </el-table-column>
         </el-table>
-
         <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
-        -->
-
 
       </el-col>
     </el-row>
@@ -244,6 +175,7 @@ const deptOptions = ref(undefined);
 const postOptions = ref([]);
 const roleOptions = ref([]);
 const fields = ref([]);
+const formattedFields  = ref([]);
 
 // 列显隐信息
 const columns = ref([
@@ -282,11 +214,24 @@ function getList() {
     loading.value = false;
     AssetDataList.value = res.rows;
     total.value = res.total;
+
     fields.value = res.fields; // 动态设置表头
   }).finally(() => {
     loading.value = false;
   });
 };
+
+// 格式化日期的函数
+const formatDate = (row, column,cellValue) => {
+  console.log('row = ' + JSON.stringify(row) + 'column = ' + JSON.stringify(column)) 
+  if(cellValue){ 
+    return cellValue 
+  }else if(cellValue === 0){ 
+    return 0
+  }else{
+    return '--' 
+  }
+}
 
 // 节点单击事件
 function handleNodeClick(data) {
