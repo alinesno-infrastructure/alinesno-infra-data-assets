@@ -12,6 +12,15 @@ import { parseStrEmpty } from "@/utils/ruoyi";
 var prefix = '/api/infra/data/assets/dashboard/' ;
 var managerUrl = {
     topCatalog : prefix +"topCatalog" ,
+    getApiKey: prefix +"getApiKey" ,
+}
+
+// 获取apikey
+export function getApiKey() {
+    return request({
+        url: managerUrl.getApiKey,
+        method: 'get'
+    })
 }
 
 // 查询部门下拉树结构
