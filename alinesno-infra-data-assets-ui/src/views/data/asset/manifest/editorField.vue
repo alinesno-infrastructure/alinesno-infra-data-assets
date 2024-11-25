@@ -28,6 +28,7 @@
                             <el-option label="整数" value="integer"></el-option>
                             <el-option label="浮点数" value="float"></el-option>
                             <el-option label="布尔值" value="boolean"></el-option>
+                            <el-option label="时间戳" value="timestamp"></el-option>
                             <el-option label="日期" value="date"></el-option>
                         </el-select>
                         <div v-if="errors[scope.$index] && errors[scope.$index].type" class="error">{{
