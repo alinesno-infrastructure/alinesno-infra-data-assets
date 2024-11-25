@@ -1,5 +1,8 @@
 package com.alinesno.infra.data.assets.collector.service.impl;
 
+import cn.hutool.core.util.IdUtil;
+import com.alinesno.infra.common.core.utils.DateUtils;
+import com.alinesno.infra.data.assets.api.PushDataUserInfoDto;
 import com.alinesno.infra.data.assets.api.TableFieldRequestDto;
 import com.alinesno.infra.data.assets.api.TableMetrics;
 import com.alinesno.infra.data.assets.collector.service.DataAssetService;
@@ -28,7 +31,7 @@ public class DataAssetServiceImpl implements DataAssetService {
     private IManifestFieldService manifestFieldService;
 
     @Override
-    public TableMetrics handleCsvFile(MultipartFile file, String model) {
+    public TableMetrics handleCsvFile(MultipartFile file, String model, PushDataUserInfoDto userInfoDto) {
         // 实现CSV文件处理逻辑
         // 可以使用OpenCSV等库来解析CSV文件
         log.debug("Handling CSV file for model: " + model);
@@ -48,7 +51,7 @@ public class DataAssetServiceImpl implements DataAssetService {
     }
 
     @Override
-    public TableMetrics handleJsonFile(MultipartFile file, String model) {
+    public TableMetrics handleJsonFile(MultipartFile file, String model, PushDataUserInfoDto userInfoDto) {
         // 可以使用Jackson或Gson等库来解析JSON文件
         log.debug("Handling JSON file for model: " + model);
 
@@ -67,7 +70,7 @@ public class DataAssetServiceImpl implements DataAssetService {
     }
 
     @Override
-    public TableMetrics handleListData(List<Map<String, String>> dataList, String model) {
+    public TableMetrics handleListData(List<Map<String, Object>> dataList, String model, PushDataUserInfoDto userInfoDto) {
         // 实现List数据处理逻辑
         log.debug("Handling list data for model: " + model);
 
@@ -75,18 +78,24 @@ public class DataAssetServiceImpl implements DataAssetService {
         List<TableFieldRequestDto> defaultFields = AssetDataConstants.DEFAULT_FIELDS;
 
         // 检查并添加默认字段
-        for (Map<String, String> data : dataList) {
+        for (Map<String, Object> data : dataList) {
             for (TableFieldRequestDto defaultField : defaultFields) {
                 if (!data.containsKey(defaultField.getName())) {
-                    switch (defaultField.getType()) {
-                        case "string":
-                            data.put(defaultField.getName(), "");
+                    switch (defaultField.getName()) {
+                        case "id":
+                            data.put(defaultField.getName(), IdUtil.getSnowflakeNextIdStr());
                             break;
-                        case "date":
-                            data.put(defaultField.getName(), new Date().toString());
+                        case "add_time":
+                            data.put(defaultField.getName(), new java.sql.Timestamp(System.currentTimeMillis()));
                             break;
-                        default:
-                            data.put(defaultField.getName(), "");
+                        case "operator_id":
+                            data.put(defaultField.getName(), userInfoDto.getUserId());
+                            break;
+                        case "org_id":
+                            data.put(defaultField.getName(), userInfoDto.getOrgId());
+                            break;
+                        case "department_id":
+                            data.put(defaultField.getName(), 0);
                             break;
                     }
                 }
