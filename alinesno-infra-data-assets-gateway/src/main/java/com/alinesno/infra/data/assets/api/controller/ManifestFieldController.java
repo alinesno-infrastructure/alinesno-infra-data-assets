@@ -60,7 +60,7 @@ public class ManifestFieldController extends BaseController<ManifestFieldEntity,
         List<TableFieldRequestDto> updatedFieldRequests = new ArrayList<>(fieldRequests);
         for (TableFieldRequestDto defaultField : AssetDataConstants.DEFAULT_FIELDS) {
             boolean exists = fieldRequests.stream()
-                .anyMatch(field -> field.getName().equals(defaultField.getName()));
+                    .anyMatch(field -> field.getName().equals(defaultField.getName()));
             if (!exists) {
                 updatedFieldRequests.add(defaultField);
             }
@@ -81,13 +81,26 @@ public class ManifestFieldController extends BaseController<ManifestFieldEntity,
         queryWrapper.eq(ManifestFieldEntity::getManifestId, mId);
         List<ManifestFieldEntity> list = service.list(queryWrapper) ;
 
-        List<TableFieldRequestDto> dtos = list.stream().map(e -> new TableFieldRequestDto(
+        List<TableFieldRequestDto> dtos = new ArrayList<>(list.stream().map(e -> new TableFieldRequestDto(
                 e.getFieldName(),
                 e.getFieldType(),
                 e.getFiledLength(),
                 e.getIsNullable(),
                 e.getIsPrimaryKey(),
-                e.getFieldComment())).toList();
+                e.getFieldComment())).toList());
+
+        // 如果是空表，则自动初始化表单默认字段或者对比查看是否缺少默认字段，没有则添加到dtos里面
+        if (dtos.isEmpty()) {
+            dtos.addAll(AssetDataConstants.DEFAULT_FIELDS);
+        }else{
+            for (TableFieldRequestDto defaultField : AssetDataConstants.DEFAULT_FIELDS) {
+                boolean exists = dtos.stream()
+                        .anyMatch(field -> field.getName().equals(defaultField.getName()));
+                if (!exists) {
+                    dtos.add(defaultField);
+                }
+            }
+        }
 
         return AjaxResult.success(dtos);
     }
