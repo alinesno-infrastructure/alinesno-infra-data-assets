@@ -1,209 +1,198 @@
 <template>
-  <div>
-    <el-form :model="form" :rules="rules" ref="executeRef" label-width="120px">
-<!--      <el-row>
-        <el-col :span="24">
-          <el-form-item style="width: 100%;" label="数据库源" prop="datasourceId">
-            <el-tree-select
-                v-model="form.datasourceId"
-                :data="datasourceList"
-                :props="{ value: 'id', label: 'dbDesc'}"
-                value-key="id"
-                placeholder="请选择归属数据库源"
-                check-strictly
-            />
-          </el-form-item>
-        </el-col>
-      </el-row>-->
+    <div class="app-container">
+        <el-page-header @back="goBack" :content="'['+ currentApi.name +']工具脚本配置'">
+        </el-page-header>
 
-      <el-row>
-        <el-col :span="24">
-          <el-form-item label="执行SQL" prop="runSql">
-            <el-tabs
-                v-model="editableTabsValue"
-                type="card"
-                editable
-                @edit="handleTabsEdit"
-                tab-position="top"
-            >
-              <el-tab-pane
-                  v-for="(item, index) in editableTabs"
-                  :key="item.index"
-                  :label="item.name"
-                  :name="item.name"
-              >
-                <el-input
-                    type="textarea"
-                    :autosize="{minRows:10,maxRows:20}"
-                    v-model="item.runSql"
-                    placeholder="请输入指令名称"
-                    style="width: 865px"
-                    maxlength="500" />
-              </el-tab-pane>
-            </el-tabs>
-          </el-form-item>
-        </el-col>
-      </el-row>
+        <div class="form-container">
+            <el-row>
+                <el-col :span="14" 
+                    v-loading="loading"
+                    element-loading-text="任务正在生成中，请勿刷新 ..."
+                    :element-loading-spinner="svg"
+                >
 
-      <el-form-item label="事务" prop="openTran">
-        <el-switch
-            v-model="form.openTran"
-            :active-value="true"
-            :inactive-value="false"
-        />
-      </el-form-item>
+                    <div style="margin-top: 20px;margin-bottom: 20px;display: inline-flex;width: 100%;flex-direction: column;gap: 8px;">
 
-    </el-form>
-  </div>
+                        <div class="flow-setting-footer" style="margin: 0px;display: flex;gap: 10px;">
+                            <el-input v-model="chatMessage" size="large" style="width: 100%;" placeholder="输入请求参数，比如{'name':'lisi'}." />
+                            <el-button type="primary" text bg @click="handleValidateTask()" size="large">
+                                <i class="fa-solid fa-truck-fast"></i>&nbsp;验证任务
+                            </el-button>
+                            <el-button type="danger" bg text @click="submitForm()" size="large">
+                                <i class="fa-solid fa-paper-plane"></i>&nbsp;提交保存
+                            </el-button>
+                        </div>
 
+                        <div>
+                            <ScriptEditorPanel ref="executeEditorRef" :lang="'java'" />
+                        </div>
+
+
+                    </div>
+
+                </el-col>
+                <el-col :span="10">
+                    <div class="output-result-box">
+                        <el-card shadow="never" style="height:calc(100vh - 220px);padding:0px !important">
+                            <template #header>
+                                <div class="card-header">
+                                    <span>执行结果</span>
+                                </div>
+                            </template>
+                            
+                            <el-skeleton v-if="!genContent" :rows="10" />
+                            <el-scrollbar v-else style="height: calc(-320px + 100vh);">
+                                <div v-html="markdown.render(genContent)"></div>
+                            </el-scrollbar>
+
+                        </el-card>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
 </template>
 
-<script setup name="SqlEditor">
+<script setup>
+
+// import { validateApiScript, updateApiScript } from '@/api/smart/assistant/role'
+import ScriptEditorPanel from './ScriptEditor.vue';
 
 import {
-  allDatasource,
-} from "@/api/data/fastapi/datasource";
-
-import {
-  updateExecuteSql
+  getApi , 
+  validateApiScript,
+  updateApiScript
 } from "@/api/data/fastapi/apiConfig";
+
+// import { getParam } from '@/utils/ruoyi'
+
+// import MarkdownIt from 'markdown-it';
+// const markdown = new MarkdownIt()
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
-const datasourceList = ref([]);
 
-const props = defineProps({
-  currentApiConfigContent: {
-    type: Object ,
-    require: true,
-  },
-})
+const loading = ref(false)
+const executeEditorRef = ref(null)
 
-const data = reactive({
-  form: {
-    datasourceId:'',
-    runSql:'',
-    openTran:0,
-  },
-  queryParams: {
-    pageNum: 1,
-    pageSize: 10,
-    datasourceId: '',
-    runSql: '',
-    openTran: 0
-  },
-  rules: {
-    datasourceId: [{ required: true, message: "数据源不能为空", trigger: "blur" }],
-    runSql: [{ required: true, message: "SQL不能为空", trigger: "blur" }] ,
-    openTran: [{ required: true, message: "事务不能为空", trigger: "blur" }]
-  }
+// const tabPosition = ref('right')
+// const auditEditorRef = ref(null)
+// const functionCallEditorRef = ref(null)
+
+const scriptType = ref("execute")
+const genContent = ref(null)
+
+const currentApi = ref({
+    name:''
 });
+const currentApiId = ref(null)
+const chatMessage = ref("")
 
-const { queryParams, form, rules } = toRefs(data);
+/** 获取代码 */
+const getCode = () => {
+    return executeEditorRef.value.getRawScript()
+}
 
-const editableTabsValue = ref('SQL-0') ;
+/** 设置当前角色 */
+function setCurrentApiId(id) {
+    currentApiId.value = id;
+}
 
-const editableTabs = ref([
-  { name: 'SQL-0',"runSql":"SELECT now()"}
-])
+/** 验证脚本任务 */
+const handleValidateTask = () => {
+    let type = scriptType.value;
+    const code = getCode();
+    const toolId = currentApiId.value;
 
-onMounted(() => {
-  reset();
-  form.value.datasourceId = props.currentApiConfigContent.datasourceId ;
-  form.value.runSql = props.currentApiConfigContent.runSql ;
-  form.value.openTran = props.currentApiConfigContent.openTran ;
-  if ( props.currentApiConfigContent.runSql != null && props.currentApiConfigContent.runSql != undefined && props.currentApiConfigContent.runSql != '' ){
-    editableTabs.value = JSON.parse(props.currentApiConfigContent.runSql)
-  }
+    loading.value = true
+    
+    validateApiScript({
+        'script': code,
+        'toolId': toolId,
+        'type': type,
+        'params': chatMessage.value
+    }).then(res => {
+        console.log('res = ' + res);
+        loading.value = false 
+        genContent.value = res.data
+        proxy.$modal.msgSuccess("验证成功");
+    }).catch(err => {
+        console.log('err = ' + err);
+        loading.value = false 
+    })
+}
+
+/** 提交脚本任务 */
+const submitForm = () => {
+    
+    let type = scriptType.value;
+    const code = getCode();
+    const toolId = currentApiId.value;
+
+    loading.value = true
+    
+    updateApiScript({
+        'script': code,
+        'toolId': toolId,
+        'type': type,
+        'params': 'save'
+    }).then(res => {
+        console.log('res = ' + res);
+        loading.value = false 
+        proxy.$modal.msgSuccess("更新成功");
+    }).catch(err => {
+        console.log('err = ' + err);
+        loading.value = false 
+    })
+}
+
+/** 返回 */
+function goBack() {
+    router.push({ path: '/template/smart/assistant/plugin/index' });
+}
+
+/** 获取角色信息 */
+function getApiInfo() {
+    currentApiId.value = router.currentRoute.value.query.toolId; 
+    getApi(currentApiId.value).then(response => {
+        currentApi.value = response.data;
+        let groovyScript = "" ;
+        if(response.data.groovyScript){
+            groovyScript = response.data.groovyScript
+        }
+        executeEditorRef.value.setRawScript(groovyScript) ;
+    });
+}
+
+/** 切换tab */
+function handleTabClick(tab, event) {
+    console.log('tab = ' + JSON.stringify(tab))
+    scriptType.value = tab.props.name
+    console.log('type = ' + scriptType.value)
+}
+
+nextTick(() => {
+    // getApiInfo();
 })
 
-function  reset() {
-  form.value = {
-    datasourceId:'',
-    runSql:'',
-    openTran:0,
-  };
-  proxy.resetForm("executeRef");
-}
-
-
-
-/** 获取到所有数据源 */
-function handleAllDatasource() {
-  allDatasource().then(res => {
-    datasourceList.value = res.data ;
-  })
-}
-
-/** 提交按钮 */
-function submitForm(id) {
-  let check = true ;
-  for(var i = 0; i < editableTabs.value.length; i++){
-    if ( editableTabs.value[i].runSql == null || editableTabs.value[i].runSql == undefined || editableTabs.value[i].runSql == '' ) {
-      proxy.$modal.msgError("请填写"+ editableTabs.value[i].name + "的执行SQL!");
-      check = false;
-      break ;
-    }
-
-  }
-
-  if ( check ) {
-    form.value.runSql =  JSON.stringify(editableTabs.value) ;
-    proxy.$refs["executeRef"].validate(valid => {
-      if (valid) {
-        updateExecuteSql(form.value , id).then(response => {
-          return check ;
-        });
-      }
-    });
-  } else {
-    return false
-  }
-
-};
-
-function handleTabsEdit (targetName, action)  {
-  if (action === 'add') {
-    const newTabName = "SQL-"+`${editableTabs.value.length}`
-    editableTabs.value.push({
-      "name":newTabName,
-      "runSql":""
-    })
-    editableTabsValue.value = newTabName
-  } else if (action === 'remove') {
-    let tabs = editableTabs.value;
-
-    let activeName = editableTabsValue.value;
-    if (activeName === targetName) {
-      tabs.forEach((tab, index) => {
-        if (tab.name === targetName) {
-          const nextTab = tabs[index + 1] || tabs[index - 1]
-          if (nextTab) {
-            activeName = nextTab.name
-          }
-        }
-      })
-    }
-
-    editableTabsValue.value = activeName
-    editableTabs.value = tabs.filter((tab) => {
-      return tab.name !== targetName
-    })
-
-  }
-}
-
-
-handleAllDatasource() ;
-
-/** 提供对外访问接口 */
 defineExpose({
-  submitForm
+    setCurrentApiId
 })
 
 </script>
 
 <style scoped lang="scss">
+.flow-setting-footer {
+    float: right;
+    margin-bottom: 20px;
+}
+
+.output-result-box {
+    padding: 20px;
+    margin-left: 20px;
+
+    .card-header {
+        padding: 10px;
+    }
+}
 </style>
-
-
