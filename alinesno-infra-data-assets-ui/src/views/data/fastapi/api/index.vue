@@ -3,12 +3,11 @@
       <el-row :gutter="20">
          <!--类型数据-->
          <el-col :span="4" :xs="24">
-<!--            <div class="head-container">
+            <div class="head-container">
                <el-input v-model="deptName" placeholder="请输入服务目录" clearable prefix-icon="Search"
                   style="margin-bottom: 20px" />
-            </div>-->
+            </div>
             <div class="head-container">
-              服务目录
                <el-tree :data="deptOptions" :props="{ label: 'label', children: 'children' }"
                   :expand-on-click-node="false" :filter-node-method="filterNode" ref="deptTreeRef" node-key="id"
                   highlight-current default-expand-all @node-click="handleNodeClick" />
@@ -50,10 +49,10 @@
             <el-table v-loading="loading" :data="ApiConfigList" @selection-change="handleSelectionChange">
                <el-table-column type="selection" width="50" :align="'center'" />
 
-               <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[0].visible">
+               <el-table-column label="图标" :align="'center'" width="60" key="status" v-if="columns[0].visible">
                   <template #default="scope">
-                     <div class="role-icon">
-                        <img :src="'http://data.linesno.com/icons/sepcialist/dataset_' + ((scope.$index + 1) % 10 + 5) + '.png'" style="width: 25px;height: 25px"/>
+                     <div class="role-icon" style="font-size:25px">
+                        <i class="fa-solid fa-lemon"></i>
                      </div>
                   </template>
                </el-table-column>
@@ -81,8 +80,7 @@
                <el-table-column label="配置" align="center" width="150" key="note" prop="note" v-if="columns[4].visible"
                   :show-overflow-tooltip="true">
                   <template #default="scope">
-                     <el-button type="primary" text bg icon="Paperclip"
-                        @click="configExecuteSqlConfig(scope.row)">配置SQL</el-button>
+                     <el-button type="primary" text bg icon="Paperclip" @click="configApiScript(scope.row)">脚本</el-button>
                   </template>
                </el-table-column>
                <el-table-column label="内容类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[5].visible">
@@ -96,7 +94,7 @@
                 <el-switch v-model="form.access" :active-value="0" :inactive-value="1" v-if="columns[6].visible"/>
               </el-form-item>
 
-               <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
+               <el-table-column label="上线" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
                   <template #default="scope">
                      <el-switch v-model="scope.row.hasStatus" :active-value="0" :inactive-value="1"
                         @change="handleChangStatusField('hasStatus', scope.row.hasStatus, scope.row.id)" />
@@ -130,19 +128,18 @@
       </el-row>
 
       <!-- 添加或修改指令配置对话框 -->
+      <!-- 
       <el-dialog :title="sqlEditorTitle" v-model="promptOpen" width="1024" destroy-on-close append-to-body>
-
          <ApiConfigEditor ref="sqlEditorRef" :currentPostId="currentPostId"
             :currentApiConfigContent="currentApiConfigContent" />
-
          <template #footer>
             <div class="dialog-footer">
                <el-button type="primary" @click="submitSqlExecuteForm">确 定</el-button>
                <el-button @click="cancel">取 消</el-button>
             </div>
          </template>
-
-      </el-dialog>
+      </el-dialog> 
+      -->
 
       <!-- 添加或修改指令配置对话框 -->
       <el-dialog :title="title" v-model="open" width="900px" append-to-body>
@@ -214,7 +211,7 @@ import {
    changStatusField
 } from "@/api/data/fastapi/apiConfig";
 
-import ApiConfigEditor from "./sqlEditor.vue"
+// import ApiConfigEditor from "./sqlEditor.vue"
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
@@ -289,6 +286,12 @@ function getList() {
       total.value = res.total;
    });
 };
+
+
+/** 配置执行脚本 */
+function configApiScript(row){
+  router.push({path:"/service/data/fastapi/api/script" , query: {apiId: row.id}});
+}
 
 // 节点单击事件
 function handleNodeClick(data) {
