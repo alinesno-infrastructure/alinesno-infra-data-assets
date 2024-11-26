@@ -36,7 +36,6 @@
 
         <!-- 数据服务 -->
         <module>alinesno-infra-data-fastapi-facade</module>  <!-- 接口与引用 -->
-        <module>alinesno-infra-data-fastapi-plugins</module>  <!-- 接口插件 -->
         <module>alinesno-infra-data-fastapi-domain</module>  <!-- 业务领域 -->
         <module>alinesno-infra-data-fastapi-gateway</module>  <!-- 接口网关 -->
 
