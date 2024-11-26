@@ -39,12 +39,30 @@
     <el-table v-loading="loading" :data="ApiClientList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" :align="'center'" />
       <!-- 业务字段-->
-      <el-table-column label="客户端名称" align="left" key="clientName" prop="clientName" v-if="columns[0].visible" />
-      <el-table-column label="客户端ID" align="left" key="clientId" prop="clientId" v-if="columns[1].visible" />
-      <el-table-column label="密钥" align="left" key="secret" prop="secret" v-if="columns[2].visible" />
-<!--      <el-table-column label="备注" align="left" key="remark" prop="remark" width="170" v-if="columns[3].visible" />-->
-      <el-table-column label="Token过期时间" align="left" key="expiryTime" prop="expiryTime"  width="170" v-if="columns[4].visible" />
-      <el-table-column label="调用次数" align="left" key="useCount" prop="useCount" width="80" v-if="columns[5].visible" />
+      <el-table-column label="客户端名称" align="left" key="clientName" prop="clientName" v-if="columns[0].visible">
+        <template #default="scope">
+            <div>
+              {{ scope.row.clientName}}
+            </div>
+            <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.secret">
+              密钥: {{ scope.row.secret}}
+            </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="描述" align="left" key="remark" prop="remark" v-if="columns[2].visible" />
+      <el-table-column label="Token过期时间" align="left" key="expiryTime" prop="expiryTime"  width="170" v-if="columns[4].visible">
+        <template #default="scope">
+          <div style="display: flex;flex-direction: column;">
+            <span>
+              {{ parseTime(scope.row.expiryTime) }}
+            </span>
+            <span style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
+              {{ calculateRemainingTime(scope.row.expiryTime)  }}
+            </span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="调用次数" align="center" key="useCount" prop="useCount" width="80" v-if="columns[5].visible" />
       <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
         <template #default="scope">
           <el-switch v-model="scope.row.hasStatus" :active-value="0" :inactive-value="1"
@@ -84,21 +102,28 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
-            <el-form-item label="客户端ID" prop="clientId">
-              <el-input v-model="form.clientId" placeholder="请输入客户端ID" maxlength="128" style="width: 720px;"/>
-            </el-form-item>
+          <el-col :span="12">
+            <el-form-item label="过期时间" prop="expiryTimeStr">
+              <el-select v-model="form.expiryTimeStr" placeholder="设置过期时间">
+                <el-option
+                  v-for="option in expiryOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                ></el-option>
+              </el-select>
+            </el-form-item> 
+          </el-col>
+          <el-col :span="12" v-if="form.expiryTimeStr === 'custom'">
+            <el-form-item label="天数" prop="customDays">
+              <el-input
+                v-model.number="form.customDays"
+                placeholder="输入自定义天数"
+                type="number"
+              ></el-input>
+            </el-form-item> 
           </el-col>
         </el-row>
-
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="密钥" prop="secret">
-              <el-input v-model="form.secret" placeholder="请输入密钥" maxlength="128" style="width: 720px;"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
         <el-row>
           <el-col :span="24">
             <el-form-item label="备注" prop="remark">
@@ -148,6 +173,13 @@ const total = ref(0);
 const title = ref("");
 const dateRange = ref([]);
 
+const expiryOptions = ref([
+  { label: '24小时', value: '1' },
+  { label: '7天', value: '7' },
+  { label: '30天', value: '30' },
+  { label: '自定义', value: 'custom' },
+]);
+
 
 // 列显隐信息
 const columns = ref([
@@ -188,7 +220,6 @@ const { queryParams, form, rules } = toRefs(data);
 function getList() {
   loading.value = true;
   listApiClient(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
-    debugger
     loading.value = false;
     ApiClientList.value = res.rows;
     total.value = res.total;
@@ -221,6 +252,40 @@ function handleDelete(row) {
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => { });
 };
+
+/** 计算剩余天数 */
+function calculateRemainingTime(expiryTimeStr) {
+  // 将传递的时间字符串转换为 Date 对象
+  const expiryDate = new Date(expiryTimeStr);
+  const now = new Date();
+
+  // 计算时间差（以毫秒为单位）
+  const diff = expiryDate.getTime() - now.getTime();
+
+  // 如果已经过期，返回已过期
+  if (diff <= 0) {
+    return "已过期";
+  }
+
+  // 计算剩余的天数、小时数、分钟数
+  const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  // 格式化输出
+  let remainingTime = "";
+  if (diffDays > 0) {
+    remainingTime += `${diffDays}天 `;
+  }
+  if (diffHours > 0 || remainingTime !== "") {
+    remainingTime += `${diffHours}小时 `;
+  }
+  if (diffMinutes > 0 || remainingTime !== "") {
+    remainingTime += `${diffMinutes}分`;
+  }
+
+  return remainingTime.trim();
+}
 
 /** 选择条数  */
 function handleSelectionChange(selection) {
@@ -271,6 +336,11 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["databaseRef"].validate(valid => {
     if (valid) {
+
+      if(form.value.expiryTimeStr === 'custom'){
+        form.value.expiryTimeStr = form.value.customDays;
+      }
+
       if (form.value.id != undefined) {
         updateApiClient(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
