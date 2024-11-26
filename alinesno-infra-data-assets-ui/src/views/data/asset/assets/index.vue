@@ -46,7 +46,7 @@
 
           <el-col :span="1.5">
             <el-button type="primary" plain icon="Plus" @click="handleAdd">新增</el-button>
-          </el-col>
+          </el-col> 
           <el-col :span="1.5">
             <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate">修改</el-button>
           </el-col>
@@ -57,7 +57,7 @@
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
-         <el-table v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
+         <el-table v-show="total > 0" v-loading="loading" :data="AssetDataList" @selection-change="handleSelectionChange">
 
           <el-table-column type="selection" width="50" :align="'center'" />
           
