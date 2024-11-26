@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.util.Date;
 
 /**
@@ -24,6 +27,7 @@ public class ApiClientEntity extends InfraBaseEntity {
     @TableField("client_id")
     @ColumnType(value = MySqlTypeConstant.VARCHAR, length = 64)
     @ColumnComment("客户端ID")
+    @NotBlank(message = "Client ID cannot be blank.")
     private String clientId;
 
     /**
@@ -32,6 +36,7 @@ public class ApiClientEntity extends InfraBaseEntity {
     @TableField("client_name")
     @ColumnType(value = MySqlTypeConstant.VARCHAR, length = 64)
     @ColumnComment("客户端名称")
+    @NotBlank(message = "Client Name cannot be blank.")
     private String clientName;
 
     /**
@@ -48,6 +53,7 @@ public class ApiClientEntity extends InfraBaseEntity {
     @TableField("secret")
     @ColumnType(value = MySqlTypeConstant.VARCHAR, length = 64)
     @ColumnComment("密钥")
+    @NotBlank(message = "Secret cannot be blank.")
     private String secret;
 
     /**
@@ -56,8 +62,8 @@ public class ApiClientEntity extends InfraBaseEntity {
     @TableField("expiry_time")
     @ColumnType(value = MySqlTypeConstant.DATETIME)
     @ColumnComment("Token过期时间")
+    @NotNull(message = "Expiry Time cannot be null.")
     private Date expiryTime;
-
 
     /**
      * 调用次数
@@ -65,5 +71,5 @@ public class ApiClientEntity extends InfraBaseEntity {
     @TableField("use_count")
     @ColumnType(value = MySqlTypeConstant.INT, length = 5)
     @ColumnComment("调用次数")
-    private Integer useCount = 0 ;
+    private Integer useCount = 0;
 }
