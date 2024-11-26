@@ -9,10 +9,10 @@ import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
+import com.alinesno.infra.data.fastapi.api.ApiConfigRequestDto;
 import com.alinesno.infra.data.fastapi.entity.ApiConfigEntity;
 import com.alinesno.infra.data.fastapi.service.IApiConfigService;
 import com.alinesno.infra.data.fastapi.service.IApiGroupService;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -64,25 +64,50 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
 
     /**
      * 更新执行sql操作
-     * @param entity
-     * @param id
-     * @return
+//     * @param entity
+//     * @param id
+//     * @return
+//     */
+//    @PostMapping("/updateExecuteSql")
+//    public AjaxResult updateExecuteSql(@RequestBody ApiConfigEntity entity , String id){
+//
+//        log.debug("id = {}" , id);
+//        log.debug("entity = {}" , entity);
+//
+//        UpdateWrapper<ApiConfigEntity> updateWrapper = new UpdateWrapper<>();
+//        updateWrapper.eq("id", id);
+//        updateWrapper.set("datasource_id",  entity.getDatasourceId());
+//        updateWrapper.set("run_sql", entity.getRunSql());
+//        updateWrapper.set("open_tran", entity.isOpenTran());
+//        service.update(null, updateWrapper);
+//
+//        return AjaxResult.success() ;
+//    }
+
+    /**
+     * 获取获取到getApi
      */
-    @PostMapping("/updateExecuteSql")
-    public AjaxResult updateExecuteSql(@RequestBody ApiConfigEntity entity , String id){
+    @GetMapping("/getApi")
+    public AjaxResult getApi(@RequestParam("id") String id){
+        return AjaxResult.success("success" , service.getById(id)) ;
+    }
 
-        log.debug("id = {}" , id);
-        log.debug("entity = {}" , entity);
+    /**
+     * 更新运行脚本
+     * @param dto
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/updateApiScript")
+    public AjaxResult updateApiScript(@RequestBody ApiConfigRequestDto dto) throws Exception {
 
-        UpdateWrapper<ApiConfigEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id", id);
-        updateWrapper.set("datasource_id",  entity.getDatasourceId());
-        updateWrapper.set("run_sql", entity.getRunSql());
-        updateWrapper.set("open_tran", entity.isOpenTran());
-        service.update(null, updateWrapper);
+        ApiConfigEntity entity = service.getById(dto.getApiId()) ;
+        entity.setGroovyScript(dto.getScript()) ;
+        service.updateById(entity) ;
 
         return AjaxResult.success() ;
     }
+
 
     @DataPermissionSave
     @Override
