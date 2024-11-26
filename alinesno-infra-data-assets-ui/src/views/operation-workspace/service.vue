@@ -4,12 +4,12 @@
       <el-col class="panel-col" :span="19">
         <div class="grid-content">
           <div class="panel-header">
-            <div class="header-title"><i class="fa-solid fa-file-waveform"></i>  数据资产列表</div>
+            <div class="header-title"><i class="fa-solid fa-file-waveform"></i>  数据域列表</div>
           </div>
           <div class="panel-body acp-height-auto" style="padding: 0;padding-bottom: 10px;">
             <div class="acp-app-list">
               <ul>
-                <li class="app-items" v-for="item in apps" :key="item" style="width:calc(25% - 10px)">
+                <li class="app-items" v-for="item in apps" :key="item" style="width:calc(25% - 10px);display: flex">
                   <div class="app-icon">
                     <i :class="item.icon" style="font-size: 20px" />
                   </div>
