@@ -74,13 +74,17 @@
               <div>
                 {{ scope.row.tableName }}
               </div>
-              <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
+              <div style="font-size: 13px; color: rgb(165, 165, 165); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" v-copyText="scope.row.promptId">
                 {{ scope.row.description }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="主题域" align="center" key="dataDomain" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="主题域" align="center" key="dataDomain" width="120" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true">
+            <template #default="scope">
+                {{ getDataDomainLabel(scope.row.dataDomain) }}
+            </template> 
+          </el-table-column>  
+          <!-- <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" /> -->
           <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="120" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" >
             <template #default="scope">
               <div>
@@ -88,7 +92,11 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <el-check-tag checked type="info">政务</el-check-tag>
+            </template> 
+          </el-table-column>  
 
           <el-table-column label="字段" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
@@ -351,7 +359,12 @@ function cancel() {
 const getConfidentialityLevelValue = (key) => {
   const level = dataSecurityLevels.value.find(item => item.key == key);
   return level ? level.value : '未知';
-};
+}
+
+const getDataDomainLabel = (key) => {
+  const domain = deptOptions.value.find(item => item.id == key);
+  return domain ? domain.label: '未配置';
+}
 
 /** 新增按钮操作 */
 function handleAdd() {
