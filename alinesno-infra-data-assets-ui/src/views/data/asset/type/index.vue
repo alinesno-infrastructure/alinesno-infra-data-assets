@@ -105,7 +105,7 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="deptRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="24" v-if="form.parentId !== 0">
+          <el-col :span="24">
             <el-form-item label="上级分类" prop="parentId">
               <el-tree-select
                   v-model="form.parentId"
