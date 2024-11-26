@@ -57,7 +57,13 @@ public class ApiConfigEntity extends InfraBaseEntity {
     @ColumnComment("JSON参数")
     private String jsonParam;
 
-
+    /**
+     * groovyScript
+     */
+    @TableField("groovy_script")
+    @ColumnType(value = MySqlTypeConstant.TEXT)
+    @ColumnComment("groovy脚本")
+    private String groovyScript;
 
     /**
      * 访问权限
