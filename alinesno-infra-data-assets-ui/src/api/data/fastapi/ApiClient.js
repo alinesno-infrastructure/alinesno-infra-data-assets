@@ -13,7 +13,7 @@ var prefix = '/api/infra/data/fastapi/ApiClient/' ;
 var managerUrl = {
     datatables : prefix +"datatables" ,
     createUrl: prefix + 'add' ,
-    saveUrl: prefix + 'save' ,
+    saveUrl: prefix + 'saveClient' ,
     updateUrl: prefix +"modify" ,
     statusUrl: prefix +"changeStatus" ,
     cleanUrl: prefix + "clean",
@@ -34,7 +34,6 @@ export function changStatusField(data){
 
 // 查询数据库列表
 export function listApiClient(query) {
-    debugger
   return request({
     url: managerUrl.datatables ,
     method: 'post',
