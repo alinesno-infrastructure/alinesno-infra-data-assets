@@ -102,13 +102,13 @@ function setCurrentApiId(id) {
 const handleValidateTask = () => {
     let type = scriptType.value;
     const code = getCode();
-    const toolId = currentApiId.value;
+    const apiId = currentApiId.value;
 
     loading.value = true
     
     validateApiScript({
         'script': code,
-        'toolId': toolId,
+        'apiId': apiId,
         'type': type,
         'params': chatMessage.value
     }).then(res => {
@@ -127,13 +127,13 @@ const submitForm = () => {
     
     let type = scriptType.value;
     const code = getCode();
-    const toolId = currentApiId.value;
+    const apiId = currentApiId.value;
 
     loading.value = true
     
     updateApiScript({
         'script': code,
-        'toolId': toolId,
+        'apiId': apiId,
         'type': type,
         'params': 'save'
     }).then(res => {
@@ -148,12 +148,11 @@ const submitForm = () => {
 
 /** 返回 */
 function goBack() {
-    router.push({ path: '/template/smart/assistant/plugin/index' });
+    router.push({ path: '/service/data/fastapi/api/index' });
 }
 
 /** 获取角色信息 */
 function getApiInfo() {
-    currentApiId.value = router.currentRoute.value.query.toolId; 
     getApi(currentApiId.value).then(response => {
         currentApi.value = response.data;
         let groovyScript = "" ;
@@ -171,8 +170,9 @@ function handleTabClick(tab, event) {
     console.log('type = ' + scriptType.value)
 }
 
-nextTick(() => {
-    // getApiInfo();
+onMounted(() => {
+    currentApiId.value = router.currentRoute.value.query.apiId; 
+    getApiInfo();
 })
 
 defineExpose({
