@@ -16,7 +16,7 @@
             </div>
           </div>
           <div style="font-size: 14px;color: #444;">
-            数据接入密钥 <el-button type="primary" v-copyText="apiKey" text bg ><el-icon><CopyDocument /></el-icon> 复制</el-button>
+            数据接入密钥 <el-button type="primary" text bg  @click="copyApiKey"><el-icon><CopyDocument /></el-icon> 复制</el-button>
           </div>
         </div>
       </el-col>
@@ -38,7 +38,7 @@
 
 import OperationWorkspaceApps from './operation-workspace/apps.vue'
 import OperationWorkspaceService from './operation-workspace/service.vue'
-
+import { ElMessage } from 'element-plus';
 import { getApiKey} from '@/api/data/asset/dashboard'
 
 const currentEnvClusterObj = ref({
@@ -47,7 +47,7 @@ const currentEnvClusterObj = ref({
   desc: '数据经采集、集成、加工等流程处理完成后，可以在数据资产模块进行系统化管理'
 }) 
 
-let apiKey = ref('sk-xxxx')
+const apiKey = ref(null)
 
 const handleApiKey = () => {
   getApiKey().then(response => {
@@ -56,7 +56,21 @@ const handleApiKey = () => {
   })
 }
 
-onMounted(() => {
+const copyApiKey = async () => {
+  if (!apiKey.value) {
+    ElMessage.warning('API 密钥为空，请先获取密钥');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(apiKey.value);
+    ElMessage.success('API 密钥已复制到剪贴板');
+  } catch (err) {
+    ElMessage.error('复制失败，请手动复制');
+    console.error('Failed to copy API key:', err);
+  }
+};
+
+nextTick(() => {
   handleApiKey()
 })
 
