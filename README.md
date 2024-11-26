@@ -44,7 +44,66 @@
 
 - (不在当前应用管理中)数据仓库: clickhouse + minio(分布式存储)
 
-## 
+## 自定义api接口模板
+
+```groovy
+import groovy.transform.Canonical
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+
+// 定义数据操作的sql
+def querySql = "SELECT id, name, created_date FROM my_table WHERE created_date > ?"
+
+// 创建RowMapper实例，用于将数据库行转换为MyDto对象
+RowMapper<MyDto> rowMapper = { resultSet, rowNum ->
+    def dto = new MyDto(
+            resultSet.getInt("id"),
+            resultSet.getString("name"),
+            resultSet.getDate("created_date")
+    )
+    // 在 RowMapper 中进行 DTO 校验
+    dto.validate()
+    return dto
+}
+
+// 假设 jdbcTemplate 已经被正确配置并注入到当前上下文中
+def jdbcTemplate = new JdbcTemplate(/* 数据源配置 */)
+
+// 设置查询参数
+def oneMonthAgo = new Date() - 30 // 假设我们想获取最近一个月的数据
+
+// 参数校验
+if (oneMonthAgo == null) {
+    throw new IllegalArgumentException("查询参数不能为null")
+}
+
+// 执行查询
+def output = jdbcTemplate.query(querySql, [oneMonthAgo] as Object[], rowMapper)
+
+// 返回查询结果
+return output
+
+// 使用 @Canonical 注解简化 DTO 类的定义
+@Canonical
+class MyDto {
+    int id
+    String name
+    Date createdDate
+
+    // DTO 校验方法
+    void validate() {
+        if (id <= 0) {
+            throw new IllegalArgumentException("ID 必须大于 0")
+        }
+        if (!name || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("名称不能为空")
+        }
+        if (createdDate == null) {
+            throw new IllegalArgumentException("创建日期不能为空")
+        }
+    }
+}
+```
 
 
 
