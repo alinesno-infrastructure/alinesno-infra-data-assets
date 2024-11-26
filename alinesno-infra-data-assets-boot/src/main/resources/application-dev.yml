@@ -61,6 +61,7 @@ alinesno:
       - /sso/**
       - /logout
       - /api/assets/collector/**
+      - /provider/**
   infra:
     gateway:
       host: http://alinesno-infra-base-gateway-proxy-application.beta.base.infra.linesno.com
