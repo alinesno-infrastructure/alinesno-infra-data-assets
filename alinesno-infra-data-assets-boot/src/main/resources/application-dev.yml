@@ -47,9 +47,9 @@ sa-token:
   sso:
     auth-url: ${sa-token.host-path}/login
     is-http: true
-    check-ticket-url: ${sa-token.host-path}/sso/checkTicket
-    slo-url: ${sa-token.host-path}/sso/signout
-    get-data-url: ${sa-token.host-path}/sso/getData
+    check-ticket-url: ${sa-token.host-path}/prod-api/sso/checkTicket
+    slo-url: ${sa-token.host-path}/prod-api/sso/signout
+    get-data-url: ${sa-token.host-path}/prod-api/sso/getData
   sign:
     secret-key: kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
 
