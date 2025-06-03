@@ -67,11 +67,14 @@
 			<artifactId>alinesno-infra-data-fastapi-domain</artifactId>
 			<version>${revision}</version>
 		</dependency>
+
+		<!-- 
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-fastapi-plugins</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		-->
 
 
 		<!-- pgvector依赖 -->
