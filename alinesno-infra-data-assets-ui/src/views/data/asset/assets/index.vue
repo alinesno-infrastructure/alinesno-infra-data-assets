@@ -21,6 +21,7 @@
               ref="deptTreeRef"
               node-key="id"
               highlight-current
+              :default-expanded-keys="expandedKeys"
               @node-click="handleNodeClick"
           />
               <!-- default-expand-all -->
@@ -278,8 +279,33 @@ function handleSelectionChange(selection) {
 function getDeptTree() {
   catalogManifestTreeSelect().then(response => {
     deptOptions.value = response.data;
+
+    // 确保数据完全加载后再计算
+    nextTick(() => {
+      expandedKeys.value = getNonLeafNodeIds(deptOptions.value);
+      console.log('Expanded keys:', expandedKeys.value);
+    });
+
   });
 };
+
+function getNonLeafNodeIds(nodes, currentLevel = 1, maxLevel = 1) {
+  const ids = [];
+  if (!nodes || currentLevel > maxLevel) return ids;
+  
+  nodes.forEach(node => {
+    if (node.children && node.children.length > 0) {
+      // 只收集1-2级非叶子节点ID
+      if (currentLevel <= maxLevel) {
+        ids.push(String(node.id));
+      }
+      // 递归处理子节点，层级+1
+      ids.push(...getNonLeafNodeIds(node.children, currentLevel + 1, maxLevel));
+    }
+  });
+  
+  return [...new Set(ids)]; // 去重
+}
 
 /** 配置AssetData */
 function configAssetData(row){
@@ -351,6 +377,17 @@ function submitForm() {
     }
   });
 };
+
+const expandedKeys = ref([]);
+
+// 监听 deptOptions 变化，计算需要展开的节点
+watch(() => deptOptions.value, (newOptions) => {
+  console.log('Tree data:', JSON.stringify(newOptions, null, 2)); // 检查数据结构
+  if (newOptions && newOptions.length) {
+    expandedKeys.value = getNonLeafNodeIds(newOptions);
+    console.log('Computed expanded keys:', expandedKeys.value);
+  }
+}, { immediate: true });
 
 getDeptTree();
 getList();
