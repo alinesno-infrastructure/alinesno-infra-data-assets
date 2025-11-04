@@ -1,11 +1,8 @@
 package com.alinesno.infra.data.assets.service.impl;
 
 import com.alinesno.infra.common.core.service.impl.IBaseServiceImpl;
-import com.alinesno.infra.data.assets.entity.AssetDataEntity;
 import com.alinesno.infra.data.assets.entity.LabelEntity;
-import com.alinesno.infra.data.assets.mapper.AssetDataMapper;
 import com.alinesno.infra.data.assets.mapper.LabelMapper;
-import com.alinesno.infra.data.assets.service.IAssetDataService;
 import com.alinesno.infra.data.assets.service.ILabelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
