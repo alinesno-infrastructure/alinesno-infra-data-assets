@@ -19,13 +19,13 @@
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-facade</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-web-api-log</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 
 		<!-- fastjson -->
