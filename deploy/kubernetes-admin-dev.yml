@@ -55,6 +55,10 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
+  tls:
+    - hosts:
+        - "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
+      secretName: alinesno-tls
   rules:
     - host: "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
       http:
