@@ -4,12 +4,11 @@ import com.alinesno.infra.common.extend.datasource.enable.EnableInfraDataScope;
 import com.alinesno.infra.common.facade.enable.EnableActable;
 import com.alinesno.infra.common.web.adapter.sso.enable.EnableInfraSsoApi;
 import com.alinesno.infra.common.web.log.aspect.LogAspect;
-import com.alinesno.infra.data.assets.sample.ISimpleService;
 import com.dtflys.forest.springboot.annotation.ForestScan;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import jakarta.servlet.MultipartConfigElement;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +21,7 @@ import org.springframework.util.unit.DataSize;
  */
 @Slf4j
 @EnableActable
+@EnableEncryptableProperties
 @EnableInfraDataScope
 @EnableInfraSsoApi
 @ForestScan({
@@ -46,9 +46,6 @@ public class AppConfiguration implements CommandLineRunner {
         config.setLocation(System.getProperty("java.io.tmpdir")); 	// 设置临时保存目录
         return config.createMultipartConfig() ;	// 创建一个上传配置
     }
-
-    @Autowired
-    private ISimpleService simpleService ;
 
     @Bean
     public LogAspect getLogAspect(){
