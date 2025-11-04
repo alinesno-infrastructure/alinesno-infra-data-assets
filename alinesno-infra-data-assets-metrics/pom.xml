@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.alinesno.infra.common</groupId>
             <artifactId>alinesno-infra-common-web-api</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
         </dependency>
 
     </dependencies>
