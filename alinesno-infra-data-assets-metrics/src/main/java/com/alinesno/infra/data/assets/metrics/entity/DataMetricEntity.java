@@ -3,7 +3,6 @@ package com.alinesno.infra.data.assets.metrics.entity;
 import com.alinesno.infra.common.facade.mapper.entity.InfraBaseEntity;
 import com.alinesno.infra.data.assets.metrics.handle.JsonTypeHandler;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
