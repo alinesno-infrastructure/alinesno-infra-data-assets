@@ -1,1 +1,0 @@
-package com.alinesno.infra.data.assets.initialize;
