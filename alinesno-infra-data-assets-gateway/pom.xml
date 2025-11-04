@@ -25,19 +25,19 @@
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-web-api</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 
 		<!-- 扩展引入_start -->
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-extend-excel</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-extend-datascope</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 		<!-- 扩展引入_end -->
 
