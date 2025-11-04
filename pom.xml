@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.alinesno.infra.common</groupId>
         <artifactId>alinesno-infra-platform-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.3.1-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <packaging>pom</packaging>
@@ -16,8 +16,8 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>1.1.0-SNAPSHOT</revision>
-        <alinesno.infra.version>${revision}</alinesno.infra.version>
+        <revision>3.0.0-SNAPSHOT</revision>
+        <alinesno.infra.common.version>1.3.1-SNAPSHOT</alinesno.infra.common.version>
 
         <!-- 依赖包 -->
         <fastjson.version>2.0.48</fastjson.version>
@@ -26,22 +26,12 @@
     <modules>
         <!-- 应用服务 -->
         <module>alinesno-infra-data-assets-facade</module>  <!-- 接口和引用 -->
-        <module>alinesno-infra-data-assets-domain</module>  <!-- 领域服务 -->
         <module>alinesno-infra-data-assets-adapter</module> <!-- 适配层 -->
+        <module>alinesno-infra-data-assets-domain</module>  <!-- 领域服务 -->
         <module>alinesno-infra-data-assets-gateway</module>  <!-- 接口服务 -->
-        <module>alinesno-infra-data-assets-client</module>  <!-- 对外引用 -->
-
-        <!-- 业务指标管理 -->
         <module>alinesno-infra-data-assets-metrics</module> <!-- 数据指标管理-->
-
-        <!-- 数据服务 -->
-        <module>alinesno-infra-data-fastapi-facade</module>  <!-- 接口与引用 -->
-        <module>alinesno-infra-data-fastapi-domain</module>  <!-- 业务领域 -->
-        <module>alinesno-infra-data-fastapi-gateway</module>  <!-- 接口网关 -->
-
-        <module>alinesno-infra-data-assets-initialize</module> <!-- 初步化数据和示例 -->
+        <module>alinesno-infra-data-assets-fastapi</module>  <!-- 数据接口服务 -->
         <module>alinesno-infra-data-assets-collector</module> <!-- 数据收集 -->
-
         <module>alinesno-infra-data-assets-boot</module>  <!-- 启动服务 -->
 
         <!-- 前端服务
