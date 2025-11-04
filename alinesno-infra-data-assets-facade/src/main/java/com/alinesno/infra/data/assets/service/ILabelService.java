@@ -2,7 +2,6 @@ package com.alinesno.infra.data.assets.service;
 
 
 import com.alinesno.infra.common.facade.services.IBaseService;
-import com.alinesno.infra.data.assets.entity.AssetDataEntity;
 import com.alinesno.infra.data.assets.entity.LabelEntity;
 
 /**
