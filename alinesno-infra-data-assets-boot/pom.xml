@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
 			<artifactId>alinesno-infra-common-web-api-sso</artifactId>
-			<version>${revision}</version>
+			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
@@ -40,11 +40,15 @@
 			<artifactId>alinesno-infra-data-assets-gateway</artifactId>
 			<version>${revision}</version>
 		</dependency>
+
+        <!--
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-initialize</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		-->
+
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-metrics</artifactId>
@@ -56,7 +60,7 @@
 			<version>${revision}</version>
 		</dependency>
 
-		<!-- 引用fastapi工具包 -->
+		<!-- 引用fastapi工具包
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-fastapi-gateway</artifactId>
@@ -67,6 +71,7 @@
 			<artifactId>alinesno-infra-data-fastapi-domain</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		-->
 
 		<!-- 
 		<dependency>
