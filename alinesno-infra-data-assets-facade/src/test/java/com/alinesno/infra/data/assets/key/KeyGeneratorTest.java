@@ -1,6 +1,7 @@
 package com.alinesno.infra.data.assets.key;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class KeyGeneratorTest {
