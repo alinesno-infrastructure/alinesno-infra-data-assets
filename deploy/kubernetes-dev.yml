@@ -40,41 +40,51 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: |
-                -Dspring.data.redis.host=${REDIS_HOST}
-                -Dspring.data.redis.password=${REDIS_KEY}
+                -Dsa-token.jwt-secret-key=ENC(${SA_TOKEN_JWT_SECRET_KEY})
+                -Dsa-token.sign.secret-key=ENC(${SA_TOKEN_SIGN_SECRET_KEY})
+                -Dsa-token.host-path=ENC(${SA_TOKEN_HOST_PATH})
+
+                -Dapi-decrypt.publicKey=ENC(${API_DECRYPT_PUBLIC_KEY})
+                -Dapi-decrypt.privateKey=ENC(${API_DECRYPT_PRIVATE_KEY})
+
+                -Dspring.data.redis.host=ENC(${REDIS_HOST})
+                -Dspring.data.redis.password=ENC(${REDIS_KEY})
                 
                 -Dspring.datasource.dynamic.datasource.mysql.url=jdbc:mysql://${DB_MYSQL_URL}/dev_alinesno_infra_data_assets_v100?serverTimezone=GMT%2B8&zeroDateTimeBehavior=CONVERT_TO_NULL
-                -Dspring.datasource.dynamic.datasource.mysql.username=${DB_MYSQL_USRENAME}
-                -Dspring.datasource.dynamic.datasource.mysql.password=${DB_MYSQL_PASSWORD}
+                -Dspring.datasource.dynamic.datasource.mysql.username=ENC(${DB_MYSQL_USERNAME})
+                -Dspring.datasource.dynamic.datasource.mysql.password=ENC(${DB_MYSQL_PASSWORD})
 
                 -Dspring.datasource.dynamic.datasource.postgresql.driver-class-name=org.postgresql.Driver
                 -Dspring.datasource.dynamic.datasource.postgresql.url=jdbc:postgresql://${DB_PG_URL}/dev_alinesno_infra_data_assets_datahouse
-                -Dspring.datasource.dynamic.datasource.postgresql.username=${DB_PG_USERNAME}
-                -Dspring.datasource.dynamic.datasource.postgresql.password=${DB_PG_PASSWORD}
+                -Dspring.datasource.dynamic.datasource.postgresql.username=ENC(${DB_PG_USERNAME})
+                -Dspring.datasource.dynamic.datasource.postgresql.password=ENC(${DB_PG_PASSWORD})
                 
                 -Dserver.port=8080
+                -Dalinesno.infra.gateway.host=http://alinesno-infra-base-gateway-proxy-application:8080
+            - name: JASYPT_ENCRYPTOR_PASSWORD
+              value: ${JASYPT_ENCRYPTOR_PASSWORD}
           ports:
             - name: http
               containerPort: 8080
 
----
-# 创建域名服务
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-${PROJECT_NAME}
-  namespace: ${NAMESPACE}
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-spec:
-  rules:
-    - host: "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: ${PROJECT_NAME}
-                port:
-                  number: 8080
+# ---
+# # 创建域名服务
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: ingress-${PROJECT_NAME}
+#   namespace: ${NAMESPACE}
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+# spec:
+#   rules:
+#     - host: "${PROJECT_NAME}.${INFRA_DEV_DOMAIN}"
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: ${PROJECT_NAME}
+#                 port:
+#                   number: 8080
