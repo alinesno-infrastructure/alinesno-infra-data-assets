@@ -3,7 +3,6 @@ package com.alinesno.infra.data.assets.api.controller;
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
-import com.alinesno.infra.common.web.adapter.plugins.TranslateCode;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.entity.AssetCollectionEntity;
 import com.alinesno.infra.data.assets.service.IAssetCollectionService;
