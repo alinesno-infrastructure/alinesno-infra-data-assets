@@ -41,46 +41,23 @@
 			<version>${revision}</version>
 		</dependency>
 
-        <!--
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
-			<artifactId>alinesno-infra-data-assets-initialize</artifactId>
+			<artifactId>alinesno-infra-data-assets-fastapi</artifactId>
 			<version>${revision}</version>
 		</dependency>
-		-->
 
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-metrics</artifactId>
 			<version>${revision}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.alinesno.infra.data</groupId>
 			<artifactId>alinesno-infra-data-assets-collector</artifactId>
 			<version>${revision}</version>
 		</dependency>
-
-		<!-- 引用fastapi工具包
-		<dependency>
-			<groupId>com.alinesno.infra.data</groupId>
-			<artifactId>alinesno-infra-data-fastapi-gateway</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alinesno.infra.data</groupId>
-			<artifactId>alinesno-infra-data-fastapi-domain</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		-->
-
-		<!-- 
-		<dependency>
-			<groupId>com.alinesno.infra.data</groupId>
-			<artifactId>alinesno-infra-data-fastapi-plugins</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		-->
-
 
 		<!-- pgvector依赖 -->
 		<dependency>
