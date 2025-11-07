@@ -16,7 +16,7 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>3.0.0-SNAPSHOT</revision>
+        <revision>3.1.0-SNAPSHOT</revision>
         <alinesno.infra.common.version>1.3.1-SNAPSHOT</alinesno.infra.common.version>
 
         <!-- 依赖包 -->
