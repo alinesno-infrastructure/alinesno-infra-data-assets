@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from 'vue-router'
 /* Layout */
-//import Layout from '@/layout/SaaSLayout'
-import Layout from '@/layout'
+import Layout from '@/layout/SaaSLayout'
+//import Layout from '@/layout'
 
 /**
  * Note: 路由配置项
@@ -82,6 +82,18 @@ export const constantRoutes = [
         component: () => import('@/views/learnPanel'),
         name: '/dashboard/learnPanel',
         meta: { title: '学习手册', icon: 'dashboard', affix: true }
+      },
+      {
+        path: '/global/config',
+        component: () => import('@/views/data/config/index'),
+        name: '/global/config',
+        meta: { title: '全局配置', icon: 'dashboard', affix: true }
+      },
+      {
+        path: '/assets/data/datasource/index',
+        component: () => import('@/views/data/datasource/index'),
+        name: '/assets/data/datasource/index',
+        meta: { title: '元数据配置', icon: 'dashboard', affix: true }
       },
 
     ]
