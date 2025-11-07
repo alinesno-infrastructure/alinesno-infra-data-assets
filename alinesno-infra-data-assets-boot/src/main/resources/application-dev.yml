@@ -43,7 +43,7 @@ actable:
 # sa-token配置
 sa-token:
   token-name: Authorization
-  host-path: http://alinesno-infra-base-identity-auth-application.linesno.com
+  host-path: https://alinesno-infra-base-identity-auth-application.linesno.com
   sso:
     auth-url: ${sa-token.host-path}/login
     is-http: true
@@ -64,4 +64,4 @@ alinesno:
       - /provider/**
   infra:
     gateway:
-      host: http://alinesno-infra-base-gateway-proxy-application.linesno.com
+      host: https://alinesno-infra-base-gateway-proxy-application.linesno.com
