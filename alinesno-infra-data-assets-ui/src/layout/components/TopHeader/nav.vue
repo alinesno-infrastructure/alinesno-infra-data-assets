@@ -1,22 +1,10 @@
 <template>
   <nav class=" header-text">
     <div class="acp-header-item ">
-      <router-link class="header-label-text" to="/index">
-        <i class="fa-solid fa-screwdriver-wrench"></i> 控制台 
+      <router-link class="header-label-text" to="/global/config">
+        <i class="fa-solid fa-screwdriver-wrench"></i> 全局配置
       </router-link>
     </div>
-    <!-- 
-    <div class="acp-header-item ">
-      <router-link class="header-label-text" to="/dashboard/learnPanel">
-        <i class="fa-regular fa-file-word"></i> 手册
-      </router-link>
-    </div>
-    <div class="acp-header-item ">
-      <router-link class="header-label-text" to="/dashboard/smartService">
-        <i class="fa-solid fa-swatchbook"></i> 专家
-      </router-link>
-    </div> 
-    -->
     <div class="acp-header-item ">
       <router-link class="header-label-text" to="/dashboard/suportTechnique">
         <i class="fa-solid fa-user-tag"></i> 服务
