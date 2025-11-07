@@ -6,6 +6,7 @@
           <div class="panel-header">
             <div class="header-title"><i class="fa-solid fa-file-waveform"></i>  数据域列表</div>
           </div>
+
           <div class="panel-body acp-height-auto" style="padding: 0;padding-bottom: 10px;">
             <div class="acp-app-list">
               <ul>
@@ -20,7 +21,13 @@
                 </li>
               </ul>
             </div>
+            <div v-if="apps.length == 0">
+              <el-empty image-size="100" description="当前还没有进行数据域划分，请配置元数据目录并集成数据域" >
+                <el-button type="primary" text bg icon="Plus">配置数据域</el-button>
+              </el-empty>
+            </div>
           </div>
+
         </div>
       </el-col>
 
