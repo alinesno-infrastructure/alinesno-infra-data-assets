@@ -143,7 +143,7 @@
 
       <!-- 添加或修改指令配置对话框 -->
       <el-dialog :title="title" v-model="open" width="900px" append-to-body>
-         <el-form :model="form" :rules="rules" ref="databaseRef" label-width="120px">
+         <el-form :model="form" :rules="rules" ref="databaseRef" label-width="120px" size="large">
             <el-row>
                <el-col :span="24">
                   <el-form-item label="名称" prop="name">
@@ -190,8 +190,8 @@
          </el-form>
          <template #footer>
             <div class="dialog-footer">
-               <el-button type="primary" @click="submitForm">确 定</el-button>
-               <el-button @click="cancel">取 消</el-button>
+               <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+               <el-button @click="cancel" size="large">取 消</el-button>
             </div>
          </template>
       </el-dialog>
