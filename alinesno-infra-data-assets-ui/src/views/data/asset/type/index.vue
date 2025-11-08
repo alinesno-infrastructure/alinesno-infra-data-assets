@@ -66,11 +66,13 @@
           L2级别
         </template>
       </el-table-column>
+      <!-- 
       <el-table-column align="center" prop="hasStatus" label="状态" width="100">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.hasStatus" />
         </template>
-      </el-table-column>
+      </el-table-column> 
+      -->
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template #default="scope">
           <span>{{ parseTime(scope.row.addTime ) }}</span>
@@ -91,7 +93,7 @@
               v-hasPermi="['system:dept:add']"
           >新增</el-button>
           <el-button
-              v-if="scope.row.parentId != 0"
+              v-if="scope.row.parentId == 0"
               type="text"
               icon="Delete"
               @click="handleDelete(scope.row)"
@@ -103,7 +105,7 @@
 
     <!-- 添加或修改分类对话框 -->
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
-      <el-form ref="deptRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="deptRef" :model="form" :rules="rules" size="large" label-width="80px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="上级分类" prop="parentId">
@@ -158,8 +160,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+          <el-button @click="cancel" size="large">取 消</el-button>
         </div>
       </template>
     </el-dialog>
@@ -178,7 +180,7 @@ const loading = ref(true);
 const showSearch = ref(true);
 const title = ref("");
 const deptOptions = ref([]);
-const isExpandAll = ref(false);
+const isExpandAll = ref(true);
 const refreshTable = ref(true);
 
 const data = reactive({
