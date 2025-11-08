@@ -9,12 +9,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 数据清单
+ * 数据资产登记表，会定时从数据源中同步资产清单列表
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("assets_manifest")
-@TableComment("数据清单")
+@TableComment("数据资产登记表")
 public class ManifestEntity extends InfraBaseEntity {
 
     @TableField("table_name")
@@ -38,7 +38,22 @@ public class ManifestEntity extends InfraBaseEntity {
     private String confidentialityLevel;
 
     @TableField("asset_tag")
-    @Column(length = 50 , comment = "资产标签" )
+    @Column(length = 512 , comment = "资产标签" )
     private String assetTag;
+
+    // 上次同步时间
+    @TableField("last_sync_time")
+    @Column(length = 50 , comment = "上次同步时间" )
+    private String lastSyncTime;
+
+    // 数据源dataSource
+    @TableField("data_source")
+    @Column(length = 256, comment = "数据源" )
+    private String dataSource;
+
+    // 数据源配置ID
+    @TableField("data_source_config_id")
+    @Column(comment = "数据源配置ID" )
+    private Long dataSourceConfigId;
 
 }
