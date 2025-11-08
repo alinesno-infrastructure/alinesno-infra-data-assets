@@ -13,4 +13,11 @@ public interface IDataSourceConfigService extends IBaseService<DataSourceConfigE
      */
     DataSourceConfigEntity getCurrentDatasourceConfig(PermissionQuery permissionQuery);
 
+    /**
+     * 获取当前数据源配置
+     * @param orgId
+     * @return
+     */
+    DataSourceConfigEntity getCurrentDatasourceConfig(Long orgId);
+
 }
