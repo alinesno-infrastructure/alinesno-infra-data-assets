@@ -15,9 +15,6 @@
                 </div>
             </div>
           </div>
-          <div style="font-size: 14px;color: #444;">
-            数据接入密钥 <el-button type="primary" text bg  @click="copyApiKey"><el-icon><CopyDocument /></el-icon> 复制</el-button>
-          </div>
         </div>
       </el-col>
     </el-row>
