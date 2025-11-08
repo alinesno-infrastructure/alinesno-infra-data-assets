@@ -1,43 +1,39 @@
 package com.alinesno.infra.data.assets.metrics.entity;
 
 import com.alinesno.infra.common.facade.mapper.entity.InfraBaseEntity;
-import com.alinesno.infra.data.assets.metrics.handle.JsonTypeHandler;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
-import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("data_metrics")
+@TableName("data_metric")
 public class DataMetricEntity extends InfraBaseEntity {
 
     @TableField
-    @ColumnType(length = 128)
-    @ColumnComment("指标名称")
+    @Column(type = MySqlTypeConstant.VARCHAR , length = 255 , comment = "指标名称")
     private String metricName;
 
     @TableField
+    @Column(type = MySqlTypeConstant.DOUBLE , comment = "指标值")
     private Double value;
 
     @TableField
-    private LocalDateTime timestamp;
-
-    @TableField(typeHandler = JsonTypeHandler.class)
-    private Map<String, String> dimension;
+    @Column(type = MySqlTypeConstant.VARCHAR , length = 255 , comment = "维度")
+    private String dimension;
 
     @TableField
+    @Column(type = MySqlTypeConstant.VARCHAR , length = 255 , comment = "描述")
     private String description;
 
     @TableField
-    @ColumnComment("更新策略")
+    @Column(type = MySqlTypeConstant.VARCHAR , length = 255 , comment = "更新策略")
     private String updatePolicy;
 
-    @TableField(typeHandler = JsonTypeHandler.class)
-    private Map<String, String> processingSql;
+    @TableField
+    @Column(type = MySqlTypeConstant.VARCHAR , length = 255 , comment = "处理SQL")
+    private String processingSql;
 }
