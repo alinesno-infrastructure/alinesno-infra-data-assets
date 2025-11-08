@@ -72,6 +72,12 @@ export const constantRoutes = [
         meta: { title: '工具脚本', icon: 'dashboard', affix: true }
       },
       {
+        path: '/service/data/fastapi/api/index',
+        component: () => import('@/views/data/fastapi/api/index'),
+        name: '/service/data/fastapi/api/index',
+        meta: { title: '接口管理', icon: 'dashboard', affix: true }
+      },
+      {
         path: '/dashboard/suportTechnique',
         component: () => import('@/views/suportTechnique'),
         name: '/dashboard/suportTechnique',
