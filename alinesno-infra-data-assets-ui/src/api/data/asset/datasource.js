@@ -25,7 +25,16 @@ var managerUrl = {
     getCurrentDatasourceConfig: prefix + "getCurrentDatasourceConfig",
     probeDatasourceConfig: prefix + "probe",
     excludeChild: prefix + "excludeChild",
-    downloadfile: prefix + "downloadfile"
+    downloadfile: prefix + "downloadfile" ,
+    syncNowDatasource: prefix + "syncNow"
+}
+
+// 立即同步数据源
+export function syncNowDatasource(id) {
+  return request({
+    url: managerUrl.syncNowDatasource + "/" + parseStrEmpty(id) ,
+    method: 'post'
+  })
 }
 
 // 获取当前数据源配置
