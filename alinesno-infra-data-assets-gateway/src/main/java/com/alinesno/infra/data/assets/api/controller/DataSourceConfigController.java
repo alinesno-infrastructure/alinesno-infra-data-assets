@@ -10,9 +10,12 @@ import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.api.DataSourceConfigDto;
+import com.alinesno.infra.data.assets.api.utils.JdbcDriverUtils;
 import com.alinesno.infra.data.assets.entity.DataSourceConfigEntity;
+import com.alinesno.infra.data.assets.job.IDataAssetSyncJob;
 import com.alinesno.infra.data.assets.service.IDataSourceConfigService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
 
     @Autowired
     private IDataSourceConfigService service;
+
+    @Autowired
+    private IDataAssetSyncJob dataAssetSyncJob ;
 
     /**
      * 获取BusinessLogEntity的DataTables数据。
@@ -70,15 +76,18 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
      * 保存数据源配置
      */
     @DataPermissionSave
-    @PostMapping("/saveDatasourceConfig")
-    public AjaxResult saveDatasourceConfig(@RequestBody DataSourceConfigDto dto){
+    @PostMapping("/insertDatasourceConfig")
+    public AjaxResult insertDatasourceConfig(@RequestBody @Valid DataSourceConfigDto dto){
 
         log.debug("dto = {}", dto.toString());
 
-        DataSourceConfigEntity entity = dto.toEntity() ;
-        service.save(entity) ;
+        // 根据类型选择驱动
+        String driver = JdbcDriverUtils.getDriverByType(dto.getType());
 
-        return AjaxResult.success() ;
+        DataSourceConfigEntity entity = dto.toEntity(driver) ;
+        service.saveOrUpdate(entity) ;
+
+        return AjaxResult.success("操作成功." , entity.getId()) ;
     }
 
     /**
@@ -98,16 +107,12 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
             @RequestParam String type) {
 
         AjaxResult result ;
-        String driver;
 
-        // 根据类型选择驱动
-        switch (type.toLowerCase()) {
-            case "mysql" -> driver = "com.mysql.cj.jdbc.Driver";
-            case "postgresql" -> driver = "org.postgresql.Driver";
-            case "clickhouse" -> driver = "ru.yandex.clickhouse.ClickHouseDriver";
-            default -> {
-                return AjaxResult.error("不支持的数据库类型");
-            }
+        String driver;
+        try {
+            driver = JdbcDriverUtils.getDriverByType(type);
+        } catch (IllegalArgumentException e) {
+            return AjaxResult.error(e.getMessage());
         }
 
         log.info("检测数据源连接: url={}, username={}, type={}", url, username, type);
@@ -124,6 +129,28 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
         }
 
         return result;
+    }
+
+    /**
+     * 立即同步指定数据源
+     */
+    @PostMapping("/syncNow/{id}")
+    public AjaxResult syncNow(@PathVariable("id") Long id) {
+        try {
+            // 根据id获取配置
+            DataSourceConfigEntity config = service.getById(id);
+            if (config == null) {
+                return AjaxResult.error("数据源不存在");
+            }
+
+            // 调用同步逻辑
+            dataAssetSyncJob.syncDataSource(config);
+
+            return AjaxResult.success("已触发数据源同步");
+        } catch (Exception e) {
+            log.error("执行立即同步失败", e);
+            return AjaxResult.error("同步失败：" + e.getMessage());
+        }
     }
 
     @Override
