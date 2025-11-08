@@ -42,6 +42,8 @@ import ImagePreview from "@/components/ImagePreview"
 import TreeSelect from '@/components/TreeSelect'
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+// 回退组件
+import BackUpCompoent from "@/components/Backup/index.vue"
 
 //引入echarts
 import * as echarts from 'echarts';
@@ -63,6 +65,7 @@ app.config.globalProperties.selectDictLabels = selectDictLabels
 
 
 // 全局组件挂载
+app.component('BackUpCompoent', BackUpCompoent)
 app.component('DictTag', DictTag)
 app.component('Pagination', Pagination)
 app.component('TreeSelect', TreeSelect)
