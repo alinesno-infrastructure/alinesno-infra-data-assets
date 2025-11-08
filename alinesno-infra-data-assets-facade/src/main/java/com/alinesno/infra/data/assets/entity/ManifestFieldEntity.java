@@ -24,7 +24,7 @@ public class ManifestFieldEntity extends InfraBaseEntity {
     @TableField
     private String fieldName;
 
-    @Column(length = 16 , comment = "字段类型" , isNull = false)
+    @Column(length = 255 , comment = "字段类型" , isNull = false)
     @TableField
     private String fieldType;
 
@@ -42,6 +42,6 @@ public class ManifestFieldEntity extends InfraBaseEntity {
 
     // 字段注释，可选
     @TableField
-    @Column(length = 200 , comment = "字段注释")
+    @Column(length = 512 , comment = "字段注释")
     private String fieldComment;
 }
