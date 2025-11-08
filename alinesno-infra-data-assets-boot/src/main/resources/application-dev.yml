@@ -32,7 +32,7 @@ actable:
   table:
     auto: update
   model:
-    pack: com.alinesno.infra.data.assets.entity;com.alinesno.infra.data.fastapi.entity
+    pack: com.alinesno.infra.data.assets.entity;com.alinesno.infra.data.fastapi.entity;com.alinesno.infra.data.assets.metrics.entity
   database:
     type: mysql
   index:
