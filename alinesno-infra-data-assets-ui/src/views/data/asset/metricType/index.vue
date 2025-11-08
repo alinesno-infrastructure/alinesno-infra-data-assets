@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+
+      <div style="margin-bottom:20px;">
+         <BackUpCompoent :url="'/global/config'" :title="'指标类型'"  />
+      </div>
+
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="分类名称" prop="name">
         <el-input
