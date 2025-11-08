@@ -1,5 +1,10 @@
 <template>
    <div class="app-container">
+
+      <div style="margin-bottom:20px;">
+         <BackUpCompoent :url="'/global/config'" :title="'接口目录'"  />
+      </div>
+
       <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
          <el-form-item label="分组名称" prop="name">
             <el-input
@@ -158,6 +163,8 @@ import {
   listApiGroupExcludeChild,
   changeGroupStatus
 } from "@/api/data/fastapi/apiGroup";
+
+import BackUpCompoent from "@/components/Backup/index.vue"
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
