@@ -4,11 +4,13 @@ import com.alinesno.infra.common.extend.datasource.enable.EnableInfraDataScope;
 import com.alinesno.infra.common.facade.enable.EnableActable;
 import com.alinesno.infra.common.web.adapter.sso.enable.EnableInfraSsoApi;
 import com.alinesno.infra.common.web.log.aspect.LogAspect;
+import com.alinesno.infra.data.assets.metrics.controller.DataMetricController;
 import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import jakarta.servlet.MultipartConfigElement;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +40,9 @@ import org.springframework.util.unit.DataSize;
 @Configuration
 public class AppConfiguration implements CommandLineRunner {
 
+    @Autowired
+    private DataMetricController dataMetricController ;
+
     @Bean
     public MultipartConfigElement getMultipartConfig() {
         MultipartConfigFactory config = new MultipartConfigFactory() ;
@@ -54,7 +59,7 @@ public class AppConfiguration implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.debug("服务应用启动.");
+        log.debug("服务应用启动.dataMetricController:{}" , dataMetricController);
     }
 
 }
