@@ -36,9 +36,9 @@ const route = useRoute();
 const menuItems = ref([
   { id: '1', icon: 'fa-solid fa-house-user', link: '/index', desc: '仪表盘' }, // 仪表盘用gauge更准确
   { id: '2', icon: 'fa-solid fa-list-check', link: '/asset/data/asset/manifest/index', desc: '资产清单' }, // 清单用list-check
-  { id: '3', icon: 'fa-solid fa-sitemap', link: '/asset/data/asset/type/index', desc: '域管理' }, // 域管理用sitemap
+  { id: '3', icon: 'fa-solid fa-sitemap', link: '/asset/data/asset/type/index', desc: '业务域' }, // 域管理用sitemap
   { id: '4', icon: 'fa-solid fa-chart-line', link: '/metrics/data/asset/metric/index', desc: '指标管理' }, // 指标用chart-line
-  { id: '5', icon: 'fa-solid fa-server', link: '/service/data/fastapi/group/index', desc: '数据服务' }, // 服务用server
+  { id: '5', icon: 'fa-solid fa-server', link: '/service/data/fastapi/api/index', desc: '数据服务' }, // 服务用server
   { id: '12', icon: 'fa-solid fa-route', link: '/lift/data/lift/data/index', desc: '生命周期' }, // 生命周期用route表示流程
 ]);
 
