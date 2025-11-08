@@ -1,5 +1,10 @@
 <template>
    <div class="app-container">
+
+      <div style="margin-bottom:20px;">
+         <BackUpCompoent :url="'/global/config'" :title="'满意度评价'"  />
+      </div>
+
       <el-row :gutter="20">
          <!--应用数据-->
          <el-col :span="24" :xs="24">
