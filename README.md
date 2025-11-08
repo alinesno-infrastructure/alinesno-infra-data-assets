@@ -10,7 +10,7 @@
 
 ## 架构图
 
-![数据资产架构图](document/image/arch.png) *(注：请将架构图文件放入 `docs/images/` 目录下)*
+![数据资产架构图](document/image/aliarch.png) *(注：请将架构图文件放入 `docs/images/` 目录下)*
 
 以下为相关项目地址:
 
@@ -167,4 +167,4 @@ class MyDto {
 
 ## 鸣谢
 
-- 开发参考阿里云的数据资产运营平台：https://www.aliyun.com/product/data-asset-platform
+- 开发参考阿里云的数据资产运营平台：https://help.aliyun.com/zh/dataphin/asset-panorama-and-catalog-overview
