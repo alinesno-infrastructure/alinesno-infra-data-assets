@@ -129,7 +129,7 @@ handCatalog();
     padding: 10px 0px;
     width: calc(33% - 10px);
     background: #fafafa;
-    border-radius: 3px;
+    border-radius: 10px;
     padding: 10px;
     margin-right: 5px;
     margin-top: 10px;
