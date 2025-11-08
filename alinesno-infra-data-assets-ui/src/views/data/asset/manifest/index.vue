@@ -16,7 +16,7 @@
           <el-tree
               :data="deptOptions"
               :props="{ label: 'label', children: 'children' }"
-              :expand-on-click-node="false"
+              :expand-on-click-node="true"
               :filter-node-method="filterNode"
               ref="deptTreeRef"
               node-key="id"
@@ -63,7 +63,7 @@
           <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
             <template #default="scope">
               <div class="role-icon">
-                <img src="http://data.linesno.com/icons/entity-icon/table.png" />
+                <img :src="tableIcon" />
               </div>
             </template>
           </el-table-column>
@@ -84,7 +84,7 @@
                 {{ getDataDomainLabel(scope.row.dataDomain) }}
             </template> 
           </el-table-column>  
-          <!-- <el-table-column label="项目" align="center" key="project" prop="project" v-if="columns[3].visible" :show-overflow-tooltip="true" /> -->
+          <el-table-column label="数据来源" align="center" key="dataSource" prop="dataSource" v-if="columns[3].visible" width="200" :show-overflow-tooltip="true" />
           <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="120" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" >
             <template #default="scope">
               <div>
@@ -92,15 +92,15 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true">
+          <el-table-column label="资产标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true">
             <template #default="scope">
               <el-check-tag checked type="info">政务</el-check-tag>
             </template> 
           </el-table-column>  
 
-          <el-table-column label="字段" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
+          <el-table-column label="元信息" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
-              <el-button type="primary" text bg icon="Paperclip" @click="configManifestField(scope.row)">配置</el-button>
+              <el-button type="primary" text bg icon="Paperclip" @click="configManifestField(scope.row)">查看</el-button>
             </template>
           </el-table-column>
           <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
@@ -135,7 +135,7 @@
 
     <!-- 添加或修改清单配置对话框 -->
     <el-dialog :title="title" v-model="open" width="900px" append-to-body>
-      <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px">
+      <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px" size="large">
         <el-row>
           <el-col :span="24">
             <el-form-item style="width: 100%;" label="类型" prop="dataDomain">
@@ -180,8 +180,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+          <el-button @click="cancel" size="large">取 消</el-button>
         </div>
       </template>
     </el-dialog>
@@ -203,7 +203,7 @@ import {
   addManifest
 } from "@/api/data/asset/manifest";
 
-// import ManifestEditor from "./editor.vue"
+import tableIcon from '@/assets/icons/entity-icon/table.png';
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
