@@ -4,6 +4,7 @@ import com.alinesno.infra.common.facade.mapper.entity.InfraBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("data_metric")
+@TableComment("数据资产指标")
 public class DataMetricEntity extends InfraBaseEntity {
 
     @TableField
