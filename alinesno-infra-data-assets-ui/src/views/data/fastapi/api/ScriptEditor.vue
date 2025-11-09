@@ -60,7 +60,7 @@ const theme = {
 
 const calculateFirstSectionHeight = () => {
   const windowHeight = window.innerHeight;
-  const offset = 280;
+  const offset = 220;
   editorHeight.value = `${windowHeight - offset}px`;
   console.log(editorHeight.value); //打印高度
 }
@@ -91,10 +91,15 @@ defineExpose({
 
 </script>
 
-<style >
+<style lang="scss" scoped>
 /* required! */
-.cm-editor {
+:deep(.cm-editor) {
   height: 100%;
+  border-radius:5px;
+}
+
+:deep(.cm-gutters){
+  border-radius:5px;
 }
 
 .cm-container{
