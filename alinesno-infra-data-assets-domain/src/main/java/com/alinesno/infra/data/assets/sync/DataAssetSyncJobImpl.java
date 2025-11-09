@@ -3,6 +3,7 @@ package com.alinesno.infra.data.assets.sync;
 import com.alinesno.infra.data.assets.entity.DataSourceConfigEntity;
 import com.alinesno.infra.data.assets.entity.ManifestEntity;
 import com.alinesno.infra.data.assets.entity.ManifestFieldEntity;
+import com.alinesno.infra.data.assets.enums.DataSourceTypeEnum;
 import com.alinesno.infra.data.assets.job.IDataAssetSyncJob;
 import com.alinesno.infra.data.assets.service.IDataSourceConfigService;
 import com.alinesno.infra.data.assets.service.IManifestFieldService;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.sql.*;
 import java.time.Duration;
@@ -105,12 +107,15 @@ public class DataAssetSyncJobImpl implements IDataAssetSyncJob {
                     manifest.setConfidentialityLevel("3");
                 }
 
-                if(manifest.getDescription() == null){
+                if(manifest.getDescription() == null || !StringUtils.hasLength(manifest.getDescription())){
                     manifest.setDescription(tableComment);
                 }
 
                 manifest.setDataSourceConfigId(config.getId());
                 manifest.setLastSyncTime(LocalDateTime.now().toString());
+
+                // 调用补充表元数据信息的方法
+                syncTableExtraInfo(conn, conn.getCatalog(), tableName, manifest, config.getType());
 
                 // 保存或更新
                 manifestService.saveOrUpdate(manifest);
@@ -142,9 +147,14 @@ public class DataAssetSyncJobImpl implements IDataAssetSyncJob {
             field.setFieldName(columns.getString("COLUMN_NAME"));
             field.setFieldType(columns.getString("TYPE_NAME"));
             field.setFiledLength(columns.getInt("COLUMN_SIZE"));
+            field.setNumericPrecision(columns.getInt("NUM_PREC_RADIX"));
+            field.setNumericScale(columns.getInt("DECIMAL_DIGITS"));
             field.setIsNullable("YES".equalsIgnoreCase(columns.getString("IS_NULLABLE")));
+            field.setDefaultValue(columns.getString("COLUMN_DEF"));
+            field.setIsAutoIncrement("YES".equalsIgnoreCase(columns.getString("IS_AUTOINCREMENT")));
             field.setFieldComment(columns.getString("REMARKS"));
             field.setOrgId(orgId);
+            field.setIsPrimaryKey(isPrimaryKey(metaData, tableName, field.getFieldName()));
 
             field.setIsPrimaryKey(isPrimaryKey(metaData, tableName, field.getFieldName()));
 
@@ -172,4 +182,75 @@ public class DataAssetSyncJobImpl implements IDataAssetSyncJob {
         }
         return false;
     }
+
+    private void syncTableExtraInfo(Connection conn, String schema, String tableName, ManifestEntity manifest, String dbType) throws SQLException {
+        if (DataSourceTypeEnum.MYSQL.getCode().equalsIgnoreCase(dbType)) {
+            // MySQL版本
+            String sql = """
+            SELECT 
+                TABLE_ROWS,
+                DATA_LENGTH,
+                INDEX_LENGTH,
+                CREATE_TIME,
+                UPDATE_TIME,
+                ENGINE,
+                TABLE_COLLATION
+            FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+            """;
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, schema);
+                ps.setString(2, tableName);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        manifest.setRowCount(rs.getLong("TABLE_ROWS"));
+                        manifest.setDataSizeBytes(rs.getLong("DATA_LENGTH"));
+                        manifest.setIndexSizeBytes(rs.getLong("INDEX_LENGTH"));
+                        manifest.setTableCreateTime(rs.getTimestamp("CREATE_TIME"));
+                        manifest.setTableUpdateTime(rs.getTimestamp("UPDATE_TIME"));
+                        manifest.setEngine(rs.getString("ENGINE"));
+                        manifest.setCollation(rs.getString("TABLE_COLLATION"));
+                    }
+                }
+            }
+
+        } else if (DataSourceTypeEnum.POSTGRESQL.getCode().equalsIgnoreCase(dbType)) {
+            // PostgreSQL版本
+            String sql = """
+            SELECT 
+                reltuples::bigint AS row_count,
+                pg_relation_size(oid) AS data_size_bytes,
+                (pg_total_relation_size(oid) - pg_relation_size(oid)) AS index_size_bytes,
+                pg_total_relation_size(oid) AS total_size_bytes
+            FROM pg_class
+            WHERE relname = ? AND relkind = 'r'
+            """;
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, tableName);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        manifest.setRowCount(rs.getLong("row_count"));
+                        manifest.setDataSizeBytes(rs.getLong("data_size_bytes"));
+                        manifest.setIndexSizeBytes(rs.getLong("index_size_bytes"));
+                        // total_size_bytes 不一定要存，如果你想直接存总大小可以用这个
+                    }
+                }
+            }
+
+            // 获取schema名
+            try (PreparedStatement ps = conn.prepareStatement("SELECT nspname FROM pg_namespace WHERE oid = (SELECT relnamespace FROM pg_class WHERE relname = ?)")) {
+                ps.setString(1, tableName);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        manifest.setSchemaName(rs.getString("nspname"));
+                    }
+                }
+            }
+        }
+    }
+
 }
