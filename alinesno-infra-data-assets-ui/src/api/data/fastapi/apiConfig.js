@@ -2,73 +2,72 @@ import request from '@/utils/request'
 import { parseStrEmpty } from "@/utils/ruoyi";
 
 /**
- * 数据库接口操作
- * 
- * @author luoxiaodong
- * @since 1.0.0
+ * API 配置相关接口
  */
 
-// 接口配置项
-var prefix = '/api/infra/data/fastapi/apiConfig/' ;
-var managerUrl = {
-    datatables : prefix +"datatables" ,
-    createUrl: prefix + 'add' ,
-    saveUrl: prefix + 'save' ,
-    updateUrl: prefix +"modify" ,
-    statusUrl: prefix +"changeStatus" ,
-    cleanUrl: prefix + "clean",
-    detailUrl: prefix +"detail",
-    removeUrl: prefix + "delete" ,
-    exportUrl: prefix + "exportExcel",
-    changeField: prefix + "changeField",
-    catalogTreeSelect: prefix + "catalogTreeSelect",
-    downloadfile: prefix + "downloadfile",
-    updateExecuteSql: prefix + "updateExecuteSql",
-    getApi: prefix + "getApi",
-    validateApiScript: prefix + "validateApiScript",
-    updateApiScript: prefix + "updateApiScript",
+// 基础前缀
+const prefix = '/api/infra/data/fastapi/apiConfig/';
+const managerUrl = {
+  datatables: prefix + "datatables",
+  createUrl: prefix + 'add',
+  // 保持旧字段兼容（如项目其它位置使用），但新增新的保存/更新接口
+  saveUrl: prefix + 'save',
+  saveApiConfig: prefix + 'saveApiConfig',
+  updateApiConfig: prefix + 'updateApiConfig',
+  updateUrl: prefix + "modify",
+  statusUrl: prefix + "changeStatus",
+  cleanUrl: prefix + "clean",
+  detailUrl: prefix + "detail",
+  removeUrl: prefix + "delete",
+  exportUrl: prefix + "exportExcel",
+  changeField: prefix + "changeField",
+  catalogTreeSelect: prefix + "catalogTreeSelect",
+  downloadfile: prefix + "downloadfile",
+  updateExecuteSql: prefix + "updateExecuteSql",
+  getApi: prefix + "getApi",
+  validateApiScript: prefix + "validateApiScript",
+  updateApiScript: prefix + "updateApiScript",
 }
 
-// 获取api接口
+// 获取 api 接口信息
 export function getApi(id) {
   return request({
-    url: managerUrl.getApi + "?id=" + parseStrEmpty(id) ,
+    url: managerUrl.getApi + "?id=" + parseStrEmpty(id),
     method: 'get'
   })
 }
 
-// 校验api脚本
+// 校验 api 脚本
 export function validateApiScript(data) {
   return request({
-    url: managerUrl.validateApiScript ,
+    url: managerUrl.validateApiScript,
     method: 'post',
     data: data
   })
 }
 
-// 更新api脚本
-export function updateApiScript(data , id){
+// 更新 api 脚本（POST body: {script, apiId, type, params}）
+export function updateApiScript(data) {
   return request({
-    url: managerUrl.updateApiScript + "?id=" + parseStrEmpty(id) ,
+    url: managerUrl.updateApiScript,
     method: 'post',
     data: data
   })
 }
 
-
-// 更新api执行sql
-export function updateExecuteSql(data , id){
+// 更新 api 执行 sql（保持现有）
+export function updateExecuteSql(data, id) {
   return request({
-    url: managerUrl.updateExecuteSql + "?id=" + parseStrEmpty(id) ,
+    url: managerUrl.updateExecuteSql + "?id=" + parseStrEmpty(id),
     method: 'post',
     data: data
   })
 }
 
 // 修改字段
-export function changStatusField(data){
+export function changStatusField(data) {
   return request({
-    url: managerUrl.changeField ,
+    url: managerUrl.changeField,
     method: 'post',
     data: data
   })
@@ -77,21 +76,21 @@ export function changStatusField(data){
 // 查询部门下拉树结构
 export function catalogTreeSelect() {
   return request({
-    url: managerUrl.catalogTreeSelect , 
+    url: managerUrl.catalogTreeSelect,
     method: 'get'
   })
 }
 
-// 查询数据库列表
+// 查询列表
 export function listApiConfig(query) {
   return request({
-    url: managerUrl.datatables ,
+    url: managerUrl.datatables,
     method: 'post',
     params: query
   })
 }
 
-// 查询数据库详细
+// 查询详细（兼容）
 export function getApiConfig(databaseId) {
   return request({
     url: managerUrl.detailUrl + '/' + parseStrEmpty(databaseId),
@@ -99,25 +98,34 @@ export function getApiConfig(databaseId) {
   })
 }
 
-// 新增数据库
-export function addApiConfig(data) {
+// 新增/保存接口配置（后端 saveApiConfig，会根据 id 判断新增/更新）
+export function saveApiConfig(data) {
   return request({
-    url: managerUrl.saveUrl ,
+    url: managerUrl.saveApiConfig,
     method: 'post',
     data: data
   })
 }
 
-// 修改数据库
+// 更新接口配置（可直接调用 updateApiConfig 或 saveApiConfig）
 export function updateApiConfig(data) {
   return request({
-    url: managerUrl.updateUrl ,
-    method: 'put',
+    url: managerUrl.updateApiConfig,
+    method: 'post',
     data: data
   })
 }
 
-// 删除数据库
+// 兼容旧 saveUrl（如果后端另有实现）
+export function addApiConfig(data) {
+  return request({
+    url: managerUrl.saveUrl,
+    method: 'post',
+    data: data
+  })
+}
+
+// 删除
 export function delApiConfig(databaseId) {
   return request({
     url: managerUrl.removeUrl + '/' + parseStrEmpty(databaseId),
