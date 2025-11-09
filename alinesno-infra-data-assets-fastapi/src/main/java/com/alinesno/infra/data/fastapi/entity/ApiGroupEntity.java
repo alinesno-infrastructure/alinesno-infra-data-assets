@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,9 +14,13 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * API接口分组实体类
+ */
 @EqualsAndHashCode(callSuper = true)
 @TableName("api_group")
 @Data
+@TableComment("API接口分组表")
 public class ApiGroupEntity extends InfraBaseEntity {
 
     @Excel(name="类型图标")
