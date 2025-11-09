@@ -22,11 +22,20 @@ var managerUrl = {
     exportUrl: prefix + "exportExcel",
     changeField: prefix + "changeField",
     list: prefix + "list",
+    listAll: prefix + "listAll",
     getCurrentDatasourceConfig: prefix + "getCurrentDatasourceConfig",
     probeDatasourceConfig: prefix + "probe",
     excludeChild: prefix + "excludeChild",
     downloadfile: prefix + "downloadfile" ,
     syncNowDatasource: prefix + "syncNow"
+}
+
+// 列出所有的数据源
+export function listAllDatasourceConfig() {
+    return request({
+        url: managerUrl.listAll ,
+        method: 'get'
+    })
 }
 
 // 立即同步数据源
