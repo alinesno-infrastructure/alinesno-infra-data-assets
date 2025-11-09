@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @TableName("api_config")
 @Data
+@TableComment("API接口配置表")
 public class ApiConfigEntity extends InfraBaseEntity {
 
     /**
@@ -41,29 +43,13 @@ public class ApiConfigEntity extends InfraBaseEntity {
     @ColumnComment("路径")
     private String path;
 
-    /**
-     * 参数
-     */
-    @TableField("params")
-    @ColumnType(value = MySqlTypeConstant.TEXT)
-    @ColumnComment("参数")
-    private String params;
-
-    /**
-     * JSON参数
-     */
-    @TableField("json_param")
-    @ColumnType(value = MySqlTypeConstant.TEXT)
-    @ColumnComment("JSON参数")
-    private String jsonParam;
-
-    /**
-     * groovyScript
-     */
-    @TableField("groovy_script")
-    @ColumnType(value = MySqlTypeConstant.TEXT)
-    @ColumnComment("groovy脚本")
-    private String groovyScript;
+//    /**
+//     * 参数
+//     */
+//    @TableField("params")
+//    @ColumnType(value = MySqlTypeConstant.TEXT)
+//    @ColumnComment("参数")
+//    private String params;
 
     /**
      * 访问权限
@@ -82,6 +68,13 @@ public class ApiConfigEntity extends InfraBaseEntity {
     private String groupId;
 
     /**
+     * 是否启用
+     */
+    @TableField("enabled")
+    @ColumnType(value = MySqlTypeConstant.BIT, length = 1)
+    private boolean enabled;
+
+    /**
      * 内容类型
      */
     @TableField("content_type")
@@ -89,38 +82,32 @@ public class ApiConfigEntity extends InfraBaseEntity {
     @ColumnComment("内容类型")
     private String contentType;
 
-    /**
-     * 任务
-     */
-    @TableField("task")
-    @ColumnType(value = MySqlTypeConstant.TEXT)
-    @ColumnComment("任务")
-    private String task;
-
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 执行器_start >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
     @TableField("datasource_id")
     @ColumnType(value = MySqlTypeConstant.VARCHAR)
     @ColumnComment("数据库源ID")
     private String datasourceId ;
 
     @TableField("execute_type")
-    @ColumnType(value = MySqlTypeConstant.VARCHAR , length = 5)
+    @ColumnType(value = MySqlTypeConstant.VARCHAR , length = 64)
     @ColumnComment("执行器类型")
     private String executeType ;
 
-    @TableField("run_sql")
+    /**
+     * JSON参数
+     */
+    @TableField("json_param")
     @ColumnType(value = MySqlTypeConstant.TEXT)
-    @ColumnComment("执行SQL")
-    private String runSql ;
+    @ColumnComment("JSON参数")
+    private String jsonParam;
 
-    @TableField("open_tran")
-    @ColumnType(value = MySqlTypeConstant.INT)
-    @ColumnComment("是否开启事务")
-    private boolean openTran ; // 是否开启事务
-
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 执行器_end >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+    /**
+     * groovyScript
+     */
+    @TableField("groovy_script")
+    @ColumnType(value = MySqlTypeConstant.TEXT)
+    @ColumnComment("groovy脚本")
+    private String groovyScript;
 
     /**
      * 访问权限
