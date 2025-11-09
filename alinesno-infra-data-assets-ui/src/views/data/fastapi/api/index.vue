@@ -80,7 +80,9 @@
                <el-table-column label="配置" align="center" width="150" key="note" prop="note" v-if="columns[4].visible"
                   :show-overflow-tooltip="true">
                   <template #default="scope">
-                     <el-button type="primary" text bg icon="Paperclip" @click="configApiScript(scope.row)">脚本</el-button>
+                     <el-button type="primary" text bg @click="configApiScript(scope.row)">
+                        <i class="fa-solid fa-code"></i> 脚本
+                     </el-button>
                   </template>
                </el-table-column>
                <el-table-column label="内容类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[5].visible">
