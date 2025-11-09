@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row :gutter="20">
       <!--类型数据-->
-      <el-col :span="4" :xs="24">
+      <el-col :span="3" :xs="24">
         <div class="head-container">
           <el-input
               v-model="deptName"
@@ -28,7 +28,7 @@
       </el-col>
 
       <!--清单数据-->
-      <el-col :span="20" :xs="24">
+      <el-col :span="21" :xs="24">
         <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="100px">
           <el-form-item label="清单名称" prop="tableName">
             <el-input v-model="queryParams.tableName" placeholder="请输入清单名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
@@ -60,7 +60,7 @@
         <el-table v-loading="loading" :data="ManifestList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :align="'center'" />
 
-          <el-table-column label="图标" :align="'center'" width="70" key="status" v-if="columns[5].visible">
+          <el-table-column label="图标" :align="'center'" width="60" key="status" v-if="columns[5].visible">
             <template #default="scope">
               <div class="role-icon">
                 <img :src="tableIcon" />
@@ -75,43 +75,73 @@
                 {{ scope.row.tableName }}
               </div>
               <div style="font-size: 13px; color: rgb(165, 165, 165); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" v-copyText="scope.row.promptId">
-                {{ scope.row.description }}
+                {{ scope.row.description?scope.row.description:'暂无描述' }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="主题域" align="center" key="dataDomain" width="120" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true">
+          <el-table-column label="主题域" align="center" key="dataDomain" width="150" prop="dataDomain" v-if="columns[3].visible" :show-overflow-tooltip="true">
             <template #default="scope">
+              <el-button type="primary" bg text>
                 {{ getDataDomainLabel(scope.row.dataDomain) }}
+              </el-button>
             </template> 
           </el-table-column>  
-          <el-table-column label="数据来源" align="center" key="dataSource" prop="dataSource" v-if="columns[3].visible" width="200" :show-overflow-tooltip="true" />
-          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="120" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" >
+          <el-table-column label="数据来源" align="center" key="dataSource" prop="dataSource" v-if="columns[3].visible" width="100" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <div>
+                {{ scope.row.dataSource}} 
+              </div>
+              <div>
+                {{scope.row.dataSourceConfig?.type}}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="资产统计" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true" width="250">
+              <template #default="scope">
+                <div>
+                    <el-button type="primary" size="small" bg text> <i class="fa-solid fa-credit-card"></i> 数据量: {{ scope.row.rowCount }}条 </el-button>
+                </div>
+                <div style="margin-top: 5px;">
+                    <el-button type="success" size="small" bg text> <i class="fa-brands fa-shopify"></i> 存储: {{ formatSize(scope.row.dataSizeBytes) }}</el-button>
+                </div>
+              </template>
+          </el-table-column>  
+
+          <el-table-column label="涉密等级" align="center" key="confidentialityLevel" width="110" prop="confidentialityLevel" v-if="columns[3].visible" :show-overflow-tooltip="true" >
             <template #default="scope">
               <div>
                 {{ getConfidentialityLevelValue(scope.row.confidentialityLevel) }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="资产标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" :show-overflow-tooltip="true">
+          <el-table-column label="资产标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" width="200" :show-overflow-tooltip="true">
             <template #default="scope">
-              <el-check-tag checked type="info">政务</el-check-tag>
+              <el-check-tag type="text">
+                {{ scope.row.assetTag?scope.row.assetTag:'暂无标签' }}
+              </el-check-tag>
             </template> 
           </el-table-column>  
 
+          <!-- 
           <el-table-column label="元信息" align="center" key="promptContent" width="120" prop="promptContent" v-if="columns[2].visible" :show-overflow-tooltip="true">
             <template #default="scope">
-              <el-button type="primary" text bg icon="Paperclip" @click="configManifestField(scope.row)">查看</el-button>
+              <el-button type="primary" text icon="view" @click="configManifestField(scope.row)">查看</el-button>
             </template>
           </el-table-column>
           <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
             <template #default="scope">
               <span>{{ parseTime(scope.row.addTime) }}</span>
             </template>
-          </el-table-column>
+          </el-table-column> 
+          -->
 
           <!-- 操作字段  -->
-          <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
             <template #default="scope">
+              <el-tooltip content="查看元数据" placement="top" v-if="scope.row.ManifestId !== 1">
+                <el-button link type="primary" icon="View" @click="configManifestField(scope.row)"
+                           v-hasPermi="['system:Manifest:edit']"></el-button>
+              </el-tooltip>
               <el-tooltip content="修改" placement="top" v-if="scope.row.ManifestId !== 1">
                 <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
                            v-hasPermi="['system:Manifest:edit']"></el-button>
@@ -283,6 +313,20 @@ function handleNodeClick(data) {
   queryParams.value.dataDomain = data.id;
   console.log('data.id = ' + data.id)
   getList();
+}
+
+const formatSize = (bytes) => {
+  if (bytes == null) return '0 KB' // null 或 undefined
+  const KB = 1024
+  const MB = KB * 1024
+  const GB = MB * 1024
+
+  const abs = Math.abs(bytes)
+  const fmt = (v, unit) => `${Number(v.toFixed(2))} ${unit}` // 去除多余的 0
+
+  if (abs >= GB) return fmt(bytes / GB, 'G')
+  if (abs >= MB) return fmt(bytes / MB, 'MB')
+  return fmt(bytes / KB, 'KB')
 }
 
 /** 搜索按钮操作 */
