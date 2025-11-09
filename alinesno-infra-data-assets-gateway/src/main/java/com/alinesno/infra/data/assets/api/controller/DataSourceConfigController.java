@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.List;
 
 /**
  *
@@ -59,6 +60,15 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
         log.debug("page = {}", ToStringBuilder.reflectionToString(page));
 
         return this.toPage(model, this.getFeign(), page);
+    }
+
+    /**
+     * 列出所有的数据源listAll
+     */
+    @GetMapping("/listAll")
+    public AjaxResult listAll(){
+        List<DataSourceConfigEntity> list = service.list();
+        return AjaxResult.success(list) ;
     }
 
     /**
