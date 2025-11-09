@@ -8,6 +8,8 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * 数据资产登记表，会定时从数据源中同步资产清单列表
  */
@@ -56,4 +58,39 @@ public class ManifestEntity extends InfraBaseEntity {
     @Column(comment = "数据源配置ID" )
     private Long dataSourceConfigId;
 
+    @TableField("catalog_name")
+    @Column(length = 200 , comment = "数据库目录(Catalog)")
+    private String catalogName;
+
+    @TableField("schema_name")
+    @Column(length = 200 , comment = "数据库模式(Schema)")
+    private String schemaName;
+
+    @TableField("row_count")
+    @Column(comment = "表行数")
+    private Long rowCount;
+
+    @TableField("data_size_bytes")
+    @Column(comment = "数据大小(字节)")
+    private Long dataSizeBytes;
+
+    @TableField("index_size_bytes")
+    @Column(comment = "索引大小(字节)")
+    private Long indexSizeBytes;
+
+    @TableField("engine")
+    @Column(length = 100 , comment = "存储引擎")
+    private String engine;
+
+    @TableField("collation")
+    @Column(length = 100 , comment = "排序规则")
+    private String collation;
+
+    @TableField("table_create_time")
+    @Column(comment = "表创建时间")
+    private Date tableCreateTime;
+
+    @TableField("table_update_time")
+    @Column(comment = "表更新时间")
+    private Date tableUpdateTime;
 }
