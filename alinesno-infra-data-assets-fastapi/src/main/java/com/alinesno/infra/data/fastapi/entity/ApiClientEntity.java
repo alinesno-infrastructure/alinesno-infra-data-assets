@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,8 +18,9 @@ import java.util.Date;
  * API客户端
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("api_client")
 @Data
+@TableName("api_client")
+@TableComment("API客户端")
 public class ApiClientEntity extends InfraBaseEntity {
 
     /**
