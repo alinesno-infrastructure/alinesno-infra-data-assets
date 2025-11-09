@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("asset_statistics")
+@TableComment("数据资产统计表")
 public class AssetStatisticsEntity extends InfraBaseEntity {
     // fields
     //getter and setter
