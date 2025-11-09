@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnComment;
 import com.gitee.sunchenbin.mybatis.actable.annotation.ColumnType;
+import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,8 +18,9 @@ import lombok.EqualsAndHashCode;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("source_system")
 @Data
+@TableName("source_system")
+@TableComment("来源系统表")
 public class SourceSystemEntity extends InfraBaseEntity {
     // fields
     /**
