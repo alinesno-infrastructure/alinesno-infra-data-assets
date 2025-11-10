@@ -14,8 +14,15 @@ public interface IApiClientService extends IBaseService<ApiClientEntity> {
     void saveClientToken(@Valid ApiClientEntity client);
 
     /**
-     * 校验客户端token
-     * @param request
+     * 校验客户端token，并将 client 与 orgId 设置到 request attribute 中
+     * @return 返回 ApiClientEntity（方便上层使用）
      */
-    void validateClientToken(HttpServletRequest request);
+    ApiClientEntity validateClientToken(HttpServletRequest request);
+
+    /**
+     * 获取测试用的 token
+     * @param orgId
+     * @return
+     */
+    ApiClientEntity getTokenForTest(Long orgId);
 }
