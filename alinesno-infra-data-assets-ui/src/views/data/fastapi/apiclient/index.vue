@@ -44,8 +44,8 @@
             <div>
               {{ scope.row.clientName}}
             </div>
-            <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.secret">
-              密钥: {{ scope.row.secret}}
+            <div style="font-size: 14px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.secret">
+              复制密钥 <i class="fa-solid fa-copy"></i>
             </div>
         </template>
       </el-table-column>
@@ -93,7 +93,7 @@
 
     <!-- 添加或修改分组对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="databaseRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="databaseRef" :model="form" :rules="rules" label-width="80px" size="large">
         <el-row>
           <el-col :span="24">
             <el-form-item label="名称" prop="clientName">
@@ -134,8 +134,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+          <el-button @click="cancel" size="large">取 消</el-button>
         </div>
       </template>
     </el-dialog>
