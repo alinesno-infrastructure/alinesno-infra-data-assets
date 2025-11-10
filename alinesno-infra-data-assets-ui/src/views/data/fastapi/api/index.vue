@@ -64,7 +64,7 @@
                         {{ scope.row.name }}
                      </div>
                      <div style="font-size: 13px;color: #a5a5a5;cursor: pointer;" v-copyText="scope.row.promptId">
-                        调用次数: {{ scope.row.useCount }}
+                        调用次数: {{ scope.row.note }}
                      </div>
                   </template>
                </el-table-column>
@@ -75,8 +75,13 @@
                      <span v-else>0</span>
                   </template>
                </el-table-column>
-               <el-table-column label="描述" align="left" key="note" prop="note" v-if="columns[3].visible"
-                  :show-overflow-tooltip="true" />
+               <el-table-column label="调用次数" align="center" key="useCount" prop="useCount" v-if="columns[3].visible">
+                  <template #default="scope">
+                     <el-button type="info" text bg>
+                        {{ scope.row.useCount }}
+                     </el-button>
+                  </template>
+               </el-table-column>
                <el-table-column label="配置" align="center" width="150" key="note" prop="note" v-if="columns[4].visible"
                   :show-overflow-tooltip="true">
                   <template #default="scope">
@@ -85,10 +90,15 @@
                      </el-button>
                   </template>
                </el-table-column>
+
                <el-table-column label="内容类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[5].visible">
                   <template #default="scope">
-                     <span v-if="scope.row.contentType == 2">application/json</span>
-                     <span v-if="scope.row.contentType == 1">application/x-www-form-urlencoed</span>
+                     <el-button v-if="scope.row.executeType == 'groovy'" type="primary" text bg>
+                        GROOVY
+                     </el-button>
+                     <el-button v-if="scope.row.executeType == 'sql'" type="warning" text bg>
+                        SQL
+                     </el-button>
                   </template>
                </el-table-column>
 
@@ -96,10 +106,14 @@
                 <el-switch v-model="form.access" :active-value="0" :inactive-value="1" v-if="columns[6].visible"/>
               </el-form-item>
 
-               <el-table-column label="上线" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
+               <el-table-column label="状态" align="center" width="100" key="hasStatus" v-if="columns[7].visible">
                   <template #default="scope">
-                     <el-switch v-model="scope.row.hasStatus" :active-value="0" :inactive-value="1"
-                        @change="handleChangStatusField('hasStatus', scope.row.hasStatus, scope.row.id)" />
+                     <el-switch
+                        v-model="scope.row.enabled"
+                        :active-value="true"
+                        :inactive-value="false"
+                        @change="handleChangStatusField('enabled', scope.row.enabled, scope.row.id)"
+                         />
                   </template>
                </el-table-column>
 
