@@ -6,14 +6,14 @@
       </div>
 
       <el-row :gutter="20">
-         <!--应用数据-->
+         <!--标签数据-->
          <el-col :span="24" :xs="24">
             <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="100px">
-               <el-form-item label="应用名称" prop="dbName">
-                  <el-input v-model="queryParams.dbName" placeholder="请输入应用名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
+               <el-form-item label="标签名称" prop="dbName">
+                  <el-input v-model="queryParams.dbName" placeholder="请输入标签名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
                </el-form-item>
-               <el-form-item label="应用名称" prop="dbName">
-                  <el-input v-model="queryParams['condition[dbName|like]']" placeholder="请输入应用名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
+               <el-form-item label="标签名称" prop="dbName">
+                  <el-input v-model="queryParams['condition[dbName|like]']" placeholder="请输入标签名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
                </el-form-item>
                <el-form-item>
                   <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -40,12 +40,9 @@
                <el-table-column type="selection" width="50" align="center" />
 
                <!-- 业务字段-->
-               <el-table-column label="标签名称" align="center" key="labelName" prop="labelName" v-if="columns[0].visible" />
+               <el-table-column label="标签名称" align="left" key="labelName" prop="labelName" v-if="columns[0].visible" />
                <el-table-column label="标识" align="center" key="labelKey" prop="labelKey" v-if="columns[1].visible" :show-overflow-tooltip="true" />
                <el-table-column label="值" align="center" key="labelValue" prop="labelValue" v-if="columns[1].visible" :show-overflow-tooltip="true" />
-               <el-table-column label="标签类型" align="center" key="labelType" prop="labelType" v-if="columns[2].visible" :show-overflow-tooltip="true" />
-
-               <el-table-column label="状态" align="center" key="hasStatus" v-if="columns[5].visible" />
 
                <el-table-column label="添加时间" align="center" prop="addTime" v-if="columns[6].visible" width="160">
                   <template #default="scope">
@@ -72,13 +69,13 @@
          </el-col>
       </el-row>
 
-      <!-- 添加或修改应用配置对话框 -->
+      <!-- 添加或修改标签配置对话框 -->
       <el-dialog :title="title" v-model="open" width="900px" append-to-body>
-         <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px">
+         <el-form :model="form" :rules="rules" ref="databaseRef" label-width="100px" size="large">
             <el-row>
                <el-col :span="24">
                   <el-form-item label="名称" prop="labelName">
-                     <el-input v-model="form.labelName" placeholder="请输入应用名称" maxlength="50" />
+                     <el-input v-model="form.labelName" placeholder="请输入标签名称" maxlength="50" />
                   </el-form-item>
                </el-col>
             </el-row>
@@ -86,11 +83,6 @@
                <el-col :span="24">
                   <el-form-item label="标识" prop="labelKey">
                      <el-input v-model="form.labelKey" placeholder="请输入标识" maxlength="128" />
-                  </el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="类型" prop="labelType">
-                     <el-input v-model="form.labelType" placeholder="请输入类型" maxlength="50" />
                   </el-form-item>
                </el-col>
             </el-row>
@@ -105,8 +97,8 @@
          </el-form>
          <template #footer>
             <div class="dialog-footer">
-               <el-button type="primary" @click="submitForm">确 定</el-button>
-               <el-button @click="cancel">取 消</el-button>
+               <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+               <el-button @click="cancel" size="large">取 消</el-button>
             </div>
          </template>
       </el-dialog>
@@ -143,11 +135,11 @@ const roleOptions = ref([]);
 
 // 列显隐信息
 const columns = ref([
-   { key: 0, label: `应用名称`, visible: true },
-   { key: 1, label: `应用描述`, visible: true },
+   { key: 0, label: `标签名称`, visible: true },
+   { key: 1, label: `标签描述`, visible: true },
    { key: 2, label: `表数据量`, visible: true },
    { key: 3, label: `类型`, visible: true },
-   { key: 4, label: `应用地址`, visible: true },
+   { key: 4, label: `标签地址`, visible: true },
    { key: 5, label: `状态`, visible: true },
    { key: 6, label: `更新时间`, visible: true }
 ]);
@@ -170,7 +162,7 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询应用列表 */
+/** 查询标签列表 */
 function getList() {
    loading.value = true;
    datatableLabel(proxy.addDateRange(queryParams.value, dateRange.value)).then(res => {
@@ -197,7 +189,7 @@ function resetQuery() {
 /** 删除按钮操作 */
 function handleDelete(row) {
    const LabelIds = row.id || ids.value;
-   proxy.$modal.confirm('是否确认删除应用编号为"' + LabelIds + '"的数据项？').then(function () {
+   proxy.$modal.confirm('是否确认删除标签编号为"' + LabelIds + '"的数据项？').then(function () {
       return delLabel(LabelIds);
    }).then(() => {
       getList();
@@ -236,7 +228,7 @@ function cancel() {
 function handleAdd() {
    reset();
    open.value = true;
-   title.value = "添加应用";
+   title.value = "添加标签";
 };
 
 /** 修改按钮操作 */
@@ -246,7 +238,7 @@ function handleUpdate(row) {
    getLabel(LabelId).then(response => {
       form.value = response.data;
       open.value = true;
-      title.value = "修改应用";
+      title.value = "修改标签";
    });
 };
 
