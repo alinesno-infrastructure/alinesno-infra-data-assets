@@ -10,6 +10,6 @@ public interface IApiHandleService {
      * 处理业务请求
      * @return
      */
-    Object handle(ApiConfigEntity apiConfig, HttpServletRequest request, HttpServletResponse response);
+    Object handle(ApiConfigEntity apiConfig, HttpServletRequest request, HttpServletResponse response, Long orgId);
 
 }
