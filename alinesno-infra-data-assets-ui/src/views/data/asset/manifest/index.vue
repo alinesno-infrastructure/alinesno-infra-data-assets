@@ -114,11 +114,13 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="资产标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" width="200" :show-overflow-tooltip="true">
+          <el-table-column label="资产标签" align="center" key="assetTag" prop="assetTag" v-if="columns[3].visible" width="350" :show-overflow-tooltip="true">
             <template #default="scope">
-              <el-check-tag type="text">
-                {{ scope.row.assetTag?scope.row.assetTag:'暂无标签' }}
-              </el-check-tag>
+              <label-select
+                    :manifest-id="scope.row.id"
+                    v-model:initial-tags="scope.row.assetTag"
+                    :all-tags="allTags"
+                  />
             </template> 
           </el-table-column>  
 
@@ -221,6 +223,9 @@
 
 <script setup name="Manifest">
 
+import LabelSelect from './components/LabelSelect.vue';
+
+import { listAllLabel } from '@/api/data/asset/label'; // 导入获取标签的 API
 import {
   catalogTreeSelect,
 } from "@/api/data/asset/dataAsset";
@@ -241,6 +246,8 @@ const { proxy } = getCurrentInstance();
 // 定义变量
 const ManifestList = ref([]);
 const open = ref(false);
+
+const allTags = ref([]); // 新增：存储所有标签列表
 
 const promptTitle = ref("");
 const currentPostId = ref("");
@@ -449,7 +456,21 @@ function submitForm() {
   });
 };
 
-getDeptTree();
-getList();
+// 获取所有标签列表（在父组件初始化时调用）
+const fetchAllTags = async () => {
+  try {
+    const res = await listAllLabel({ pageSize: 100 });
+    allTags.value = res.data || []; // 存储标签数据
+  } catch (error) {
+    console.error('获取标签列表失败:', error);
+  }
+};
+
+// 在父组件初始化时调用
+onMounted(async () => {
+  await getDeptTree();
+  await getList();
+  await fetchAllTags();
+});
 
 </script>
