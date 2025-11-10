@@ -5,6 +5,8 @@ import com.alinesno.infra.common.core.utils.StringUtils;
 import com.alinesno.infra.data.fastapi.entity.ApiClientEntity;
 import com.alinesno.infra.data.fastapi.mapper.ApiClientMapper;
 import com.alinesno.infra.data.fastapi.service.IApiClientService;
+import com.alinesno.infra.data.fastapi.utils.TokenUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -25,30 +27,42 @@ public class ApiClientServiceImpl extends IBaseServiceImpl<ApiClientEntity, ApiC
 
 
     @Override
-    public void validateClientToken(HttpServletRequest request) {
-        // 从请求头中获取Token
+    public ApiClientEntity validateClientToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (StringUtils.isEmpty(token)) {
-            throw new IllegalArgumentException("Token is missing or invalid.");
+            throw new IllegalArgumentException("令牌不存在或无效");
         }
+        token = token.replace("Bearer ", "").trim();
 
-        // 去掉可能的 "Bearer " 前缀
-        token = token.replace("Bearer ", "");
-
-        // 从数据库中查询客户端信息
         ApiClientEntity client = getOne(new QueryWrapper<ApiClientEntity>().eq("secret", token));
-
         if (client == null) {
-            throw new IllegalArgumentException("Invalid client token.");
+            throw new IllegalArgumentException("客户端令牌无效");
         }
 
-        // 检查Token是否过期
         Date now = new Date();
-        if (client.getExpiryTime().before(now)) {
-            throw new IllegalArgumentException("Client token has expired.");
+        if (client.getExpiryTime() == null || client.getExpiryTime().before(now)) {
+            throw new IllegalArgumentException("客户端令牌已过期");
         }
 
-        log.info("Client token is valid for client: {}", client.getClientName());
+        // 从 token 中提取 orgId（若不可解析则返回 null）
+        Long orgId = TokenUtils.extractOrgIdFromToken(token);
+        log.info("客户端令牌验证通过，客户端：{}，机构ID：{}", client.getClientName(), orgId);
+
+        return client;
+    }
+
+    /**
+     * 获取测试用的客户端令牌，并返回一个可用的Token用于做测试
+     * @param orgId
+     * @return
+     */
+    @Override
+    public ApiClientEntity getTokenForTest(Long orgId) {
+
+        LambdaQueryWrapper<ApiClientEntity> query = new LambdaQueryWrapper<ApiClientEntity>()
+                .eq(ApiClientEntity::getOrgId , orgId) ;
+
+        return getOne(query);
     }
 
 }
