@@ -1,14 +1,17 @@
 package com.alinesno.infra.data.assets.api.controller;
 
 import com.alinesno.infra.common.core.constants.SpringInstanceScope;
+import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionQuery;
 import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionSave;
 import com.alinesno.infra.common.extend.datasource.annotation.DataPermissionScope;
+import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.assets.entity.LabelEntity;
 import com.alinesno.infra.data.assets.service.ILabelService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -16,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  *
@@ -47,6 +52,21 @@ public class LabelController extends BaseController<LabelEntity, ILabelService> 
         log.debug("page = {}", ToStringBuilder.reflectionToString(page));
 
         return this.toPage(model, this.getFeign(), page);
+    }
+
+    /**
+     * 列出所有的组织标签
+     */
+    @DataPermissionQuery
+    @GetMapping("/listAllLabel")
+    public AjaxResult listAllLabel(PermissionQuery query){
+
+        LambdaQueryWrapper<LabelEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.setEntityClass(LabelEntity.class);
+        query.toWrapper(wrapper);
+
+        List<LabelEntity> list = service.list(wrapper);
+        return AjaxResult.success(list);
     }
 
     /**
