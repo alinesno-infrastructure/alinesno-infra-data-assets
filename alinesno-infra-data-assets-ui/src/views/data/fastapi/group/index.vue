@@ -111,7 +111,7 @@
 
       <!-- 添加或修改分组对话框 -->
       <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-         <el-form ref="deptRef" :model="form" :rules="rules" label-width="80px">
+         <el-form ref="deptRef" :model="form" :rules="rules" size="large" label-width="80px">
             <el-row>
                <el-col :span="24" v-if="form.parentId !== 0" >
                   <el-form-item label="上级分组" prop="parentId">
@@ -145,8 +145,8 @@
          </el-form>
          <template #footer>
             <div class="dialog-footer">
-               <el-button type="primary" @click="submitForm">确 定</el-button>
-               <el-button @click="cancel">取 消</el-button>
+               <el-button type="primary" @click="submitForm" size="large">确 定</el-button>
+               <el-button @click="cancel" size="large">取 消</el-button>
             </div>
          </template>
       </el-dialog>
