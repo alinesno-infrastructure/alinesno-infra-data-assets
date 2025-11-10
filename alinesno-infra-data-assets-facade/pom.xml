@@ -28,6 +28,12 @@
 			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>com.alinesno.infra.common</groupId>
+            <artifactId>alinesno-infra-common-security-mapper</artifactId>
+            <version>${alinesno.infra.common.version}</version>
+        </dependency>
+
 		<!-- fastjson -->
 		<dependency>
 				<groupId>com.alibaba</groupId>
