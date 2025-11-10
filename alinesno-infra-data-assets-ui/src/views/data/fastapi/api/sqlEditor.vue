@@ -4,7 +4,7 @@
 
     <div class="form-container">
       <el-row>
-        <el-col :span="7">
+        <el-col :span="9">
           <ParamConfigPanel v-model="currentApi" />
         </el-col>
 
@@ -34,9 +34,9 @@
 
         </el-col>
 
-        <el-col :span="7">
+        <el-col :span="5">
           <div class="output-result-box">
-            <el-card shadow="never" style="height:calc(100vh - 160px);padding:0px !important">
+            <el-card shadow="never" style="height:calc(100vh - 150px);padding:0px !important">
               <template #header>
                 <div class="card-header">
                   <span>执行结果</span>
@@ -44,8 +44,10 @@
               </template>
 
               <el-skeleton v-if="!genContent" :rows="10" />
-              <el-scrollbar v-else style="height: calc(-320px + 100vh);">
-                <div v-html="markdown.render(genContent)"></div>
+              <el-scrollbar v-if="genContent" style="height: calc(-220px + 100vh);">
+                <div>
+                      <div v-html="readerHtml(genContent)"></div>
+                </div>
               </el-scrollbar>
 
             </el-card>
@@ -57,6 +59,10 @@
 </template>
 
 <script setup>
+
+import mdKatex from '@traptitech/markdown-it-katex';
+import hljs from 'highlight.js';
+
 import ScriptEditorPanel from './ScriptEditor.vue';
 import ParamConfigPanel from './ParamConfig.vue';
 import {
@@ -74,12 +80,39 @@ const loading = ref(false);
 const executeEditorRef = ref(null);
 
 import MarkdownIt from 'markdown-it';
-const markdown = new MarkdownIt();
 
-// const markdown = new (await import('markdown-it')).default();
+function highlightBlock(str, lang) {
+  return `<pre class="code-block-wrapper"><code class="hljs code-block-body ${lang}">${str}</code></pre>`;
+}
+
+const mdi = new MarkdownIt({
+  html: true,
+  linkify: true,
+  highlight(code, language) {
+    const validLang = !!(language && hljs.getLanguage(language));
+    if (validLang) {
+      const lang = language || '';
+      return highlightBlock(hljs.highlight(code, { language: lang }).value, lang);
+    }
+    return highlightBlock(hljs.highlightAuto(code).value, '');
+  },
+});
+
+mdi.use(mdKatex, { blockClass: 'katexmath-block rounded-md p-[10px]', errorColor: ' #cc0000' });
 
 const scriptType = ref("groovy"); // 与 currentApi.scriptType 同步
 const genContent = ref(null);
+
+/** 读取html文本 */
+function readerHtml(chatText) {
+  if (chatText === null || chatText === undefined) {
+    return '';
+  }
+  // 确保输入是字符串，如果是对象则转换为JSON字符串
+  const text = typeof chatText === 'string' ? chatText : JSON.stringify(chatText, null, 2);
+  var jsonText = "```json \n" + text + "\n```";
+  return mdi.render(jsonText);
+}
 
 const currentApi = ref({
   id: '',
@@ -123,7 +156,7 @@ const handleValidateTask = () => {
     params: chatMessage.value || ''
   }).then(res => {
     loading.value = false;
-    genContent.value = res.data;
+    genContent.value = res ;
     proxy.$modal.msgSuccess("验证成功");
   }).catch(err => {
     loading.value = false;
