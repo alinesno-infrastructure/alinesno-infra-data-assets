@@ -22,11 +22,20 @@ var managerUrl = {
     exportUrl: prefix + "exportExcel",
     changeField: prefix + "changeField",
     list: prefix + "list",
+    listAllLabel: prefix + "listAllLabel",
     excludeChild: prefix + "excludeChild",
     downloadfile: prefix + "downloadfile"
 }
 
-// 查询部门列表（排除节点）
+// 查询标签列表
+export function listAllLabel() {
+  return request({
+    url: managerUrl.listAllLabel,
+    method: 'get'
+  })
+}
+
+// 查询标签列表（排除节点）
 export function listLabelExcludeChild(deptId) {
     return request({
         url: managerUrl.excludeChild+ '/' + deptId ,
