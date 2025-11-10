@@ -22,9 +22,19 @@ var managerUrl = {
     exportUrl: prefix + "exportExcel",
     changeField: prefix + "changeField",
     downloadfile: prefix + "downloadfile",
+    updateManifestLabel: prefix + "updateManifestLabel",
     updateManifestContent: prefix + "updateManifestContent",
     catalogTreeSelect: prefix + "catalogTreeSelect",
     getManifestContent: prefix + "getManifestContent",
+}
+
+// 更新清单标签
+export function updateManifestLabel(data) {
+  return request({
+    url: managerUrl.updateManifestLabel,
+    method: 'put',
+    data: data
+  })
 }
 
 // 查询部门下拉树结构
