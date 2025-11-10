@@ -60,7 +60,7 @@ const theme = {
 
 const calculateFirstSectionHeight = () => {
   const windowHeight = window.innerHeight;
-  const offset = 220;
+  const offset = 210;
   editorHeight.value = `${windowHeight - offset}px`;
   console.log(editorHeight.value); //打印高度
 }
