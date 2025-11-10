@@ -1,6 +1,7 @@
 package com.alinesno.infra.data.fastapi.gateway.provider;
 
 import com.alinesno.infra.common.facade.response.AjaxResult;
+import com.alinesno.infra.data.fastapi.entity.ApiClientEntity;
 import com.alinesno.infra.data.fastapi.entity.ApiConfigEntity;
 import com.alinesno.infra.data.fastapi.service.IApiClientService;
 import com.alinesno.infra.data.fastapi.service.IApiConfigService;
@@ -9,52 +10,54 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 接收API接口服务
- */
 @Slf4j
 @RestController
-@RequestMapping
+@RequestMapping("${uriPrefix:/provider}") // 类级别使用占位符，可在配置文件中自定义
 public class ApiProviderHandle extends BasePreHandle {
 
     @Autowired
-    private IApiHandleService apiHandleService ;
+    private IApiHandleService apiHandleService;
 
     @Autowired
-    private IApiConfigService apiConfigService ;
+    private IApiConfigService apiConfigService;
 
     @Autowired
-    private IApiClientService apiClientService ;
+    private IApiClientService apiClientService;
 
-    /**
-     * 接收所有的数据api接口
-     * @return
-     */
-    @RequestMapping(value = "/provider/**" , method = {
-            RequestMethod.DELETE ,
-            RequestMethod.GET ,
-            RequestMethod.PUT ,
-            RequestMethod.POST })
-    public AjaxResult handle(HttpServletRequest request ,
-                             HttpServletResponse response){
+    @Value("${uriPrefix:/provider}")
+    private String uriPrefix;
 
-        String uri = request.getRequestURI() ;
-        log.debug("uri = {}" , uri);
+    @RequestMapping(value = "/**", method = {
+            RequestMethod.DELETE,
+            RequestMethod.GET,
+            RequestMethod.PUT,
+            RequestMethod.POST})
+    public AjaxResult handle(HttpServletRequest request,
+                             HttpServletResponse response) {
 
-        // 1. 先做过滤器处理(安全处理)
-        apiClientService.validateClientToken(request) ;
+        String requestUri = request.getRequestURI();
+        log.debug("requestUri = {}", requestUri);
 
-        // 2. 业务处理
-        ApiConfigEntity apiConfig = apiConfigService.getByUri(uri) ;
-        Object data = apiHandleService.handle(apiConfig , request , response) ;
+        // 1. 先做过滤器处理(安全处理)，返回 client 并把 client/orgId 写入 request attribute
+        ApiClientEntity client = apiClientService.validateClientToken(request);
+        Long orgId = client.getOrgId();
 
-        log.debug("data = {}" , data);
+        String relativePath = requestUri.substring(uriPrefix.length()) ;
+        log.debug("resolved relativePath = {}", relativePath);
 
-        return  AjaxResult.success(data) ;
+        // 4. 通过 orgId + relativePath 获取 ApiConfig 并处理
+        ApiConfigEntity apiConfig = apiConfigService.getByUri(relativePath, orgId);
+        Assert.notNull(apiConfig, relativePath + "找不到路径，请确认路径是否正确." );
+
+        Object data = apiHandleService.handle(apiConfig, request, response, orgId);
+
+        log.debug("data = {}", data);
+        return AjaxResult.success(data);
     }
-
 }
