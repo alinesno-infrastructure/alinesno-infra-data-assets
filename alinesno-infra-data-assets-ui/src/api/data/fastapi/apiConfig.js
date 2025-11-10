@@ -11,7 +11,7 @@ const managerUrl = {
   datatables: prefix + "datatables",
   createUrl: prefix + 'add',
   // 保持旧字段兼容（如项目其它位置使用），但新增新的保存/更新接口
-  saveUrl: prefix + 'save',
+  saveUrl: prefix + 'saveConfigInfo',
   saveApiConfig: prefix + 'saveApiConfig',
   updateApiConfig: prefix + 'updateApiConfig',
   updateUrl: prefix + "modify",
@@ -20,7 +20,7 @@ const managerUrl = {
   detailUrl: prefix + "detail",
   removeUrl: prefix + "delete",
   exportUrl: prefix + "exportExcel",
-  changeField: prefix + "changeField",
+  changeField: prefix + "changeEnableField",
   catalogTreeSelect: prefix + "catalogTreeSelect",
   downloadfile: prefix + "downloadfile",
   updateExecuteSql: prefix + "updateExecuteSql",
