@@ -79,18 +79,18 @@ public class ApiConfigSaveDto extends BaseDto {
      * 转换为实体对象
      * @return
      */
-    public ApiConfigEntity toEntity() {
+    public static ApiConfigEntity toEntity(ApiConfigSaveDto dto) {
         ApiConfigEntity entity = new ApiConfigEntity();
-        BeanUtils.copyProperties(this, entity);
+        BeanUtils.copyProperties(dto, entity);
 
-        entity.setName(this.name);
-        entity.setNote(this.description);
-        entity.setGroovyScript(this.groovyScript);
-        entity.setExecuteType(this.scriptType);
-        entity.setDatasourceId(this.datasourceId);
-        entity.setPath(this.path);
-        entity.setJsonParam(JSONObject.toJSONString(this.params));
-        entity.setEnabled(this.enabled);
+        entity.setName(dto.getName());
+        entity.setNote(dto.getDescription());
+        entity.setGroovyScript(dto.getGroovyScript());
+        entity.setExecuteType(dto.getScriptType());
+        entity.setDatasourceId(dto.getDatasourceId());
+        entity.setPath(dto.getPath());
+        entity.setJsonParam(JSONObject.toJSONString(dto.getParams()));
+        entity.setEnabled(dto.isEnabled());
 
         return entity;
     }
