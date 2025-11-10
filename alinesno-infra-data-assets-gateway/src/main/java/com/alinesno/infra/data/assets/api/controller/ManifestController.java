@@ -8,6 +8,7 @@ import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
 import com.alinesno.infra.common.web.adapter.login.account.CurrentAccountJwt;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
+import com.alinesno.infra.data.assets.api.AssetTagUpdateDto;
 import com.alinesno.infra.data.assets.api.DataSourceConfigQueryDto;
 import com.alinesno.infra.data.assets.api.ManifestDto;
 import com.alinesno.infra.data.assets.entity.DataSourceConfigEntity;
@@ -114,10 +115,21 @@ public class ManifestController extends BaseController<ManifestEntity, IManifest
     @DataPermissionSave
     @Override
     public AjaxResult save(Model model, @RequestBody ManifestEntity entity) throws Exception {
-
         log.debug("CurrentAccountJwt.get() = {}" , CurrentAccountJwt.get().getOrgId());
-
         return super.save(model, entity);
+    }
+
+    /**
+     * 更新标签信息 updateManifestLabel
+     * @return
+     */
+    @DataPermissionSave
+    @PutMapping("/updateManifestLabel")
+    public AjaxResult updateManifestLabel(@RequestBody AssetTagUpdateDto dto) {
+
+        log.debug("dto = {}" , ToStringBuilder.reflectionToString(dto));
+
+        return AjaxResult.success() ;
     }
 
     @Override
