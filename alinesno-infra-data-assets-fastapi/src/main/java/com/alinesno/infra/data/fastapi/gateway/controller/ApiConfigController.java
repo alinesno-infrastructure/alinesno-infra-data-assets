@@ -8,12 +8,14 @@ import com.alinesno.infra.common.facade.datascope.PermissionQuery;
 import com.alinesno.infra.common.facade.pageable.DatatablesPageBean;
 import com.alinesno.infra.common.facade.pageable.TableDataInfo;
 import com.alinesno.infra.common.facade.response.AjaxResult;
+import com.alinesno.infra.common.web.adapter.dto.FieldDto;
 import com.alinesno.infra.common.web.adapter.rest.BaseController;
 import com.alinesno.infra.data.fastapi.api.*;
 import com.alinesno.infra.data.fastapi.entity.ApiConfigEntity;
 import com.alinesno.infra.data.fastapi.service.IApiConfigService;
 import com.alinesno.infra.data.fastapi.service.IApiGroupService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alinesno.infra.data.fastapi.utils.ValidateApiUtils;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +24,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +50,8 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
     @Autowired
     private IApiGroupService groupService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ValidateApiUtils validateApiUtils;
 
     @DataPermissionScope
     @ResponseBody
@@ -109,27 +116,35 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
     }
 
     /**
+     * 保存接口配置（使用 DTO + 校验）
+     * @param model
+     * @param entity
+     * @return
+     * @throws Exception
+     */
+    @DataPermissionSave
+    @PostMapping("saveConfigInfo")
+    public AjaxResult save(Model model, @RequestBody ApiConfigEntity entity) throws Exception {
+        return super.save(model, entity);
+    }
+
+    /**
+     * 验证接口 validateApiScript
+     */
+    @PostMapping("/validateApiScript")
+    public Object validateApiScript(@RequestBody ApiConfigValidateDto dto) throws IOException {
+        return validateApiUtils.validateApiScript(dto) ;
+    }
+
+
+    /**
      * 新增或保存接口配置（id 为空新增，否则走更新）
      */
     @DataPermissionSave
     @PostMapping("/saveApiConfig")
     public AjaxResult saveApiConfig(Model model, @Valid @RequestBody ApiConfigSaveDto dto) {
 
-//        List<String> messages = validateBusiness(dto);
-//        if (!messages.isEmpty()) {
-//            return AjaxResult.error(String.join("；", messages));
-//        }
-//
-//        if (dto.getId() != null) {
-//            ApiConfigEntity entity = new ApiConfigEntity();
-//            applyDtoToEntity(dto, entity);
-//            service.save(entity);
-//            return AjaxResult.success("新增成功");
-//        } else {
-//            return updateApiConfig(toUpdateDto(dto));
-//        }
-
-        ApiConfigEntity entity = dto.toEntity() ;
+        ApiConfigEntity entity = ApiConfigSaveDto.toEntity(dto) ;
         service.saveOrUpdate(entity);
 
         return AjaxResult.success("操作成功." , entity.getId()) ;
@@ -169,6 +184,27 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
         }
 
         return errors;
+    }
+
+    /**
+     * 修改启停状态
+     * @param field 字段对象
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("changeEnableField")
+    public AjaxResult changeFiled(@RequestBody FieldDto field) {
+        log.debug("field = {}", field);
+        Assert.isTrue(field != null && field.getId() != null, "实体对象为空");
+        Assert.hasLength(field.getField(), "字段为空");
+
+        LambdaUpdateWrapper<ApiConfigEntity> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(ApiConfigEntity::isEnabled, field.getValue().equals("1"));
+        updateWrapper.eq(ApiConfigEntity::getId, field.getId());
+
+        boolean b = this.getFeign().update(updateWrapper);
+
+        return b ? ok() : error();
     }
 
     @Override
