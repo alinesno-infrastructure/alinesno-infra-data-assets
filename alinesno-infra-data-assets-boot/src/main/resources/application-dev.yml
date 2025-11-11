@@ -24,6 +24,7 @@ spring:
       host: 127.0.0.1
       port: 6379
       # password: aip@local
+      database: 1
   devtools:
     restart:
       enabled: true
