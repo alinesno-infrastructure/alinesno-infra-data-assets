@@ -14,6 +14,7 @@ import com.alinesno.infra.data.assets.api.utils.JdbcDriverUtils;
 import com.alinesno.infra.data.assets.entity.DataSourceConfigEntity;
 import com.alinesno.infra.data.assets.job.IDataAssetSyncJob;
 import com.alinesno.infra.data.assets.service.IDataSourceConfigService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -59,16 +62,44 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
     public TableDataInfo datatables(HttpServletRequest request, Model model, DatatablesPageBean page) {
         log.debug("page = {}", ToStringBuilder.reflectionToString(page));
 
-        return this.toPage(model, this.getFeign(), page);
+        // 1. 查询原始数据（实体列表）
+        TableDataInfo tableDataInfo = this.toPage(model, this.getFeign(), page);
+
+        // 2. 安全转换为脱敏DTO列表（消除unchecked cast警告）
+        List<DataSourceConfigDto> dtoList = Optional.ofNullable(tableDataInfo.getRows())
+                .orElse(Collections.emptyList()) // 空值处理
+                .stream()
+                // 过滤并转换为DataSourceConfigEntity类型（类型校验）
+                .filter(item -> item instanceof DataSourceConfigEntity)
+                .map(item -> (DataSourceConfigEntity) item)
+                // 转换为脱敏DTO
+                .map(DataSourceConfigDto::fromEntity)
+                .toList();
+
+        // 3. 替换rows为脱敏后的DTO
+        tableDataInfo.setRows(dtoList);
+        return tableDataInfo;
     }
 
     /**
      * 列出所有的数据源listAll
      */
+    @DataPermissionQuery
     @GetMapping("/listAll")
-    public AjaxResult listAll(){
-        List<DataSourceConfigEntity> list = service.list();
-        return AjaxResult.success(list) ;
+    public AjaxResult listAll(PermissionQuery query){
+
+        LambdaQueryWrapper<DataSourceConfigEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.setEntityClass(DataSourceConfigEntity.class) ;
+        query.toWrapper(wrapper) ;
+
+        List<DataSourceConfigEntity> list = service.list(wrapper);
+
+        // 转换成DTO返回
+        List<DataSourceConfigDto> dtoList = list.stream()
+                .map(DataSourceConfigDto::fromEntity)
+                .toList();
+
+        return AjaxResult.success(dtoList) ;
     }
 
     /**
@@ -79,7 +110,9 @@ public class DataSourceConfigController extends BaseController<DataSourceConfigE
     @GetMapping("/getCurrentDatasourceConfig")
     public AjaxResult getCurrentDatasourceConfig(PermissionQuery permissionQuery){
         DataSourceConfigEntity dataSourceConfig = service.getCurrentDatasourceConfig(permissionQuery);
-        return AjaxResult.success(dataSourceConfig);
+        // 转换成DTO
+        DataSourceConfigDto dto = DataSourceConfigDto.fromEntity(dataSourceConfig);
+        return AjaxResult.success(dto);
     }
 
     /**
