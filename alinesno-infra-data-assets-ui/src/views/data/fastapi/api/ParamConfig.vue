@@ -39,13 +39,13 @@
         <el-input v-model="local.path" placeholder="接口路径（示例：/api/user/get）" />
       </el-form-item>
 
-      <!-- 入参列表（使用 prop 绑定自定义 validator） -->
+      <!-- 入参列表（单向模式，父通过 ref 获取） -->
       <el-form-item label="入参" prop="params">
         <div class="params-list">
           <div v-for="(p, idx) in local.params" :key="p.__uid" class="param-row">
             <el-row :gutter="8" align="middle">
               <el-col :span="6">
-                <el-input v-model="p.name" placeholder="参数名 (name)" clearable />
+                <el-input v-model="p.name" placeholder="参数名 (name)"  />
               </el-col>
 
               <el-col :span="6">
@@ -63,7 +63,7 @@
               </el-col>
 
               <el-col :span="6">
-                <el-input v-model="p.description" placeholder="说明" clearable />
+                <el-input v-model="p.description" placeholder="说明"  />
               </el-col>
 
               <el-col :span="3" class="param-actions">
@@ -85,36 +85,25 @@
         </div>
       </el-form-item>
 
-      <!-- 你可以在表单底部放一个提交按钮以触发校验 
-      <div style="margin-top:12px;">
-        <el-button type="primary" @click="handleSubmit">保存并校验</el-button>
-      </div>
-       -->
-
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch, toRaw, onMounted } from 'vue'
+import { reactive, ref, toRaw, onMounted } from 'vue'
 import { listAllDatasourceConfig } from '@/api/data/asset/datasource'
 
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => ({
-      id: '',
-      name: '',
-      description: '',
-      scriptType: 'groovy',
-      enabled: true,
-      params: []
-    })
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+/**
+ * 单向组件（不接收 props）
+ * 暴露的方法（通过 ref 调用）：
+ *  - setConfig(obj)    // 设置配置（会尽量保留 params 的 __uid，做原地更新）
+ *  - getConfig()       // 获取当前配置（返回不带 __uid 的纯净对象）
+ *  - validate()        // 返回 Promise，表单校验
+ */
 
 const dataSourceArr = ref([])
+
+// __uid 生成
 let uidSeed = 1
 function genUid() {
   return Date.now().toString(36) + '-' + (uidSeed++)
@@ -128,96 +117,93 @@ function deepClone(obj) {
   }
 }
 
-function normalizeModel(input) {
-  const base = {
+// 默认模型
+function defaultModel() {
+  return {
     id: '',
     name: '',
     description: '',
     scriptType: 'groovy',
     enabled: true,
-    params: []
+    params: [],
+    path: '',
+    datasourceId: ''
   }
-  const merged = Object.assign({}, base, deepClone(input || {}))
-  merged.params = Array.isArray(merged.params) ? merged.params.map(p => {
-    const item = Object.assign({ name: '', type: 'string', required: false, description: '' }, p || {})
-    if (!item.__uid) item.__uid = genUid()
-    return item
-  }) : []
-  return merged
 }
 
-const local = reactive(normalizeModel(props.modelValue))
-
-watch(
-  () => props.modelValue,
-  (nv) => {
-    const n = normalizeModel(nv)
-    Object.assign(local, n)
-  },
-  { deep: true }
-)
-
-watch(
-  local,
-  (nv) => {
-    const out = deepClone(toRaw(nv))
-    if (Array.isArray(out.params)) {
-      out.params = out.params.map(p => {
-        const { __uid, ...rest } = p || {}
-        return rest
-      })
-    }
-    emit('update:modelValue', out)
-  },
-  { deep: true }
-)
+// 内部响应式状态（父通过 setConfig 设置）
+const local = reactive(defaultModel())
 
 // 表单 ref
 const formRef = ref(null)
 
-// 自定义 params 校验器
-function validateParams(rule, value, callback) {
-  const params = local.params || []
-  if (!Array.isArray(params) || params.length === 0) {
-    // 如果允许空参数，把下面一行改为 callback(); 这里示例要求至少一个参数可调整
-    return callback() // 允许空数组，若需不允许请改为 callback(new Error('至少需要一个入参'))
+// helpers：在保持数组引用的前提下，用 incoming 更新 target（并尽量保留已有 __uid）
+// 匹配策略：优先按 name 去找到旧项来保留 __uid，否则按索引匹配，最后生成新 __uid
+function updateParamsInPlace(targetArr, incoming = []) {
+  if (!Array.isArray(incoming)) incoming = []
+  // 简单映射 existing by name
+  const existingByName = {}
+  for (let i = 0; i < targetArr.length; i++) {
+    const e = targetArr[i]
+    if (e && e.name) existingByName[e.name] = e.__uid
   }
 
-  const namePattern = /^[A-Za-z_][A-Za-z0-9_]*$/
-  const names = params.map(p => (p && p.name ? String(p.name).trim() : ''))
-  // 非空检查 & 格式检查 & type 检查
-  for (let i = 0; i < params.length; i++) {
-    const p = params[i]
-    const n = names[i]
-    if (!n) return callback(new Error(`第 ${i + 1} 个参数名称不能为空`))
-    if (!namePattern.test(n)) return callback(new Error(`第 ${i + 1} 个参数名称不合法，仅允许字母、数字、下划线，且不能以数字开头`))
-    if (!p.type) return callback(new Error(`第 ${i + 1} 个参数类型不能为空`))
-  }
-  // 唯一性检查
-  const dup = names.find((v, idx) => names.indexOf(v) !== idx)
-  if (dup) return callback(new Error(`参数名 "${dup}" 重复，请保证参数名唯一`))
+  const mapped = incoming.map((p, idx) => {
+    const base = Object.assign({ name: '', type: 'string', required: false, description: '' }, p || {})
+    // try reuse uid by name
+    let uid = null
+    if (base.name && existingByName[base.name]) uid = existingByName[base.name]
+    // else try reuse by index
+    if (!uid && targetArr[idx] && targetArr[idx].__uid) uid = targetArr[idx].__uid
+    if (!uid) uid = genUid()
+    return Object.assign({ __uid: uid }, base)
+  })
 
-  callback()
+  // 原地修改数组内容（保持同一个 array 引用）
+  targetArr.splice(0, targetArr.length, ...mapped)
 }
 
-// rules 定义
-const rules = reactive({
-  name: [
-    { required: true, message: '请输入接口名称', trigger: 'blur' },
-    { min: 2, max: 80, message: '接口名称长度 2-80 个字符', trigger: 'blur' }
-  ],
-  path: [
-    { required: true, message: '请输入接口路径', trigger: 'blur' },
-    { pattern: /^\/[A-Za-z0-9\/\-_]*$/, message: '路径需以 / 开头，允许字母数字、/、-、_', trigger: 'blur' }
-  ],
-  datasourceId: [
-    { required: true, message: '请选择数据源', trigger: 'change' }
-  ],
-  params: [
-    { validator: validateParams, trigger: 'change' }
-  ]
-})
+// setConfig: 父通过 ref 调用设置数据
+function setConfig(cfg = {}) {
+  const normalized = Object.assign({}, defaultModel(), deepClone(cfg || {}))
+  // 直接赋值基础字段（保持 local 对象引用）
+  local.id = normalized.id || ''
+  local.name = normalized.name || ''
+  local.description = normalized.description || ''
+  local.scriptType = normalized.scriptType || 'groovy'
+  local.enabled = normalized.enabled == null ? true : normalized.enabled
+  local.path = normalized.path || ''
+  local.datasourceId = normalized.datasourceId || ''
 
+  // 更新 params 原地替换并保留 __uid
+  updateParamsInPlace(local.params, normalized.params)
+}
+
+// getConfig: 返回纯净对象（不带 __uid）
+function getConfig() {
+  const out = deepClone(toRaw(local))
+  if (Array.isArray(out.params)) {
+    out.params = out.params.map(p => {
+      const { __uid, ...rest } = p || {}
+      return rest
+    })
+  }
+  console.log('getConfig', out)
+  return out
+}
+
+// validate: 返回 Promise，方便父组件调用
+function validate() {
+  if (!formRef.value) return Promise.resolve(true)
+  return new Promise((resolve, reject) => {
+    formRef.value.validate((valid, fields) => {
+      if (valid) resolve(true)
+      else reject(fields)
+    })
+  })
+}
+
+// 参数操作
 function addParam() {
   local.params.push({
     __uid: genUid(),
@@ -253,26 +239,61 @@ function resetParams() {
   )
 }
 
-// 提交示例：手动触发表单校验
-function handleSubmit() {
-  if (!formRef.value) return
-  // callback 方式
-  formRef.value.validate((valid, fields) => {
-    if (valid) {
-      // 校验通过，执行保存逻辑
-      console.log('表单校验通过，准备保存：', JSON.parse(JSON.stringify(local)))
-    } else {
-      console.warn('校验失败：', fields)
-      // Element 会自动显示错误信息
-    }
-  })
-  // 也可以使用 promise 风格（视 Element Plus 版本）：
-  // formRef.value.validate().then(() => { ... }).catch(() => { ... })
+// 暴露给父组件的方法
+defineExpose({
+  setConfig,
+  getConfig,
+  validate,
+  addParam,
+  removeParam,
+  resetParams
+})
+
+// 校验规则（保持原有校验器）
+function validateParams(rule, value, callback) {
+  const params = local.params || []
+  if (!Array.isArray(params) || params.length === 0) {
+    return callback()
+  }
+
+  const namePattern = /^[A-Za-z_][A-Za-z0-9_]*$/
+  const names = params.map(p => (p && p.name ? String(p.name).trim() : ''))
+  for (let i = 0; i < params.length; i++) {
+    const p = params[i]
+    const n = names[i]
+    if (!n) return callback(new Error(`第 ${i + 1} 个参数名称不能为空`))
+    if (!namePattern.test(n)) return callback(new Error(`第 ${i + 1} 个参数名称不合法，仅允许字母、数字、下划线，且不能以数字开头`))
+    if (!p.type) return callback(new Error(`第 ${i + 1} 个参数类型不能为空`))
+  }
+  const dup = names.find((v, idx) => names.indexOf(v) !== idx)
+  if (dup) return callback(new Error(`参数名 "${dup}" 重复，请保证参数名唯一`))
+
+  callback()
 }
 
+const rules = reactive({
+  name: [
+    { required: true, message: '请输入接口名称', trigger: 'blur' },
+    { min: 2, max: 80, message: '接口名称长度 2-80 个字符', trigger: 'blur' }
+  ],
+  path: [
+    { required: true, message: '请输入接口路径', trigger: 'blur' },
+    { pattern: /^\/[A-Za-z0-9\/\-_]*$/, message: '路径需以 / 开头，允许字母数字、/、-、_', trigger: 'blur' }
+  ],
+  datasourceId: [
+    { required: true, message: '请选择数据源', trigger: 'change' }
+  ],
+  params: [
+    { validator: validateParams, trigger: 'change' }
+  ]
+})
+
+// 初始加载数据源
 onMounted(() => {
   listAllDatasourceConfig().then(res => {
-    dataSourceArr.value = res.data;
+    dataSourceArr.value = res.data || []
+  }).catch(() => {
+    dataSourceArr.value = []
   })
 })
 </script>
