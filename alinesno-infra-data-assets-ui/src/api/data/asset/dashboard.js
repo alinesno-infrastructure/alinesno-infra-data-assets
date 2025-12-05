@@ -10,9 +10,19 @@ import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 接口配置项
 var prefix = '/api/infra/data/assets/dashboard/' ;
+
 var managerUrl = {
     topCatalog : prefix +"topCatalog" ,
     getApiKey: prefix +"getApiKey" ,
+    getAssetStatus: prefix +"getAssetStatus" ,
+}
+
+// 查询资产状态
+export function getAssetStatus() {
+    return request({
+        url: managerUrl.getAssetStatus,
+        method: 'get'
+    })
 }
 
 // 获取apikey
