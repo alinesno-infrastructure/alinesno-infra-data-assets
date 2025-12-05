@@ -20,7 +20,7 @@ import saasLogo from '@/assets/logo/logo.png'  // 先导入图片
 
 const saasTitle = ref('AIP智能设施')
 const enableLogo = ref(true)
-const saasUrl = ref('http://alinesno-infra-plat-console-admin.beta.plat.infra.linesno.com')
+const saasUrl = ref('https://alinesno-infra-plat-console-ui.linesno.com')
 const saasLogoUrl = ref(saasLogo)  // 使用导入的图片
 const displayUrl = ref('')
 const domainName = ref(null)
