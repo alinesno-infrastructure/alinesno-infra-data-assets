@@ -23,7 +23,7 @@
             </div>
             <div v-if="apps.length == 0">
               <el-empty image-size="100" description="当前还没有进行数据域划分，请配置元数据目录并集成数据域" >
-                <el-button type="primary" text bg icon="Plus">配置数据域</el-button>
+                <el-button type="primary" @click="openMetaConfig()" text bg icon="Plus">配置数据域</el-button>
               </el-empty>
             </div>
           </div>
@@ -60,25 +60,26 @@
 <script setup>
 
 import {
-  topCatalog
+  topCatalog , 
+  getAssetStatus
 } from "@/api/data/asset/dashboard";
 
 import { ref } from 'vue'
 import { ElLoading } from 'element-plus'
 
 const operationAssets = ref([
-  { id: '1', title: '资产总量', count: 3762428145 },
-  { id: '2', title: '资产类型', count: 164 },
-  { id: '3', title: '资产主题', count: 635723 },
-  { id: '4', title: '行业统计', count: 31 },
-  { id: '5', title: '使用统计', count: 78366485 },
+  { id: '1', title: '资产总量', count: 0, key: 'assetCount' }, // 对应 assetCount
+  { id: '2', title: '资产类型', count: 0, key: 'typeCount' }, // 对应 typeCount
+  { id: '3', title: '资产主题', count: 0, key: 'topicCount' }, // 对应 topicCount
+  { id: '5', title: '指标统计', count: 0, key: 'metricCount' }, // 对应 metricCount
+  { id: '4', title: '使用统计', count: 0, key: 'totalUseCount' }, // 对应 totalUseCount（原“调用统计”）
 ])
 
 const apps = ref([]);
+const router = useRouter()
 
 // 获取数据
 function handCatalog(){
-
     const loading = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -91,8 +92,26 @@ function handCatalog(){
     })
 }
 
+const handleGetAssetStatus = () => {
+  getAssetStatus().then(res => {
+    if (res.code === 200 && res.data) {
+      const assetData = res.data;
+      // 循环匹配 key 并更新 count
+      operationAssets.value.forEach(item => {
+        item.count = assetData[item.key] || 0; // 兼容字段不存在时显示0
+      });
+    }
+  })
+}
+
+// 跳转数据域配置
+const openMetaConfig = () => {
+    router.push('/assets/data/datasource/index')
+}
+
 // 获取数据
 handCatalog();
+handleGetAssetStatus() ; 
 
 </script>
 
