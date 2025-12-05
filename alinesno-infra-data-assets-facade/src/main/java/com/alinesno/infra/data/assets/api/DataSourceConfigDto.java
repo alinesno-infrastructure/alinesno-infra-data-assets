@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * 数据源配置数据传输对象
@@ -55,4 +56,53 @@ public class DataSourceConfigDto extends BaseDto {
 
         return entity ;
     }
+
+    /**
+     * 从实体转换为DTO（自动脱敏密码，供前端展示）
+     * @param dataSourceConfigEntity 数据库实体
+     * @return 脱敏后的DTO
+     */
+    public static DataSourceConfigDto fromEntity(DataSourceConfigEntity dataSourceConfigEntity) {
+        // 空值判断
+        if (dataSourceConfigEntity == null) {
+            return null;
+        }
+
+        DataSourceConfigDto dto = new DataSourceConfigDto();
+        // 复制基础字段（ID、创建时间等继承自BaseDto的字段也会被复制）
+        BeanUtils.copyProperties(dataSourceConfigEntity, dto);
+
+        // 单独处理密码脱敏（核心：避免返回明文）
+        dto.setPassword(desensitizePassword(dataSourceConfigEntity.getPassword()));
+
+        // 补充字段（若BeanUtils未覆盖，可手动赋值）
+        dto.setName(dataSourceConfigEntity.getName());
+        dto.setType(dataSourceConfigEntity.getType());
+        dto.setUrl(dataSourceConfigEntity.getUrl());
+        dto.setUsername(dataSourceConfigEntity.getUsername());
+        dto.setConnectionTimeout(dataSourceConfigEntity.getConnectionTimeout());
+        dto.setRemark(dataSourceConfigEntity.getRemark());
+
+        return dto;
+    }
+
+    /**
+     * 密码脱敏工具方法
+     * 规则：
+     * 1. 空密码返回空字符串
+     * 2. 长度≤2：全部替换为*
+     * 3. 长度>2：保留前2位，其余替换为****
+     */
+    private static String desensitizePassword(String rawPassword) {
+        if (!StringUtils.hasText(rawPassword)) {
+            return "";
+        }
+        int length = rawPassword.length();
+        if (length <= 2) {
+            return "*".repeat(length);
+        }
+        // 示例：root → ro**** | 123456 → 12****
+        return rawPassword.substring(0, 2) + "****";
+    }
+
 }
