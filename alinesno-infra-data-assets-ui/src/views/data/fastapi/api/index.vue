@@ -91,13 +91,16 @@
                   </template>
                </el-table-column>
 
-               <el-table-column label="内容类型" align="center" width="250" key="contentType" prop="contentType" v-if="columns[5].visible">
+               <el-table-column label="内容类型" align="center" width="250" key="executeType" prop="contentType" v-if="columns[5].visible">
                   <template #default="scope">
                      <el-button v-if="scope.row.executeType == 'groovy'" type="primary" text bg>
                         GROOVY
                      </el-button>
                      <el-button v-if="scope.row.executeType == 'sql'" type="warning" text bg>
                         SQL
+                     </el-button>
+                     <el-button v-if="!scope.row.executeType" type="success" text bg>
+                        未配置 
                      </el-button>
                   </template>
                </el-table-column>
