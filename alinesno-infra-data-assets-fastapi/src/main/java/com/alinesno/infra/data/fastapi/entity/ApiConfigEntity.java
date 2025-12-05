@@ -43,14 +43,6 @@ public class ApiConfigEntity extends InfraBaseEntity {
     @ColumnComment("路径")
     private String path;
 
-//    /**
-//     * 参数
-//     */
-//    @TableField("params")
-//    @ColumnType(value = MySqlTypeConstant.TEXT)
-//    @ColumnComment("参数")
-//    private String params;
-
     /**
      * 访问权限
      */
