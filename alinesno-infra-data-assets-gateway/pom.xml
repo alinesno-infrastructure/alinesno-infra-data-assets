@@ -28,6 +28,12 @@
 			<version>${alinesno.infra.common.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>com.alinesno.infra.data</groupId>
+            <artifactId>alinesno-infra-data-assets-fastapi</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
 		<!-- 扩展引入_start -->
 		<dependency>
 			<groupId>com.alinesno.infra.common</groupId>
@@ -39,7 +45,14 @@
 			<artifactId>alinesno-infra-common-extend-datascope</artifactId>
 			<version>${alinesno.infra.common.version}</version>
 		</dependency>
-		<!-- 扩展引入_end -->
+        <dependency>
+            <groupId>com.alinesno.infra.data</groupId>
+            <artifactId>alinesno-infra-data-assets-metrics</artifactId>
+            <version>3.1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- 扩展引入_end -->
 
 	</dependencies>
 
