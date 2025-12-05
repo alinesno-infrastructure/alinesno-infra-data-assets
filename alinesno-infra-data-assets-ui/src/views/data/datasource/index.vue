@@ -52,8 +52,10 @@
               <el-tag v-if="scope.row.type === 'clickhouse'" type="warning">ClickHouse</el-tag>
             </template>
           </el-table-column>
+          <!-- 
           <el-table-column label="连接地址" prop="url" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="用户名" prop="username" align="center" v-if="columns[4].visible" width="120" />
+          <el-table-column label="用户名" prop="username" align="center" v-if="columns[4].visible" width="120" /> 
+          -->
           <el-table-column label="状态" align="center" v-if="columns[5].visible" width="100">
             <template #default="scope">
               <el-tag type="success">已配置</el-tag>
@@ -61,7 +63,8 @@
           </el-table-column>
         <el-table-column label="最后同步时间" align="center" prop="lastSyncTime" v-if="columns[6].visible" width="220">
             <template #default="scope">
-                <span>{{ parseTime(scope.row.lastSyncTime) }}</span>
+                <span v-if="!scope.row.lastSyncTime"> 未同步 </span>
+                <span v-else>{{ parseTime(scope.row.lastSyncTime) }}</span>
             </template>
         </el-table-column>
           <el-table-column label="操作" align="center" width="280" v-if="columns[7].visible">
@@ -90,11 +93,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="JDBC连接地址" prop="url">
-          <div style="display: flex">
+          <div style="display: flex;width:100%;">
             <el-input v-model="form.url" placeholder="如：jdbc:mysql://localhost:3306/dbname" style="flex: 1" max-length="255" />
             <el-button type="primary" @click="handleTestConnection" :loading="testing" style="margin-left: 10px">测试连接</el-button>
           </div>
-          <div class="form-tip" style="margin-top: 5px">
+          <div class="form-tip">
             <el-tag v-if="testResult === 'success'" type="success">连接成功</el-tag>
             <el-tag v-if="testResult === 'error'" type="danger">{{ testMsg }}</el-tag>
             <span v-else style="color: #999">未测试连接</span>
@@ -104,7 +107,7 @@
           <el-input v-model="form.username" placeholder="数据库登录用户名" />
         </el-form-item>
         <el-form-item label="数据库密码" prop="password">
-          <el-input v-model="form.password" placeholder="数据库登录密码" type="password" show-password />
+          <el-input v-model="form.password" placeholder="数据库登录密码" type="password" />
         </el-form-item>
         <el-form-item label="连接超时（毫秒）" prop="connectionTimeout">
           <el-input-number v-model="form.connectionTimeout" :min="1000" :step="1000" :max="60000" />
@@ -114,8 +117,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="cancel">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">保存</el-button>
+        <el-button @click="cancel" size="large">取消</el-button>
+        <el-button type="primary" :loading="submitting" size="large" @click="handleSubmit">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -344,8 +347,11 @@ const resetQuery = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .form-tip {
   font-size: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 </style>
