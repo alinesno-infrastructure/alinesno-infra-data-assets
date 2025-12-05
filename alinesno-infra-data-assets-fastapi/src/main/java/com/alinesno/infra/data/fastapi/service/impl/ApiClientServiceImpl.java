@@ -5,7 +5,6 @@ import com.alinesno.infra.common.core.utils.StringUtils;
 import com.alinesno.infra.data.fastapi.entity.ApiClientEntity;
 import com.alinesno.infra.data.fastapi.mapper.ApiClientMapper;
 import com.alinesno.infra.data.fastapi.service.IApiClientService;
-import com.alinesno.infra.data.fastapi.utils.TokenUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,8 +43,12 @@ public class ApiClientServiceImpl extends IBaseServiceImpl<ApiClientEntity, ApiC
             throw new IllegalArgumentException("客户端令牌已过期");
         }
 
+        // 设置调用次数
+        client.setUseCount(client.getUseCount() + 1);
+        updateById(client);
+
         // 从 token 中提取 orgId（若不可解析则返回 null）
-        Long orgId = TokenUtils.extractOrgIdFromToken(token);
+        Long orgId = client.getOrgId() ; // TokenUtils.extractOrgIdFromToken(token);
         log.info("客户端令牌验证通过，客户端：{}，机构ID：{}", client.getClientName(), orgId);
 
         return client;
