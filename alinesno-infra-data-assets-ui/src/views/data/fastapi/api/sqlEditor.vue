@@ -5,7 +5,7 @@
     <div class="form-container">
       <el-row>
         <el-col :span="9">
-          <ParamConfigPanel v-model="currentApi" />
+          <ParamConfigPanel ref="paramRef" />
         </el-col>
 
         <el-col :span="10"
@@ -65,6 +65,7 @@ import hljs from 'highlight.js';
 
 import ScriptEditorPanel from './ScriptEditor.vue';
 import ParamConfigPanel from './ParamConfig.vue';
+
 import {
   getApi,
   validateApiScript,
@@ -102,6 +103,7 @@ mdi.use(mdKatex, { blockClass: 'katexmath-block rounded-md p-[10px]', errorColor
 
 const scriptType = ref("groovy"); // 与 currentApi.scriptType 同步
 const genContent = ref(null);
+const paramRef = ref(null)
 
 /** 读取html文本 */
 function readerHtml(chatText) {
@@ -201,10 +203,13 @@ const submitForm = () => {
 
 // 保存所有配置（新增或更新由后端判断）
 const saveConfig = () => {
-  if (!currentApi.value.name || !currentApi.value.name.trim()) {
-    proxy.$modal.msgError("接口名称不能为空！");
-    return;
+  // 先从子组件读取最新表单数据
+  let childCfg = {}
+  if (paramRef.value && typeof paramRef.value.getConfig === 'function') {
+    childCfg = paramRef.value.getConfig() || {}
   }
+
+  // 取编辑器脚本 
   const code = getCode();
   if (!code || !code.trim()) {
     proxy.$modal.msgError("脚本不能为空！");
@@ -214,13 +219,16 @@ const saveConfig = () => {
   loading.value = true;
 
   const payload = {
-    ...currentApi.value,
+    ...childCfg ,
     id: currentApiId.value,
     // 设置脚本字段按照 scriptType 写入，后端会做校验
-    scriptType: currentApi.value.scriptType || scriptType.value || 'groovy',
+    scriptType: childCfg.scriptType || 'groovy',
     groovyScript: getCode(),
-    params: currentApi.value.params // 数组，后端会序列化
+    params: Array.isArray(childCfg.params) ? childCfg.params : []
   };
+
+  console.log('childCfg:' + JSON.stringify(childCfg));
+  console.log('payload:' + JSON.stringify(payload));
 
   // 使用 saveApiConfig（后端会根据 id 判断新增/更新）
   saveApiConfig(payload).then(() => {
@@ -262,12 +270,14 @@ function getApiInfo() {
     currentApi.value.enabled = (data.enabled == null ? true : data.enabled);
     currentApi.value.path = data.path || '';
     currentApi.value.datasourceId = data.datasourceId|| '';
-    // 尝试解析 jsonParam 或 params，如果是 JSON 字符串
+    
+    // 解析 params（后端可能是字符串或数组）
+    let paramsParsed = []
     try {
-      const params = data.jsonParam || data.params;
-      currentApi.value.params = typeof params === 'string' ? JSON.parse(params || '[]') : (params || []);
+      const params = data.jsonParam || data.params
+      paramsParsed = typeof params === 'string' ? JSON.parse(params || '[]') : (params || [])
     } catch (e) {
-      currentApi.value.params = data.params || [];
+      paramsParsed = data.params || []
     }
 
     // 更新编辑器脚本：优先 groovyScript，再 runSql
@@ -277,15 +287,34 @@ function getApiInfo() {
     }
     // 同步 scriptType ref
     scriptType.value = currentApi.value.scriptType || 'groovy';
+
+    // 重要：通过 ref 一次性传给子组件（避免在其他地方频繁 setConfig）
+    if (paramRef.value && typeof paramRef.value.setConfig === 'function') {
+      // 传入结构按子组件期望：包含字段 id,name,description,scriptType,enabled,params,path,datasourceId
+      paramRef.value.setConfig({
+        id: currentApi.value.id,
+        name: currentApi.value.name,
+        description: currentApi.value.description,
+        scriptType: currentApi.value.scriptType,
+        enabled: currentApi.value.enabled,
+        path: currentApi.value.path,
+        datasourceId: currentApi.value.datasourceId,
+        params: paramsParsed
+      })
+    }
+
   }).catch(err => {
     proxy.$modal.msgError(err?.message || "获取 API 信息失败");
   });
 }
 
 onMounted(() => {
-  currentApiId.value = router.currentRoute.value.query.apiId;
-  getApiInfo();
 })
+
+nextTick(() => {
+    currentApiId.value = router.currentRoute.value.query.apiId;
+    getApiInfo();
+});
 
 defineExpose({
   setCurrentApiId
