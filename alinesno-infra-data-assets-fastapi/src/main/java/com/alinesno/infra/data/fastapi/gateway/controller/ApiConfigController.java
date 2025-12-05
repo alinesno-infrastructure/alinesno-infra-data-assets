@@ -142,10 +142,19 @@ public class ApiConfigController extends BaseController<ApiConfigEntity, IApiCon
      */
     @DataPermissionSave
     @PostMapping("/saveApiConfig")
-    public AjaxResult saveApiConfig(Model model, @Valid @RequestBody ApiConfigSaveDto dto) {
+    public AjaxResult saveApiConfig(@Valid @RequestBody ApiConfigSaveDto dto) {
 
-        ApiConfigEntity entity = ApiConfigSaveDto.toEntity(dto) ;
-        service.saveOrUpdate(entity);
+        ApiConfigEntity entity ;
+
+        if(dto.getId() != null){
+            Long id = dto.getId() ;
+            entity = service.getById(id) ;
+            ApiConfigSaveDto.mergeEntity(entity, dto);
+            service.updateById(entity);
+        }else{
+            entity = ApiConfigSaveDto.toEntity(dto) ;
+            service.save(entity);
+        }
 
         return AjaxResult.success("操作成功." , entity.getId()) ;
     }
