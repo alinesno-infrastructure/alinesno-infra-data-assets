@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Scope(SpringInstanceScope.PROTOTYPE)
-@RequestMapping("/api/infra/data/assets/metricsType")
+@RequestMapping("/api/infra/data/assets/metricType")
 public class DataMetricTypeController extends BaseController<DataMetricTypeEntity, IDataMetricTypeService> {
 
     @Autowired
