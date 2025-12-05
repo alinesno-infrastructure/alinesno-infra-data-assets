@@ -1,5 +1,7 @@
 package com.alinesno.infra.data.fastapi.api;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSONObject;
 import com.alinesno.infra.common.facade.base.BaseDto;
 import com.alinesno.infra.data.fastapi.entity.ApiConfigEntity;
@@ -81,7 +83,12 @@ public class ApiConfigSaveDto extends BaseDto {
      */
     public static ApiConfigEntity toEntity(ApiConfigSaveDto dto) {
         ApiConfigEntity entity = new ApiConfigEntity();
-        BeanUtils.copyProperties(dto, entity);
+
+        // 核心配置：忽略源对象（DTO）中的 NULL 字段
+        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue();
+
+        // 执行复制：DTO 中空字段（NULL）不会覆盖 Entity 原有值
+        BeanUtil.copyProperties(dto, entity, copyOptions);
 
         entity.setName(dto.getName());
         entity.setNote(dto.getDescription());
@@ -93,6 +100,25 @@ public class ApiConfigSaveDto extends BaseDto {
         entity.setEnabled(dto.isEnabled());
 
         return entity;
+    }
+
+    /**
+     * 合并实体对象
+     *
+     * @param entity
+     * @param dto
+     */
+    public static void mergeEntity(ApiConfigEntity entity, ApiConfigSaveDto dto) {
+
+        entity.setName(dto.getName());
+        entity.setNote(dto.getDescription());
+        entity.setGroovyScript(dto.getGroovyScript());
+        entity.setExecuteType(dto.getScriptType());
+        entity.setDatasourceId(dto.getDatasourceId());
+        entity.setPath(dto.getPath());
+        entity.setJsonParam(JSONObject.toJSONString(dto.getParams()));
+        entity.setEnabled(dto.isEnabled());
+
     }
 
     /**
